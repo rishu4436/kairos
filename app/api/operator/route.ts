@@ -1,7 +1,8 @@
 import { assertOperatorMutation } from "@/operator/guard";
-import { applyRiskPosture, applyRuntimeAction, patchOperatorConfig, requestOneCycle, type OperatorAction } from "@/operator/actions";
+import { applyRiskPosture, applyRuntimeAction, patchOperatorConfig, requestOneCycle, saveMandate, type OperatorAction } from "@/operator/actions";
 import { POSTURES, type RiskPosture } from "@/operator/posture";
 import { admitOperatorAction, controlFace } from "@/operator/mandate";
+import { cycleInFlight } from "@/operator/cycle-lock";
 import { autonomousStore } from "@/runtime/store";
 import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import { readOperatorConfig } from "@/operator/store";
@@ -25,7 +26,7 @@ export async function POST(request: Request): Promise<Response> {
   const body = (await request.json().catch(() => null)) as { action?: OperatorAction; patch?: Record<string, unknown> } | null;
   const action = body?.action;
   if (action === "RUN" || action === "STOP" || action === "ONE_CYCLE") {
-    const face = controlFace(autonomousStore().readControl(LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID), false);
+    const face = controlFace(autonomousStore().readControl(LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID), cycleInFlight(autonomousStore()));
     const allowed = admitOperatorAction(action, face, true);
     if (!allowed.ok) {
       return Response.json(allowed, { status: 409 });
@@ -38,6 +39,15 @@ export async function POST(request: Request): Promise<Response> {
   if (action === "RUN" || action === "PAUSE" || action === "STOP" || action === "EXECUTION_DISABLE") {
     const result = applyRuntimeAction(action);
     return Response.json(result, { status: result.ok ? 200 : 409 });
+  }
+  if (action === "SET_MANDATE") {
+    const mode = (body as { mode?: string; profile?: string } | null)?.mode;
+    const profile = (body as { profile?: "LOW" | "MEDIUM" | "HIGH" } | null)?.profile;
+    if (mode !== "AUTO" && mode !== "MANUAL") {
+      return Response.json({ ok: false, reason: "UNKNOWN_MANDATE" }, { status: 400 });
+    }
+    const result = saveMandate({ mode, profile: profile ?? "MEDIUM" });
+    return Response.json(result, { status: result.ok ? 200 : 400 });
   }
   if (action === "POSTURE") {
     const posture = (body as { posture?: string } | null)?.posture;

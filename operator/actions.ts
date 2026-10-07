@@ -6,7 +6,10 @@ import { runKairosAutonomousCycle, type AutonomousCycleOutcome } from "@/runtime
 import { LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID } from "@/domain/watchlist";
 import { observeLiveMarket } from "@/observation/live";
 import { readDataMode } from "@/lib/mode";
-import { posturePreset, type RiskPosture } from "@/operator/posture";
+import type { RiskPosture } from "@/operator/posture";
+import { applyAutoProfile } from "@/operator/store";
+import { operatorExecutionMode } from "@/operator/runtime-mode";
+import { beginOperatorCycle, endOperatorCycle } from "@/operator/cycle-lock";
 
 export type OperatorAction =
   | "RUN"
@@ -15,7 +18,8 @@ export type OperatorAction =
   | "ONE_CYCLE"
   | "EXECUTION_DISABLE"
   | "CONFIG_PATCH"
-  | "POSTURE";
+  | "POSTURE"
+  | "SET_MANDATE";
 
 export function operatorAuditType(action: OperatorAction): string {
   if (action === "RUN") return "AGENT_STARTED";
@@ -102,13 +106,53 @@ export function patchOperatorConfig(
   return { ok: true, config: next.config };
 }
 
+export function saveMandate(
+  input: { mode: "AUTO" | "MANUAL"; profile: "LOW" | "MEDIUM" | "HIGH" },
+  store: KairosStateStore = autonomousStore(),
+  nowIso = new Date().toISOString(),
+): { ok: true; config: OperatorConfig } | { ok: false; reason: string } {
+  const current = readOperatorConfig(store);
+  const next = input.mode === "AUTO"
+    ? applyAutoProfile(current, input.profile, nowIso)
+    : {
+        ...current,
+        updatedAt: nowIso,
+        version: current.version + 1,
+        previousVersion: current.version,
+        mandate: {
+          operatorMode: "MANUAL" as const,
+          autoProfile: null,
+          autoProfileVersion: null,
+          selectedManualStrategies: ["momentum", "mean-reversion", "weekend", "dca"],
+          selectedManualAssets: current.watchlist.entries.map((entry) => entry.ticker),
+        },
+        runtime: { ...current.runtime, executionMode: "LIVE_PREVIEW" as const },
+        risk: { ...current.risk, liveTradingEnabled: false, paperTradingEnabled: false },
+      };
+  const wrote = writeOperatorConfig(next, store);
+  if (!wrote.ok) {
+    return wrote;
+  }
+  store.appendAudit({
+    id: `MANDATE:${input.mode}:${next.version}`,
+    at: nowIso,
+    userId: LOCAL_RUNTIME_USER_ID,
+    agentId: DEFAULT_AGENT_ID,
+    cycleId: null,
+    type: input.mode === "AUTO" ? "AUTO_PROFILE_SELECTED" : "MANUAL_MANDATE_UPDATED",
+    message: input.mode === "AUTO" ? `AUTO ${input.profile}` : "MANUAL",
+  });
+  return { ok: true, config: next };
+}
+
 export function applyRiskPosture(
   posture: RiskPosture,
   store: KairosStateStore = autonomousStore(),
   nowIso = new Date().toISOString(),
 ): { ok: true; config: OperatorConfig } | { ok: false; reason: string } {
   const current = readOperatorConfig(store);
-  const next = posturePreset(posture, current);
+  const profile = posture === "CONSERVATIVE" ? "LOW" : posture === "HIGH" ? "HIGH" : "MEDIUM";
+  const next = applyAutoProfile(current, profile, nowIso);
   next.version = current.version + 1;
   next.previousVersion = current.version;
   next.updatedAt = nowIso;
@@ -133,8 +177,10 @@ export async function requestOneCycle(
   nowMs = Date.now(),
 ): Promise<AutonomousCycleOutcome> {
   const nowIso = new Date(nowMs).toISOString();
+  if (!beginOperatorCycle(store, `operator-one:${nowMs}`)) {
+    throw new Error("CYCLE_IN_FLIGHT");
+  }
   writeOperatorCommand({ kind: "ONE_SHOT", requestedAt: nowIso }, store);
-  writeControl("RUNNING", store, nowIso);
   store.appendAudit({
     id: `ONE_CYCLE:${nowIso}`,
     at: nowIso,
@@ -145,11 +191,13 @@ export async function requestOneCycle(
     message: "ONE_CYCLE",
   });
   const live = readDataMode() === "live";
-  const outcome = await runKairosAutonomousCycle({
+  let outcome: AutonomousCycleOutcome;
+  try {
+    outcome = await runKairosAutonomousCycle({
     userId: LOCAL_RUNTIME_USER_ID,
     agentId: DEFAULT_AGENT_ID,
     runtimeMode: "LOCAL",
-    executionMode: readOperatorConfig(store).runtime.executionMode,
+    executionMode: operatorExecutionMode(readOperatorConfig(store)),
     cycleTrigger: "MANUAL",
     startedAtMs: nowMs,
     ownerId: `operator-one:${nowMs}`,
@@ -158,8 +206,11 @@ export async function requestOneCycle(
     observeMarket: live ? observeLiveMarket : undefined,
     store,
     control: "RUNNING",
-  });
-  writeControl("PAUSED", store, new Date().toISOString());
+    });
+  } finally {
+    endOperatorCycle(store);
+  }
+  writeControl("STOPPED", store, new Date().toISOString());
   writeOperatorCommand({ kind: "IDLE", requestedAt: new Date().toISOString() }, store);
   return outcome;
 }

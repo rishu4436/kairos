@@ -31,8 +31,8 @@ export default function OperatorStrategiesPage() {
           weekendBand: (w.minDeviationBps / 100).toFixed(2),
           dcaOn: d.enabled,
           dcaDip: (d.dipThresholdBps / 100).toFixed(2),
-          dcaSize: d.baseOrderNotional,
-          dcaBudget: d.maxBudgetNotional,
+          dcaSize: (config.capital.dcaOrderBpsOfDeployable / 100).toFixed(2),
+          dcaBudget: (config.capital.dcaMaxBudgetBpsOfDeployable / 100).toFixed(2),
         }}
       />
     </>

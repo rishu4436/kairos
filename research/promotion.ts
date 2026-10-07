@@ -77,19 +77,7 @@ export interface PromotedStrategy {
   origin: "RESEARCH-DERIVED";
 }
 
-export function promoteThesis(input: { thesisId: string; title: string; metrics: ExperimentMetrics }): PromotedStrategy | PromotionDecision {
-  const decision = assessPromotion(input.metrics);
-  if (decision.status !== "PROMOTION_ELIGIBLE") {
-    return decision;
-  }
-  const slug = input.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
-  return {
-    id: `research:${input.thesisId}:${slug || "strategy"}:v1`,
-    displayName: input.title,
-    thesisId: input.thesisId,
-    version: "v1",
-    enabled: false,
-    status: "PROMOTED",
-    origin: "RESEARCH-DERIVED",
-  };
+/** Eligibility only. This does not register a strategy or grant execution authority. */
+export function promoteThesis(input: { thesisId: string; title: string; metrics: ExperimentMetrics }): PromotionDecision & { persisted: false } {
+  return { ...assessPromotion(input.metrics), persisted: false };
 }

@@ -33,19 +33,23 @@ export function enrichBoard(
   },
 ): ObservationBoard {
   const operator = input.operator ?? defaultOperatorConfig();
-  const strategies = input.strategies ?? createStrategyRegistry().list().filter((item) => {
+  const allowedAssets = mandateAssets(operator);
+  const strategies = (input.strategies ?? createStrategyRegistry().list()).filter((item) => {
     const id = item.metadata.id;
     if (id === "momentum") return operator.strategies.momentum.enabled;
     if (id === "mean-reversion") return operator.strategies["mean-reversion"].enabled;
     if (id === "weekend") return operator.strategies.weekend.enabled;
     if (id === "dca") return operator.strategies.dca.enabled;
+    if (operator.mandate?.operatorMode === "MANUAL" && !operator.mandate.selectedManualStrategies.includes(id)) {
+      return false;
+    }
     return true;
   });
   const events = [...board.events];
   const recent: SignalView[] = [];
   const watchlist = [...new Set(board.rows.map((row) => row.ticker))];
   const cycleId = `cycle:${board.userId}:${new Date(input.asOfMs).toISOString()}`;
-  const rows = board.rows.map((row) => {
+  const rows = board.rows.filter((row) => allowedAssets === null || allowedAssets.has(row.ticker)).map((row) => {
     const candles = input.candles.get(row.representationId) ?? [];
     const analysis = analyzeRow(row, candles, input.asOfMs, strategies, board.userId, watchlist, cycleId, operator);
     events.push(...analysis.events);
@@ -62,6 +66,16 @@ export function enrichBoard(
     events: events.slice(-200),
     recentEvaluations: recent.slice(-40),
   };
+}
+
+function mandateAssets(operator: OperatorConfig): Set<string> | null {
+  if (operator.mandate?.operatorMode === "MANUAL") {
+    return new Set(operator.mandate.selectedManualAssets);
+  }
+  if (operator.mandate?.operatorMode === "AUTO") {
+    return new Set(operator.watchlist?.entries.map((entry) => entry.ticker) ?? []);
+  }
+  return null;
 }
 
 function analyzeRow(

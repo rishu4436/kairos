@@ -12,6 +12,7 @@ import type { LivePreparationAdapters } from "@/runtime/cycle";
 import { autonomousStore } from "@/runtime/store";
 import { readOperatorCommand, writeControl, writeOperatorCommand } from "@/operator/commands";
 import { readOperatorConfig } from "@/operator/store";
+import { operatorExecutionMode } from "@/operator/runtime-mode";
 
 const DEFAULT_INTERVAL_MS = 60_000;
 
@@ -112,7 +113,7 @@ export class LocalKairosRunner {
       this.options.onCycle?.(outcome);
       const store = this.options.store ?? autonomousStore();
       if (readOperatorCommand(store).kind === "ONE_SHOT") {
-        writeControl("PAUSED", store, new Date(nowMs).toISOString());
+        writeControl("STOPPED", store, new Date(nowMs).toISOString());
         writeOperatorCommand({ kind: "IDLE", requestedAt: new Date(nowMs).toISOString() }, store);
       }
       return outcome;
@@ -129,7 +130,8 @@ export class LocalKairosRunner {
 
   async runOnce(nowMs = this.now()): Promise<AutonomousCycleOutcome> {
     const operator = readOperatorConfig(this.options.store ?? autonomousStore());
-    const executionMode = resolveRunnerExecutionMode(this.options.executionMode ?? operator.runtime.executionMode, this.options.env);
+    const requested = this.options.executionMode ?? (readDataMode(this.options.env) === "paper" ? "PAPER" : operatorExecutionMode(operator));
+    const executionMode = resolveRunnerExecutionMode(requested, this.options.env);
     const livePreparation =
       typeof this.options.livePreparation === "function"
         ? this.options.livePreparation(nowMs)

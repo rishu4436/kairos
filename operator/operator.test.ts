@@ -25,7 +25,8 @@ describe("operator control plane", () => {
 
   it("increments config version on a valid patch", () => {
     const store = new InMemoryKairosStateStore();
-    const first = patchOperatorConfig({ capital: { maxPerTradeNotional: "250", maxCapitalNotional: "10000", reserveCapitalNotional: "0", strategyMaxTradeNotional: {} } }, store);
+    const base = defaultOperatorConfig();
+    const first = patchOperatorConfig({ capital: { ...base.capital, maxPerTradeNotional: "250" } }, store);
     expect(first.ok).toBe(true);
     if (first.ok) {
       expect(first.config.version).toBe(2);

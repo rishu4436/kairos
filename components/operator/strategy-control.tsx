@@ -71,9 +71,18 @@ export function StrategyControl({
             enabled: data.get("dcaOn") === "on",
             mode: "DIP_BASED",
             dipThresholdBps: Math.round(dip * 100),
-            baseOrderNotional: String(data.get("dcaSize") ?? "5"),
-            maxBudgetNotional: String(data.get("dcaBudget") ?? "50"),
           },
+        },
+        capital: {
+          dcaOrderBpsOfDeployable: Math.round(Number(data.get("dcaSize")) * 100),
+          dcaMaxBudgetBpsOfDeployable: Math.round(Number(data.get("dcaBudget")) * 100),
+        },
+        mandate: {
+          operatorMode: "MANUAL",
+          autoProfile: null,
+          autoProfileVersion: null,
+          selectedManualStrategies: ["momentum", "mean-reversion", "weekend", "dca"],
+          selectedManualAssets: [],
         },
       },
     });
@@ -144,8 +153,8 @@ export function StrategyControl({
             </label>
             <div className="mt-2 grid gap-3 sm:grid-cols-3">
               <Field name="dcaDip" label="Buy after each dip" unit="%" defaultValue={manual.dcaDip} />
-              <Field name="dcaSize" label="Each buy" unit="USDT" defaultValue={manual.dcaSize} />
-              <Field name="dcaBudget" label="Total budget" unit="USDT" defaultValue={manual.dcaBudget} />
+              <Field name="dcaSize" label="Each buy" unit="% of deployable" defaultValue={manual.dcaSize} />
+              <Field name="dcaBudget" label="DCA budget" unit="% of deployable" defaultValue={manual.dcaBudget} />
             </div>
           </fieldset>
           <button type="submit" className="rounded-md border border-line px-3 py-2 text-sm">

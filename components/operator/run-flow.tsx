@@ -45,12 +45,14 @@ export function RunFlow({ buttons }: { buttons: ButtonAvailability }) {
           <h2 className="text-base font-medium">How should KAIROS operate?</h2>
           <p className="mt-1 text-sm text-muted">AUTO chooses inside your risk mandate. MANUAL uses the assets and settings you pick. Neither one is a paper trading mode.</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <a className="pill pill-signal" href="/operator/strategies">
-              AUTO
-            </a>
-            <a className="pill" href="/operator/strategies">
+            {(["LOW", "MEDIUM", "HIGH"] as const).map((profile) => (
+              <button key={profile} type="button" className="pill" onClick={() => void post({ action: "SET_MANDATE", mode: "AUTO", profile }).then((result) => setMessage(result.ok ? `AUTO ${profile} saved` : result.reason ?? "rejected"))}>
+                AUTO {profile}
+              </button>
+            ))}
+            <button type="button" className="pill" onClick={() => void post({ action: "SET_MANDATE", mode: "MANUAL" }).then((result) => setMessage(result.ok ? "MANUAL saved" : result.reason ?? "rejected"))}>
               MANUAL
-            </a>
+            </button>
           </div>
         </div>
       ) : null}

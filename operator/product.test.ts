@@ -101,8 +101,8 @@ describe("operator control center", () => {
       title: "TSLA Dip Recovery",
       metrics: { trades: 24, winRate: 0.58, expectancy: 0.4, maxDrawdownBps: 800, sampleSufficient: true, validationViolations: 0 },
     });
-    expect("enabled" in promoted && promoted.enabled).toBe(false);
-    expect("origin" in promoted && promoted.origin).toBe("RESEARCH-DERIVED");
+    expect(promoted.status).toBe("PROMOTION_ELIGIBLE");
+    expect(promoted.persisted).toBe(false);
   });
 
   it("keeps paper off the normal operator dashboard", () => {

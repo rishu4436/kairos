@@ -76,6 +76,20 @@ export interface OperatorConfig {
     maxPerTradeNotional: string;
     reserveCapitalNotional: string;
     strategyMaxTradeNotional: Partial<Record<ImplementedStrategyId, string>>;
+    /** Share of eligible stablecoin balance. */
+    deployableCapitalBps: number;
+    /** Share of deployable capital for one trade. */
+    perTradeBpsOfDeployable: number;
+    /** Share of deployable capital for one strategy. */
+    strategyBudgetBpsOfDeployable: number;
+    /** Share of deployable capital for one position. */
+    maxPositionBpsOfDeployable: number;
+    /** Share of deployable capital for one DCA order. */
+    dcaOrderBpsOfDeployable: number;
+    /** Share of deployable capital for the DCA book. */
+    dcaMaxBudgetBpsOfDeployable: number;
+    /** Share of deployable capital allowed as daily loss. */
+    dailyLossBpsOfDeployable: number;
   };
   risk: {
     maxPositionNotional: string;
@@ -98,6 +112,24 @@ export interface OperatorConfig {
     paperThesisGenerationEnabled: boolean;
   };
   executionAdmissionDisabled: boolean;
+  mandate: {
+    operatorMode: "UNCONFIGURED" | "AUTO" | "MANUAL";
+    autoProfile: "LOW" | "MEDIUM" | "HIGH" | null;
+    autoProfileVersion: string | null;
+    selectedManualStrategies: string[];
+    selectedManualAssets: string[];
+  };
+  watchlist: {
+    version: number;
+    entries: {
+      ticker: string;
+      representationId: string;
+      chainId: string;
+      contractAddress: string | null;
+      source: "USER" | "AUTO";
+      pinned: boolean;
+    }[];
+  };
 }
 
 export type ConfigUpdateError = { ok: false; reason: string };
@@ -115,13 +147,20 @@ export function defaultOperatorConfig(nowIso = new Date().toISOString()): Operat
     runtime: {
       enabled: true,
       cycleIntervalMs: 60_000,
-      executionMode: "PAPER",
+      executionMode: "LIVE_PREVIEW",
     },
     capital: {
       maxCapitalNotional: "10000",
       maxPerTradeNotional: "500",
       reserveCapitalNotional: "0",
       strategyMaxTradeNotional: {},
+      deployableCapitalBps: 5000,
+      perTradeBpsOfDeployable: 1000,
+      strategyBudgetBpsOfDeployable: 3000,
+      maxPositionBpsOfDeployable: 3000,
+      dcaOrderBpsOfDeployable: 500,
+      dcaMaxBudgetBpsOfDeployable: 2500,
+      dailyLossBpsOfDeployable: 800,
     },
     risk: {
       maxPositionNotional: "5000",
@@ -131,7 +170,7 @@ export function defaultOperatorConfig(nowIso = new Date().toISOString()): Operat
       allowedAssets: [...CONFIGURED_WATCHLIST_TICKERS],
       allowedChainIds: [PRODUCTION_CHAIN_ID],
       liveTradingEnabled: false,
-      paperTradingEnabled: true,
+      paperTradingEnabled: false,
     },
     strategies: {
       momentum: {
@@ -174,6 +213,14 @@ export function defaultOperatorConfig(nowIso = new Date().toISOString()): Operat
       paperThesisGenerationEnabled: true,
     },
     executionAdmissionDisabled: false,
+    mandate: {
+      operatorMode: "UNCONFIGURED",
+      autoProfile: null,
+      autoProfileVersion: null,
+      selectedManualStrategies: [],
+      selectedManualAssets: [],
+    },
+    watchlist: { version: 1, entries: [] },
   };
 }
 
@@ -190,7 +237,15 @@ export function validateOperatorConfig(input: unknown): ConfigUpdateOk | ConfigU
     assertInt(value.identity?.agentId === DEFAULT_AGENT_ID, "identity");
     const interval = value.runtime?.cycleIntervalMs;
     assertInt(Number.isInteger(interval) && interval >= MIN_CYCLE_INTERVAL_MS && interval <= MAX_CYCLE_INTERVAL_MS, "cycle interval");
-    assertInt(value.runtime.executionMode === "PAPER" || value.runtime.executionMode === "LIVE_PREVIEW" || value.runtime.executionMode === "LIVE", "execution mode");
+    assertInt(value.runtime.executionMode === "LIVE_PREVIEW" || value.runtime.executionMode === "LIVE", "execution mode");
+    bps(value.capital.deployableCapitalBps, 1, 10_000);
+    bps(value.capital.perTradeBpsOfDeployable, 1, 10_000);
+    bps(value.capital.strategyBudgetBpsOfDeployable, 1, 10_000);
+    bps(value.capital.maxPositionBpsOfDeployable, 1, 10_000);
+    bps(value.capital.dcaOrderBpsOfDeployable, 1, 10_000);
+    bps(value.capital.dcaMaxBudgetBpsOfDeployable, 1, 10_000);
+    bps(value.capital.dailyLossBpsOfDeployable, 0, 10_000);
+    assertInt(value.mandate?.operatorMode === "UNCONFIGURED" || value.mandate?.operatorMode === "AUTO" || value.mandate?.operatorMode === "MANUAL", "mandate");
     money(value.capital.maxCapitalNotional, true);
     money(value.capital.maxPerTradeNotional, true);
     money(value.capital.reserveCapitalNotional, false);
@@ -237,10 +292,15 @@ export function applyOperatorPatch(
   patch: Partial<OperatorConfig> & Record<string, unknown>,
   nowIso: string,
 ): ConfigUpdateOk | ConfigUpdateError {
+  if (patch.runtime?.executionMode === "PAPER") {
+    return { ok: false, reason: "PAPER_RESEARCH_ONLY" };
+  }
   const next: OperatorConfig = {
     ...current,
     ...("runtime" in patch && patch.runtime ? { runtime: { ...current.runtime, ...patch.runtime } } : {}),
     ...("capital" in patch && patch.capital ? { capital: { ...current.capital, ...patch.capital } } : {}),
+    ...("mandate" in patch && patch.mandate ? { mandate: { ...current.mandate, ...patch.mandate } } : {}),
+    ...("watchlist" in patch && patch.watchlist ? { watchlist: patch.watchlist } : {}),
     ...("risk" in patch && patch.risk ? { risk: { ...current.risk, ...patch.risk } } : {}),
     ...("research" in patch && patch.research ? { research: { ...current.research, ...patch.research } } : {}),
     strategies: {

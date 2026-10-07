@@ -8,6 +8,8 @@ import { paperAccountId } from "@/paper/store";
 import { runKairosAutonomousCycle } from "@/runtime/cycle";
 import { InMemoryKairosStateStore, resetAutonomousStore } from "@/runtime/store";
 import { accountState, ids, policy } from "@/test/fixtures";
+import { defaultOperatorConfig } from "@/operator/config";
+import { applyAutoProfile } from "@/operator/store";
 
 const NOW = Date.parse("2026-10-04T15:00:00.000Z");
 const WALLET = "0x1111111111111111111111111111111111111111";
@@ -35,6 +37,7 @@ describe("canonical live pipeline", () => {
       observeMarket: () => snapshot(),
       riskPolicy: policy({ liveTradingEnabled: true }),
       account: accountState({ accountId: paperAccountId(ids.userId) }),
+      operatorConfig: liveMandate(),
       livePreparation: {
         capability: issueLiveExecutionContext({ userId: ids.userId, agentId: ids.agentId, nowMs: NOW }),
         quote: { quote, build },
@@ -160,6 +163,7 @@ describe("canonical live pipeline", () => {
       observeMarket: () => snapshot(),
       riskPolicy: policy({ liveTradingEnabled: true }),
       account: accountState({ accountId: paperAccountId(ids.userId) }),
+      operatorConfig: liveMandate("LIVE"),
       livePreparation: {
         capability: issueLiveExecutionContext({ userId: ids.userId, agentId: ids.agentId, nowMs: NOW }),
         quote: { quote: vi.fn(async () => validQuote()), build: vi.fn(async () => validBuild()) },
@@ -177,6 +181,17 @@ describe("canonical live pipeline", () => {
     expect(result.walletSubmitted).toBe(false);
   });
 });
+
+function liveMandate(mode: "LIVE" | "LIVE_PREVIEW" = "LIVE_PREVIEW") {
+  const config = applyAutoProfile(defaultOperatorConfig(new Date(NOW).toISOString()), "MEDIUM", new Date(NOW).toISOString());
+  config.runtime.executionMode = mode;
+  config.risk.liveTradingEnabled = mode === "LIVE";
+  config.watchlist = {
+    version: 1,
+    entries: [{ ticker: "NVDA", representationId: "56:nvda", chainId: "56", contractAddress: null, source: "AUTO", pinned: false }],
+  };
+  return config;
+}
 
 async function runLive(
   executionMode: "LIVE" | "LIVE_PREVIEW",
@@ -203,6 +218,7 @@ async function runLive(
     observeMarket: () => snapshot({ candles: extra.candles, confidence: extra.confidence, dataQuality: extra.dataQuality }),
     riskPolicy: extra.riskPolicy ?? policy({ liveTradingEnabled: true }),
     account: accountState({ accountId: paperAccountId(ids.userId) }),
+    operatorConfig: liveMandate(executionMode),
     livePreparation: {
       capability: issueLiveExecutionContext({ userId: ids.userId, agentId: ids.agentId, nowMs: NOW }),
       quote: { quote: extra.quote, build: extra.build },

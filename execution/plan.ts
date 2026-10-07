@@ -16,7 +16,7 @@ import { DEFAULT_ADD_POLICY } from "@/position/policy";
 import type { PositionDecision } from "@/position/types";
 import type { RiskEffect } from "@/risk/validate";
 import type { OperatorConfig } from "@/operator/config";
-import { capTradeNotional } from "@/execution/capital";
+import { bpsOf, sizeByPercentage } from "@/operator/mandate";
 import { dcaEligibleKey, emptyDcaState, readDcaState, writeDcaState } from "@/strategies/dca-state";
 
 export interface IntentPlanInput {
@@ -56,6 +56,7 @@ export type IntentPlan =
       positionDecision: PositionDecision | null;
       heldQuantity: Scaled;
       dedupKey: string;
+      sizing?: { eligible: string; deployable: string; raw: string; effective: string; binding: string };
     };
 
 export const MARKET_DATA_SUSPICIOUS = "MARKET_DATA_SUSPICIOUS";
@@ -106,6 +107,9 @@ function planEntry(
   if (input.operatorConfig?.executionAdmissionDisabled) {
     return skip(row, "EXECUTION_DISABLED");
   }
+  if (input.operatorConfig && !mandateAllows(input.operatorConfig, row.ticker, decision.selectedStrategy)) {
+    return skip(row, "MANDATE_EXCLUDES_ASSET");
+  }
   if (input.safetyMode === "RISK_REDUCTION_ONLY" && action === "BUY") {
     return skip(row, "RISK_REDUCTION_ONLY blocks a new long.");
   }
@@ -134,39 +138,42 @@ function planEntry(
   if (!sized.ok) {
     return skip(row, sized.reason);
   }
+  let sizingRecord: { eligible: string; deployable: string; raw: string; effective: string; binding: string } | undefined;
   if (action === "BUY" && input.operatorConfig) {
-    const reserved = parseDecimal(input.operatorConfig.capital.reserveCapitalNotional);
-    const deployable = input.account.cash - reserved;
-    const capped = capTradeNotional({
-      proposed: sized.notional,
-      config: input.operatorConfig,
-      strategyId: decision.selectedStrategy,
-      remainingDeployable: deployable > 0n ? deployable : 0n,
-      remainingPosition: input.riskPolicy.maxPositionNotional - (held ? mul(held.currentPrice, held.quantity) : 0n),
-      remainingAllocation: summary.equity > 0n ? (summary.equity * BigInt(input.riskPolicy.maxAllocationBps)) / 10_000n - summary.invested : 0n,
-      availableBalance: input.account.cash,
+    const capital = input.operatorConfig.capital;
+    const percent = sizeByPercentage({
+      stablecoinBalance: input.account.cash,
+      reserve: parseDecimal(capital.reserveCapitalNotional),
+      capital,
+      absoluteCap: parseDecimal(capital.maxPerTradeNotional),
     });
-    if (!capped.ok) {
-      return skip(row, capped.reason);
+    if (!percent.ok) {
+      return skip(row, percent.reason);
     }
-    if (capped.notional < sized.notional) {
-      const resized = sizePaperOrder({
-        action,
-        observedPrice: observed,
-        cash: input.account.cash,
-        equity: summary.equity,
-        invested: summary.invested,
-        heldQuantity: held?.quantity ?? 0n,
-        existingMarketValue: held ? mul(held.currentPrice, held.quantity) : 0n,
-        riskPolicy: input.riskPolicy,
-        paperPolicy,
-        maxIncrementalNotional: capped.notional,
-      });
-      if (!resized.ok) {
-        return skip(row, resized.reason);
-      }
-      Object.assign(sized, resized);
+    const target = decision.selectedStrategy === "dca" ? bpsOf(percent.deployable, capital.dcaOrderBpsOfDeployable) : percent.notional;
+    const resized = sizePaperOrder({
+      action,
+      observedPrice: observed,
+      cash: input.account.cash,
+      equity: summary.equity,
+      invested: summary.invested,
+      heldQuantity: held?.quantity ?? 0n,
+      existingMarketValue: held ? mul(held.currentPrice, held.quantity) : 0n,
+      riskPolicy: input.riskPolicy,
+      paperPolicy,
+      maxIncrementalNotional: target,
+    });
+    if (!resized.ok) {
+      return skip(row, resized.reason);
     }
+    Object.assign(sized, resized);
+    sizingRecord = {
+      eligible: formatDecimal(percent.eligible, 2),
+      deployable: formatDecimal(percent.deployable, 2),
+      raw: formatDecimal(percent.raw, 2),
+      effective: formatDecimal(resized.notional, 2),
+      binding: decision.selectedStrategy === "dca" ? "DCA_ORDER_PCT" : percent.binding,
+    };
   }
   const created = createTradeIntent({
     userId: input.userId,
@@ -211,6 +218,7 @@ function planEntry(
     positionDecision: null,
     heldQuantity: held?.quantity ?? 0n,
     dedupKey: `${row.representationId}|${decision.selectedStrategy}|${action}`,
+    sizing: sizingRecord,
   };
 }
 
@@ -310,6 +318,17 @@ function planOpenPosition(
     heldQuantity: held.quantity,
     dedupKey: `${row.representationId}|${strategyId}|${decision.action}`,
   };
+}
+
+function mandateAllows(config: NonNullable<IntentPlanInput["operatorConfig"]>, ticker: string, strategyId: string): boolean {
+  const mode = config.mandate?.operatorMode ?? "UNCONFIGURED";
+  if (mode === "UNCONFIGURED") {
+    return false;
+  }
+  if (mode === "MANUAL") {
+    return config.mandate.selectedManualAssets.includes(ticker) && config.mandate.selectedManualStrategies.includes(strategyId);
+  }
+  return config.watchlist.entries.some((entry) => entry.ticker === ticker);
 }
 
 function admitDcaTranche(input: IntentPlanInput, assetId: string, ticker: string, price: Scaled, notional: Scaled): void {
