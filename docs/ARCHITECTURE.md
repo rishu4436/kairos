@@ -147,7 +147,7 @@ Implemented strategies evaluate an observation context and return an `Analytical
 
 ## Autonomous runtime
 
-`runKairosAutonomousCycle` is the single orchestration entry. Local persistent runner (`npm run kairos:runner`) and Agent Studio adapters invoke it. They do not own strategies, risk, or position logic.
+`runKairosAutonomousCycle` is the single async orchestration entry. Local persistent runner (`npm run kairos:runner`) and Agent Studio adapters invoke it. They do not own strategies, risk, or position logic. `LIVE_PREVIEW` and `LIVE` run the same observe → plan → risk path as paper; they do not exit before observation.
 
 Cycle shape: watchlist → observe → validate market data → build KAIROS context → run built-in strategies → arbitrate → deterministic risk → prepare execution → execution adapter → reconcile → persist/audit.
 

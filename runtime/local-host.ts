@@ -1,4 +1,4 @@
-import { CycleScheduler } from "@/studio/scheduler";
+import { CycleScheduler } from "@/runtime/scheduler";
 import { runKairosAutonomousCycle, type AutonomousCycleOutcome } from "@/runtime/cycle";
 import { runAgentCycle } from "@/paper/run-cycle";
 import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
@@ -71,13 +71,13 @@ export class LocalKairosRunner {
     return this.started && !this.stopping && this.scheduler.due(nowMs);
   }
 
-  tick(nowMs = this.now()): AutonomousCycleOutcome | null {
+  async tick(nowMs = this.now()): Promise<AutonomousCycleOutcome | null> {
     if (!this.started || this.stopping || this.inFlight || !this.scheduler.due(nowMs)) {
       return null;
     }
     this.inFlight = true;
     try {
-      const outcome = this.runOnce(nowMs);
+      const outcome = await this.runOnce(nowMs);
       if (outcome.status === "FAILED") {
         this.scheduler.recordFailure(nowMs);
       } else {
@@ -96,7 +96,7 @@ export class LocalKairosRunner {
     }
   }
 
-  runOnce(nowMs = this.now()): AutonomousCycleOutcome {
+  async runOnce(nowMs = this.now()): Promise<AutonomousCycleOutcome> {
     const executionMode = resolveProductExecutionMode({
       serverMode: this.options.executionMode ?? "PAPER",
       requested: "LIVE",
@@ -121,7 +121,7 @@ export class LocalKairosRunner {
     while (this.started && !this.stopping) {
       const now = this.now();
       if (this.due(now)) {
-        this.tick(now);
+        await this.tick(now);
       }
       const wait = Math.min(1_000, this.interval());
       await (this.options.sleep ?? delay)(wait);

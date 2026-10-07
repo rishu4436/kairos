@@ -29,7 +29,7 @@ export function trustedStudioMode(serverMode: "PAPER" | "LIVE_PREVIEW" | undefin
   return clampStudioExecutionMode(server);
 }
 
-export function runStudioKairosCycle(input: StudioInvocation): {
+export async function runStudioKairosCycle(input: StudioInvocation): Promise<{
   executionMode: "PAPER" | "LIVE_PREVIEW";
   signed: false;
   broadcast: false;
@@ -38,14 +38,14 @@ export function runStudioKairosCycle(input: StudioInvocation): {
   operatingCapitalUsedForTrade: false;
   cycleStatus: string;
   cycleId: string;
-} {
+}> {
   const executionMode = trustedStudioMode(input.serverMode, input.requestedMode);
   const operating = input.operatingWallet ?? emptyOperatingWallet();
   const trading = input.tradingWallet ?? tradingWallet({ userId: input.userId, address: null, connectionStatus: "UNCONNECTED" });
   if (!walletsAreDistinct(operating, trading)) {
     throw new Error("OPERATING_WALLET_ALIASED_TO_TRADING_WALLET");
   }
-  const cycle = runKairosAutonomousCycle({
+  const cycle = await runKairosAutonomousCycle({
     userId: input.userId,
     agentId: input.agentId,
     runtimeMode: "AGENT_STUDIO",

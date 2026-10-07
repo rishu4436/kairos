@@ -10,16 +10,16 @@ afterEach(() => {
 });
 
 describe("local persistent runner", () => {
-  it("does not start a loop on import and refuses overlapping ticks", () => {
+  it("does not start a loop on import and refuses overlapping ticks", async () => {
     const runner = createLocalKairosRunner({ intervalMs: 1_000, nowMs: () => 1_000 });
     expect(runner.due(1_000)).toBe(false);
     runner.start(0);
     expect(runner.due(1_000)).toBe(true);
-    const first = runner.tick(1_000);
+    const first = await runner.tick(1_000);
     expect(first).not.toBeNull();
-    expect(runner.tick(1_000)).toBeNull();
+    expect(await runner.tick(1_000)).toBeNull();
     runner.stop();
-    expect(runner.tick(2_000)).toBeNull();
+    expect(await runner.tick(2_000)).toBeNull();
   });
 
   it("loads the persisted local user and agent literals", () => {

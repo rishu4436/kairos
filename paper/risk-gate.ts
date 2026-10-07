@@ -1,4 +1,4 @@
-import type { PaperAccountState, RiskPolicy } from "@/domain/models";
+import type { PaperAccountState, RiskPolicy, TradeVenue } from "@/domain/models";
 import { validateRiskPolicy, type RiskEffect, type RiskViolation, type RiskViolationCode } from "@/risk/validate";
 import type { AgentTradeIntent } from "@/paper/intent";
 import { toRiskIntent } from "@/paper/intent";
@@ -66,9 +66,10 @@ export function assessTradeIntent(
   state: PaperAccountState,
   nowMs: number,
   riskEffect?: RiskEffect,
+  venue?: TradeVenue,
 ): StructuredRiskDecision {
   const checkedAt = new Date(nowMs).toISOString();
-  const engine = validateRiskPolicy(toRiskIntent(intent), policy, state, riskEffect);
+  const engine = validateRiskPolicy(toRiskIntent(intent, venue ?? intent.venue), policy, state, riskEffect);
   const violations: StructuredRiskViolation[] = engine.ok ? [] : engine.violations.map(mapViolation);
   if (!Number.isFinite(Date.parse(intent.expiresAt)) || nowMs >= Date.parse(intent.expiresAt)) {
     violations.push({

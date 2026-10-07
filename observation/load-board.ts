@@ -21,7 +21,7 @@ export async function loadDemoObservationBoard(): Promise<ObservationBoard> {
         return buildPaperObservation(userId).board;
       }
       await warmUnderlyingEvents({ tickers: eventTickers(userId), nowMs: Date.now(), fidelity: "paper" });
-      return runManualPaperCycle();
+      return await runManualPaperCycle();
     }
     return await liveObservationBoard(userId);
   } catch (error) {

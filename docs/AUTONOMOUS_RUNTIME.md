@@ -8,7 +8,7 @@
 | Execution | `PAPER`, `LIVE_PREVIEW`, `LIVE` |
 | Control | `RUNNING`, `PAUSED`, `STOPPED`, `RISK_REDUCTION_ONLY` |
 
-`PAUSED` and `STOPPED` create no execution intent. `LIVE` and `LIVE_PREVIEW` never call the paper executor. `RISK_REDUCTION_ONLY` blocks a new buy and an add. Reduce and exit still pass risk. The mode is not turned on by itself.
+`PAUSED` and `STOPPED` create no execution intent. `PAPER` observes, plans, risks, and paper-fills. `LIVE_PREVIEW` uses the same observation → strategy → arbitration → shared plan → risk path, then quote/build/simulation, and stops at `TRANSACTION_SIMULATED` (`signed=false`, `broadcast=false`). `LIVE` continues to `READY_FOR_WALLET` and does not submit an Agentic Wallet order in this phase. `RISK_REDUCTION_ONLY` blocks a new buy and an add. Reduce and exit still pass risk. The mode is not turned on by itself. Observation is injected (`observeMarket`); hosts do not duplicate strategy, arbitration, or risk.
 
 ## Order
 

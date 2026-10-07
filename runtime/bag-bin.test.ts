@@ -50,13 +50,13 @@ describe("studio cli selection", () => {
     }
   });
 
-  it("keeps Studio storage free of secrets and separate from KAIROS Redis", () => {
+  it("keeps Studio storage free of secrets and separate from KAIROS Redis", async () => {
     const toml = readFileSync("studio/bnb/app/agent/studio.toml", "utf8");
     expect(toml).toMatch(/kind = "ipfs"/);
     expect(toml).not.toMatch(/STORAGE_API_KEY=\S/);
     expect(toml).not.toMatch(/WALLET_PASSWORD=\S/);
     const store = new InMemoryKairosStateStore();
-    const cycle = runStudioKairosCycle({
+    const cycle = await runStudioKairosCycle({
       userId: "user_storage",
       agentId: "agent_storage",
       nowMs: 1_700_000_400_000,

@@ -8,9 +8,9 @@ import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import type { AgentCycleResult } from "@/paper/cycle";
 
 /** One manual paper cycle. Pages call this. Tests and builds do not start a background loop. */
-export function runManualPaperCycle(now = new Date()): ObservationBoard {
+export async function runManualPaperCycle(now = new Date()): Promise<ObservationBoard> {
   let captured: ObservationBoard | null = null;
-  runKairosAutonomousCycle({
+  await runKairosAutonomousCycle({
     userId: LOCAL_RUNTIME_USER_ID,
     agentId: DEFAULT_AGENT_ID,
     runtimeMode: "LOCAL",

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppShell } from "@/components/shell/app-shell";
 import "./globals.css";
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
     "Command center for tokenized equities. Market observation can use Binance Web3. Trading, signing, and chain submission are not connected.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full">

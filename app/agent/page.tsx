@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 export default async function AgentPage() {
   const model = getAgentPageModel();
   if (readDataMode() === "paper") {
-    runManualPaperCycle();
+    await runManualPaperCycle();
   }
   const runtime = autonomousSnapshot();
   const trading = await new CliAgenticWalletGateway()

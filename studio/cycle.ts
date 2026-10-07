@@ -20,9 +20,9 @@ export function resetCycleSequence(): void {
   cycleSequence = 0;
 }
 
-export function runKairosAgentCycle(input: CycleDependencies, nowMs: number): KairosCycleReport {
+export async function runKairosAgentCycle(input: CycleDependencies, nowMs: number): Promise<KairosCycleReport> {
   cycleSequence += 1;
-  const autonomous = runKairosAutonomousCycle({
+  const autonomous = await runKairosAutonomousCycle({
     userId: input.userId,
     agentId: input.kairosAgentId,
     runtimeMode: "LOCAL",
@@ -45,7 +45,7 @@ export function runKairosAgentCycle(input: CycleDependencies, nowMs: number): Ka
       input.researchAvailable ? skipped("RESEARCH_CONTEXT") : degraded("RESEARCH_CONTEXT", "Research provider is unavailable. Strategies are unaffected."),
       skipped("TRADE_INTENT"),
       skipped("RISK"),
-      skipped("EXECUTION"),
+      input.liveRequested ? blocked("EXECUTION", "Live execution is blocked. No paper fill was created.") : skipped("EXECUTION"),
     );
     return finish(input, autonomous.cycleId, startedAt, nowMs, steps, [], false, null, null);
   }

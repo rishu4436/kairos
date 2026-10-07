@@ -30,20 +30,20 @@ afterEach(() => {
 });
 
 describe("autonomous runtime", () => {
-  it("buys once and then holds the open position", () => {
-    runManualPaperCycle(new Date(NOW));
+  it("buys once and then holds the open position", async () => {
+    await runManualPaperCycle(new Date(NOW));
     const opened = readPaperBook(asUserId(DEMO_USER_ID), asAgentId("agent_demo"));
     expect(opened?.account.positions).toHaveLength(1);
     const quantity = opened?.account.positions[0]?.quantity;
-    runManualPaperCycle(new Date(NOW + 15 * 60 * 1000));
+    await runManualPaperCycle(new Date(NOW + 15 * 60 * 1000));
     const held = readPaperBook(asUserId(DEMO_USER_ID), asAgentId("agent_demo"));
     expect(held?.account.positions).toHaveLength(1);
     expect(held?.account.positions[0]?.quantity).toBe(quantity);
     expect(held?.metas.get("TSLA")?.lastDecision).toBe("HOLD");
   });
 
-  it("reloads a paper position into a new runtime and does not open another", () => {
-    runManualPaperCycle(new Date(NOW));
+  it("reloads a paper position into a new runtime and does not open another", async () => {
+    await runManualPaperCycle(new Date(NOW));
     const snapshot = exportPaperBook(asUserId(DEMO_USER_ID), asAgentId("agent_demo"));
     expect(snapshot?.account.positions).toHaveLength(1);
     resetMarketStores();
@@ -51,7 +51,7 @@ describe("autonomous runtime", () => {
     importPaperBook(snapshot!);
     const store = new InMemoryKairosStateStore();
     let calls = 0;
-    runKairosAutonomousCycle({
+    await runKairosAutonomousCycle({
       userId: DEMO_USER_ID,
       agentId: "agent_demo",
       runtimeMode: "LOCAL",
@@ -60,9 +60,9 @@ describe("autonomous runtime", () => {
       startedAtMs: NOW + 15 * 60 * 1000,
       ownerId: "recovered-runtime",
       store,
-      runPaper: () => {
+      runPaper: async () => {
         calls += 1;
-        runManualPaperCycle(new Date(NOW + 15 * 60 * 1000));
+        await runManualPaperCycle(new Date(NOW + 15 * 60 * 1000));
         return { ran: true, reason: "recovered", events: [], view: null, createdIntentIds: [], executionMode: "PAPER", authorityCode: null, executionContextId: null, loopState: "MONITORING_POSITION", transitions: [] };
       },
     });
@@ -84,7 +84,7 @@ describe("autonomous runtime", () => {
     expect(cash).toBe(parseDecimal("9900"));
   });
 
-  it("lets one runtime hold the lease", () => {
+  it("lets one runtime hold the lease", async () => {
     const store = new InMemoryKairosStateStore();
     let calls = 0;
     const runPaper = () => {
@@ -92,7 +92,7 @@ describe("autonomous runtime", () => {
       return { ran: false, reason: "idle", events: [], view: null, createdIntentIds: [], executionMode: null, authorityCode: null, executionContextId: null, loopState: null, transitions: [] };
     };
     store.acquireLease({ userId: "user_a", agentId: "agent_a", ownerId: "runtime-a", nowMs: NOW, ttlMs: 60_000 });
-    const blocked = runKairosAutonomousCycle({
+    const blocked = await runKairosAutonomousCycle({
       userId: "user_a",
       agentId: "agent_a",
       runtimeMode: "LOCAL",
@@ -108,7 +108,7 @@ describe("autonomous runtime", () => {
     expect(calls).toBe(0);
   });
 
-  it("marks an unfinished cycle interrupted and does not fill its intent again", () => {
+  it("marks an unfinished cycle interrupted and does not fill its intent again", async () => {
     const store = new InMemoryKairosStateStore();
     store.saveCycle({
       cycleId: "cycle_open",
@@ -128,7 +128,7 @@ describe("autonomous runtime", () => {
       transitions: [],
     });
     applyPaperFillOnce("intent_open", "exec_open", () => undefined);
-    runKairosAutonomousCycle({
+    await runKairosAutonomousCycle({
       userId: "user_a",
       agentId: "agent_a",
       runtimeMode: "LOCAL",
@@ -145,7 +145,7 @@ describe("autonomous runtime", () => {
     }).repeated).toBe(true);
   });
 
-  it("keeps a shadow candidate off execution and a paper candidate out of live mode", () => {
+  it("keeps a shadow candidate off execution and a paper candidate out of live mode", async () => {
     const candidate = registerStrategyCandidate({
       candidateId: "cand-rt",
       thesisId: "thesis-rt",
@@ -163,7 +163,7 @@ describe("autonomous runtime", () => {
     transitionCandidate("user_a", candidate.candidateId, "EXPERIMENTING");
     transitionCandidate("user_a", candidate.candidateId, "CANDIDATE");
     transitionCandidate("user_a", candidate.candidateId, "SHADOW");
-    const shadow = runKairosAutonomousCycle({
+    const shadow = await runKairosAutonomousCycle({
       userId: "user_a",
       agentId: "agent_a",
       runtimeMode: "LOCAL",
@@ -213,7 +213,7 @@ describe("autonomous runtime", () => {
     const liveExcluded = arbitrateAsset(arbContext({ paperResearchEligible: false }), [evaluation]);
     expect(liveExcluded.candidates[0]?.rejectionReason).toMatch(/not eligible/);
     let liveCalls = 0;
-    const live = runKairosAutonomousCycle({
+    const live = await runKairosAutonomousCycle({
       userId: "user_a",
       agentId: "agent_a",
       runtimeMode: "LOCAL",
@@ -247,9 +247,9 @@ describe("autonomous runtime", () => {
     expect(() => memory.compareAndSet("kairos:v1:secret", 0, { apiKey: "nope" }, new Date(NOW).toISOString())).toThrow(/STATE_INVALID/);
   });
 
-  it("does not let a client execution mode create a paper fill from live", () => {
+  it("does not let a client execution mode create a paper fill from live", async () => {
     let calls = 0;
-    const result = runKairosAutonomousCycle({
+    const result = await runKairosAutonomousCycle({
       userId: "user_a",
       agentId: "agent_a",
       runtimeMode: "LOCAL",
@@ -266,8 +266,8 @@ describe("autonomous runtime", () => {
     expect(result.createdIntentIds).toEqual([]);
   });
 
-  it("continues the cycle when research throws and blocks a second asset mutation", () => {
-    const result = runKairosAutonomousCycle({
+  it("continues the cycle when research throws and blocks a second asset mutation", async () => {
+    const result = await runKairosAutonomousCycle({
       userId: "user_a",
       agentId: "agent_a",
       runtimeMode: "LOCAL",

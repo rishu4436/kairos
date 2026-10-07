@@ -82,11 +82,11 @@ describe("atomic redis lease and revision", () => {
 });
 
 describe("durable restart", () => {
-  it("reloads position, performance, research, candidate, and arbitration without a second fill", () => {
+  it("reloads position, performance, research, candidate, and arbitration without a second fill", async () => {
     const transport = new MemoryRedisTransport();
     const store = new RedisKairosStateStore("redis://durable", transport);
-    runManualPaperCycle(new Date(NOW));
-    runManualPaperCycle(new Date(NOW + 15 * 60 * 1000));
+    await runManualPaperCycle(new Date(NOW));
+    await runManualPaperCycle(new Date(NOW + 15 * 60 * 1000));
     const opened = readPaperBook(asUserId(USER), asAgentId(AGENT));
     expect(opened?.account.positions).toHaveLength(1);
     const quantity = opened?.account.positions[0]?.quantity;
@@ -216,7 +216,7 @@ describe("durable restart", () => {
     arbitrationMemory.write({ userId: USER, assetId: "paper:TSLA", strategyId: "momentum", action: "BUY", score: 0.7945, selectedAtMs: NOW });
 
     const idle = () => ({ ran: true, reason: "checkpoint", events: [], view: null, createdIntentIds: [], executionMode: "PAPER" as const, authorityCode: null, executionContextId: null, loopState: "MONITORING_POSITION" as const, transitions: [] });
-    runKairosAutonomousCycle({
+    await runKairosAutonomousCycle({
       userId: USER,
       agentId: AGENT,
       runtimeMode: "LOCAL",
@@ -243,7 +243,7 @@ describe("durable restart", () => {
 
     const restored = new RedisKairosStateStore("redis://durable", transport);
     let fills = 0;
-    runKairosAutonomousCycle({
+    await runKairosAutonomousCycle({
       userId: USER,
       agentId: AGENT,
       runtimeMode: "LOCAL",

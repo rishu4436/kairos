@@ -169,7 +169,7 @@ export interface AgentRuntime {
   stop(nowMs: number): StudioRuntimeState;
   status(): StudioRuntimeState;
   health(): RuntimeHealthReport;
-  runCycle(nowMs: number): KairosCycleReport;
+  runCycle(nowMs: number): Promise<KairosCycleReport>;
   scheduleCycle(intervalMs: number, nowMs: number): void;
-  pump(nowMs: number): KairosCycleReport | null;
+  pump(nowMs: number): Promise<KairosCycleReport | null>;
 }

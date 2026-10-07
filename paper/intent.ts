@@ -1,6 +1,6 @@
 import type { ArbitrationDecision } from "@/domain/arbitration";
 import type { AccountId, AgentId, UserId } from "@/domain/ids";
-import type { RiskPolicy, TradeIntent, TradeSide } from "@/domain/models";
+import type { RiskPolicy, TradeIntent, TradeSide, TradeVenue } from "@/domain/models";
 import { divRound, type Scaled } from "@/domain/money";
 import type { SignalAction } from "@/domain/signal";
 import type { PositionIntentKind } from "@/position/types";
@@ -257,7 +257,7 @@ export function createManagementIntent(input: {
 }
 
 /** Map a lifecycle intent into the existing risk-engine intent. Limit price is the worst acceptable price. */
-export function toRiskIntent(intent: AgentTradeIntent): TradeIntent {
+export function toRiskIntent(intent: AgentTradeIntent, venue: TradeVenue = intent.venue): TradeIntent {
   const side: TradeSide = intent.action === "BUY" ? "buy" : "sell";
   return {
     id: intent.intentId,
@@ -270,7 +270,7 @@ export function toRiskIntent(intent: AgentTradeIntent): TradeIntent {
     limitPrice: worstPrice(intent),
     slippageBps: intent.maxSlippageBps,
     strategyId: intent.strategyId,
-    venue: "paper",
+    venue,
     confidence: 0,
     asOf: intent.createdAt,
   };

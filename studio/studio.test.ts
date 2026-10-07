@@ -50,7 +50,7 @@ function deps(runPaper: (userId: string, now: Date) => AgentCycleResult, extra: 
 }
 
 describe("agent studio runtime", () => {
-  it("runs the same cycle from the local and studio providers", () => {
+  it("runs the same cycle from the local and studio providers", async () => {
     let calls = 0;
     const runPaper = () => {
       calls += 1;
@@ -58,10 +58,10 @@ describe("agent studio runtime", () => {
     };
     const local = new LocalRuntimeProvider(deps(runPaper));
     local.start(1_000);
-    const first = local.runCycle(1_000);
+    const first = await local.runCycle(1_000);
     const studio = new AgentStudioRuntimeProvider({ ...deps(runPaper), userId: "user_a", studioProjectPresent: true, configurationValid: true });
     studio.start(2_000);
-    const second = studio.runCycle(2_000);
+    const second = await studio.runCycle(2_000);
     expect(calls).toBe(2);
     expect(first.signed).toBe(false);
     expect(second.broadcast).toBe(false);
@@ -69,7 +69,7 @@ describe("agent studio runtime", () => {
     expect(second.userId).toBe(first.userId);
   });
 
-  it("does not run a cycle before it is due", () => {
+  it("does not run a cycle before it is due", async () => {
     let calls = 0;
     const runtime = new LocalRuntimeProvider(deps(() => {
       calls += 1;
@@ -77,13 +77,13 @@ describe("agent studio runtime", () => {
     }));
     runtime.start(0);
     runtime.scheduleCycle(5_000, 0);
-    expect(runtime.pump(4_999)).toBeNull();
+    expect(await runtime.pump(4_999)).toBeNull();
     expect(calls).toBe(0);
-    expect(runtime.pump(5_000)?.cycleId).toBeTruthy();
+    expect((await runtime.pump(5_000))?.cycleId).toBeTruthy();
     expect(calls).toBe(1);
   });
 
-  it("backs off after a cycle failure and does not create a trade", () => {
+  it("backs off after a cycle failure and does not create a trade", async () => {
     let calls = 0;
     const runtime = new LocalRuntimeProvider(
       deps(() => {
@@ -93,18 +93,18 @@ describe("agent studio runtime", () => {
     );
     runtime.start(0);
     runtime.scheduleCycle(1_000, 0);
-    const failed = runtime.pump(1_000);
+    const failed = await runtime.pump(1_000);
     expect(failed?.createdIntent).toBe(false);
     expect(failed?.error).toMatch(/observation failed/);
-    expect(runtime.pump(2_999)).toBeNull();
-    expect(runtime.pump(3_000)?.cycleId).not.toBe(failed?.cycleId);
+    expect(await runtime.pump(2_999)).toBeNull();
+    expect((await runtime.pump(3_000))?.cycleId).not.toBe(failed?.cycleId);
     expect(calls).toBe(2);
   });
 
-  it("keeps the last cycle when the runtime restarts", () => {
+  it("keeps the last cycle when the runtime restarts", async () => {
     const runtime = new LocalRuntimeProvider(deps(() => paperResult(false)));
     runtime.start(0);
-    const cycle = runtime.runCycle(10);
+    const cycle = await runtime.runCycle(10);
     runtime.stop(20);
     expect(runtime.status()).toBe("PAUSED");
     runtime.start(50);
@@ -112,9 +112,9 @@ describe("agent studio runtime", () => {
     expect(readRuntimeBook(runtime, "agent_demo").lastCycle?.cycleId).toBe(cycle.cycleId);
   });
 
-  it("blocks trading when market data is down and continues when research is down", () => {
+  it("blocks trading when market data is down and continues when research is down", async () => {
     let calls = 0;
-    const blocked = runKairosAgentCycle(
+    const blocked = await runKairosAgentCycle(
       { userId: "user_a", kairosAgentId: "agent_demo", marketAvailable: false, researchAvailable: true, externalIntelligence: "OK", tradingWalletConnected: false, liveRequested: false, runPaper: () => {
         calls += 1;
         return paperResult(true);
@@ -124,7 +124,7 @@ describe("agent studio runtime", () => {
     expect(calls).toBe(0);
     expect(blocked.createdIntent).toBe(false);
     expect(blocked.steps.find((step) => step.name === "OBSERVE")?.status).toBe("BLOCKED");
-    const researchDown = runKairosAgentCycle(
+    const researchDown = await runKairosAgentCycle(
       { userId: "user_a", kairosAgentId: "agent_demo", marketAvailable: true, researchAvailable: false, externalIntelligence: "DEGRADED", tradingWalletConnected: false, liveRequested: false, runPaper: () => paperResult(false) },
       20,
     );
@@ -132,9 +132,9 @@ describe("agent studio runtime", () => {
     expect(researchDown.steps.find((step) => step.name === "STRATEGY_EVALUATION")?.status).toBe("OK");
   });
 
-  it("does not fall from a live request into paper and does not sign", () => {
+  it("does not fall from a live request into paper and does not sign", async () => {
     let calls = 0;
-    const report = runKairosAgentCycle(
+    const report = await runKairosAgentCycle(
       {
         userId: "user_a",
         kairosAgentId: "agent_demo",
@@ -156,10 +156,10 @@ describe("agent studio runtime", () => {
     expect(report.signed).toBe(false);
   });
 
-  it("reports studio unavailable and invalid configuration without deploying", () => {
+  it("reports studio unavailable and invalid configuration without deploying", async () => {
     const missing = new AgentStudioRuntimeProvider({ ...deps(() => paperResult(true)), kairosAgentId: "agent_missing" });
     expect(missing.start(1)).toBe("OFFLINE");
-    expect(missing.runCycle(1).createdIntent).toBe(false);
+    expect((await missing.runCycle(1)).createdIntent).toBe(false);
     const invalid = new AgentStudioRuntimeProvider({ ...deps(() => paperResult(true)), kairosAgentId: "agent_invalid", studioProjectPresent: true, configurationValid: false });
     expect(invalid.start(2)).toBe("ERROR");
     const book = readRuntimeBook(invalid, "agent_invalid");
@@ -167,14 +167,14 @@ describe("agent studio runtime", () => {
     expect(book.events.some((event) => event.detail === "AGENT_STUDIO_PROJECT_NOT_FOUND")).toBe(false);
   });
 
-  it("isolates cycles by user and keeps runtime events free of secrets", () => {
+  it("isolates cycles by user and keeps runtime events free of secrets", async () => {
     const runPaper = () => paperResult(false);
     const first = new LocalRuntimeProvider(deps(runPaper));
     const second = new LocalRuntimeProvider({ ...deps(runPaper), userId: "user_b" });
     first.start(1);
     second.start(1);
-    first.runCycle(2);
-    second.runCycle(3);
+    await first.runCycle(2);
+    await second.runCycle(3);
     const cycles = readRuntimeBook(first, "agent_demo").cycles;
     expect(cycles.filter((cycle) => cycle.userId === "user_a")).toHaveLength(1);
     expect(cycles.filter((cycle) => cycle.userId === "user_b")).toHaveLength(1);

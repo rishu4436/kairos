@@ -42,7 +42,7 @@ export async function GET(request: Request): Promise<Response> {
       }
       const open = readPaperBook(asUserId(requested), asAgentId(session.agent.id))?.account.positions.map((position) => position.assetSymbol) ?? [];
       await warmUnderlyingEvents({ tickers: [...CONFIGURED_WATCHLIST_TICKERS, ...open], nowMs: Date.now(), fidelity: "paper" });
-      return json(runManualPaperCycle());
+      return json(await runManualPaperCycle());
     }
     return json(await liveObservationBoard(requested, request.signal));
   } catch (error) {

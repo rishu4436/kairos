@@ -20,12 +20,12 @@ const idle = (): AgentCycleResult => ({
 });
 
 describe("studio paper entrypoint", () => {
-  it("calls the canonical cycle in PAPER and ignores a LIVE payload", () => {
+  it("calls the canonical cycle in PAPER and ignores a LIVE payload", async () => {
     expect(trustedStudioMode(undefined, "LIVE")).toBe("PAPER");
     expect(trustedStudioMode("LIVE_PREVIEW", "LIVE")).toBe("LIVE_PREVIEW");
     const store = new InMemoryKairosStateStore();
     let calls = 0;
-    const paper = runStudioKairosCycle({
+    const paper = await runStudioKairosCycle({
       userId: "user_studio",
       agentId: "agent_studio",
       nowMs: 1_700_000_000_000,
@@ -46,7 +46,7 @@ describe("studio paper entrypoint", () => {
     expect(useOperatingCapitalForTrade().ok).toBe(false);
 
     let previewCalls = 0;
-    const preview = runStudioKairosCycle({
+    const preview = await runStudioKairosCycle({
       userId: "user_studio",
       agentId: "agent_studio_preview",
       nowMs: 1_700_000_100_000,
@@ -64,21 +64,21 @@ describe("studio paper entrypoint", () => {
     expect(preview.broadcast).toBe(false);
   });
 
-  it("refuses an operating wallet that matches the trading wallet and does not retry a failed paper call", () => {
+  it("refuses an operating wallet that matches the trading wallet and does not retry a failed paper call", async () => {
     const operating = { ...emptyOperatingWallet(), address: "0xabc", configured: true };
     const trading = tradingWallet({ userId: "user_studio", address: "0xABC", connectionStatus: "CONNECTED" });
-    expect(() => runStudioKairosCycle({
+    await expect(runStudioKairosCycle({
       userId: "user_studio",
       agentId: "agent_alias",
       nowMs: 1_700_000_200_000,
       operatingWallet: operating,
       tradingWallet: trading,
       store: new InMemoryKairosStateStore(),
-    })).toThrow(/OPERATING_WALLET_ALIASED_TO_TRADING_WALLET/);
+    })).rejects.toThrow(/OPERATING_WALLET_ALIASED_TO_TRADING_WALLET/);
 
     const store = new InMemoryKairosStateStore();
     let calls = 0;
-    const failed = runStudioKairosCycle({
+    const failed = await runStudioKairosCycle({
       userId: "user_studio",
       agentId: "agent_fail",
       nowMs: 1_700_000_300_000,

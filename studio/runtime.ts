@@ -1,6 +1,6 @@
 import { runtimeEvent } from "@/studio/events";
 import { buildRuntimeHealth } from "@/studio/health";
-import { CycleScheduler } from "@/studio/scheduler";
+import { CycleScheduler } from "@/runtime/scheduler";
 import { InMemoryRuntimeStateStore, type RuntimeState } from "@/studio/store";
 import { runKairosAgentCycle, type CycleDependencies } from "@/studio/cycle";
 import type { AgentRuntime, KairosCycleReport, RuntimeHealthReport, StudioRuntimeState } from "@/studio/types";
@@ -67,7 +67,7 @@ abstract class BaseRuntime implements AgentRuntime {
     this.touch(nowMs);
   }
 
-  runCycle(nowMs: number): KairosCycleReport {
+  async runCycle(nowMs: number): Promise<KairosCycleReport> {
     if (this.state !== "RUNNING") {
       this.state = "ERROR";
       const report = this.failed(nowMs, "The runtime is not running.");
@@ -78,7 +78,7 @@ abstract class BaseRuntime implements AgentRuntime {
     this.record(nowMs, "AGENT_CYCLE_STARTED", cycleIdPreview, null);
     let report: KairosCycleReport;
     try {
-      report = runKairosAgentCycle({ ...this.options.dependencies, userId: this.options.userId, kairosAgentId: this.options.kairosAgentId }, nowMs);
+      report = await runKairosAgentCycle({ ...this.options.dependencies, userId: this.options.userId, kairosAgentId: this.options.kairosAgentId }, nowMs);
     } catch (error) {
       report = this.failed(nowMs, error instanceof Error ? error.message : "Cycle failed.");
     }
@@ -106,7 +106,7 @@ abstract class BaseRuntime implements AgentRuntime {
     return report;
   }
 
-  pump(nowMs: number): KairosCycleReport | null {
+  async pump(nowMs: number): Promise<KairosCycleReport | null> {
     if (!this.scheduler.due(nowMs)) {
       return null;
     }
