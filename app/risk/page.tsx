@@ -1,12 +1,23 @@
 import { PageHeader } from "@/components/ui/page-header";
-import { getRiskPageModel } from "@/services/command-center";
+import { readOperatorConfig } from "@/operator/store";
+import { formatPercentFromBps } from "@/lib/format";
 
 export const metadata = { title: "Risk" };
 
 export const dynamic = "force-dynamic";
 
 export default function RiskPage() {
-  const model = getRiskPageModel();
+  const config = readOperatorConfig();
+  const model = {
+    owner: config.identity.userId,
+    liveTrading: config.risk.liveTradingEnabled ? "Enabled" : "Disabled",
+    paperTrading: config.risk.paperTradingEnabled ? "Enabled" : "Disabled",
+    maxPosition: `${config.risk.maxPositionNotional} USDT`,
+    maxAllocation: formatPercentFromBps(config.risk.maxAllocationBps).replace("+", ""),
+    maxDailyLoss: `${config.risk.maxDailyLoss} USDT`,
+    maxSlippage: formatPercentFromBps(config.risk.maxSlippageBps).replace("+", ""),
+    allowedAssets: config.risk.allowedAssets,
+  };
 
   return (
     <>
@@ -16,7 +27,7 @@ export default function RiskPage() {
         description="Hard limits for the local user. The validator lives outside any future model proposer."
       />
       <p className="phase-banner" role="status">
-        Policy editing is not available. The values below are the local user&apos;s configured paper policy. The paper cycle sends intents through the same risk engine. This screen does not approve a trade.
+        Read-only operator risk policy, version {config.version}. Change it on the operator console. This screen does not approve a trade.
       </p>
       <section className="panel panel-risk max-w-3xl">
         <p className="text-sm text-muted">Owner · {model.owner}</p>

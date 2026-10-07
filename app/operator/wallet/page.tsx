@@ -1,7 +1,5 @@
-import { CliAgenticWalletGateway } from "@/wallet/agentic/cli";
-import { persistWalletSnapshot, readWalletSnapshot } from "@/operator/snapshots";
-import { readOperatorTokenScope } from "@/wallet/agentic/token-scope";
-import { LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID } from "@/domain/watchlist";
+import { readWalletSnapshot } from "@/operator/snapshots";
+import { publishWalletSnapshot } from "@/operator/wallet-publish";
 import { operatorMutationsAllowed } from "@/operator/guard";
 
 export const metadata = { title: "Operator wallet" };
@@ -9,25 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function OperatorWalletPage() {
   if (operatorMutationsAllowed()) {
-    const gateway = new CliAgenticWalletGateway();
-    const account = await gateway.getStatus(LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID).catch(() => null);
-    const balances = account?.connectionStatus === "CONNECTED" ? await gateway.getBalances(LOCAL_RUNTIME_USER_ID, "56").catch(() => []) : [];
-    const usdt = balances.find((item) => item.symbol === "USDT")?.amount ?? null;
-    const bnb = balances.find((item) => (item.symbol ?? "").toUpperCase() === "BNB")?.amount ?? null;
-    persistWalletSnapshot({
-      connectionStatus: account?.connectionStatus === "CONNECTED" ? "CONNECTED" : "UNCONNECTED",
-      address: account?.walletAddress ?? null,
-      chainId: "56",
-      bnb,
-      usdt,
-      tokens: balances.filter((item) => item.amount).map((item) => ({ symbol: item.symbol ?? "Token", amount: item.amount ?? "—" })),
-      quotaUsed: account?.securityPolicy?.quotaUsed == null ? null : String(account.securityPolicy.quotaUsed),
-      quotaRemaining: account?.securityPolicy?.quotaLeft == null ? null : String(account.securityPolicy.quotaLeft),
-      highRiskHandling: account?.securityPolicy?.highRiskHandling ?? null,
-      tokenScope: readOperatorTokenScope() ? "OPERATOR_ATTESTED" : "TOKEN_SCOPE_UNVERIFIED",
-      observedAt: new Date().toISOString(),
-      stale: false,
-    });
+    await publishWalletSnapshot().catch(() => undefined);
   }
   const snap = readWalletSnapshot();
   return (

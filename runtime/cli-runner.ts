@@ -11,6 +11,7 @@ import { BinanceWeb3Client } from "@/services/binance/client";
 import { readBinanceConfig } from "@/services/binance/config";
 import { BinanceQuoteGateway } from "@/services/binance/trading/gateway";
 import { BinanceSimulationGateway } from "@/services/binance/transaction/gateway";
+import { publishWalletSnapshot } from "@/operator/wallet-publish";
 
 if (existsSync(".env.local")) {
   process.loadEnvFile(".env.local");
@@ -69,6 +70,9 @@ const runner = createLocalKairosRunner({
       completedAt: outcome.completedAt,
     };
     console.log(`[kairos.cycle] ${JSON.stringify(summary)}`);
+    void publishWalletSnapshot().catch(() => {
+      console.error("[kairos.wallet] snapshot refresh failed");
+    });
   },
 });
 

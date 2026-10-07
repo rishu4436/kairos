@@ -51,6 +51,13 @@ export interface ObservationSnapshot {
     selectedStrategy: string | null;
     selectedAction: string | null;
     reasons: string | null;
+    signals: readonly {
+      strategyId: string;
+      strategyName: string;
+      action: string;
+      confidence: number;
+      reason: string;
+    }[];
   }[];
   observedAt: string;
 }
@@ -100,6 +107,15 @@ export function persistObservationSnapshot(board: ObservationBoard, store: Kairo
       selectedStrategy: row.arbitration?.selectedStrategyName ?? null,
       selectedAction: row.arbitration?.selectedAction ?? null,
       reasons: row.arbitration?.evidence.summary ?? null,
+      signals: row.signals
+        .filter((signal) => signal.strategyId === "momentum" || signal.strategyId === "mean-reversion" || signal.strategyId === "weekend" || signal.strategyId === "dca")
+        .map((signal) => ({
+          strategyId: signal.strategyId,
+          strategyName: signal.strategyName,
+          action: signal.action,
+          confidence: signal.confidence,
+          reason: signal.reasons[0] ?? signal.evaluation,
+        })),
     })),
   };
   assertPersistable(snapshot);

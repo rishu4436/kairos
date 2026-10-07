@@ -3,8 +3,16 @@
  * Lease acquire, renew, release, and revision CAS are EVAL scripts, not GET followed by SET.
  * A TCP socket opens only when LazyRedisTransport runs a command.
  */
+import { createRequire } from "node:module";
 import path from "node:path";
-import { Worker } from "node:worker_threads";
+import type { Worker } from "node:worker_threads";
+
+const nodeRequire = createRequire(path.join(process.cwd(), "package.json"));
+
+function createNodeWorker(filename: string, workerData: unknown): Worker {
+  const threads = nodeRequire("node:worker_threads") as typeof import("node:worker_threads");
+  return new threads.Worker(filename, { workerData });
+}
 
 export interface RedisTransport {
   command(args: readonly string[]): string | null;
@@ -181,7 +189,7 @@ export class LazyRedisTransport implements RedisTransport {
       return;
     }
     const start = Atomics.load(this.header, 0);
-    this.worker = new Worker(workerPath(), { workerData: { url: this.url, sab: this.shared } });
+    this.worker = createNodeWorker(workerPath(), { url: this.url, sab: this.shared });
     this.worker.unref();
     this.wait(start);
     if (Atomics.load(this.header, 1) !== 1) {

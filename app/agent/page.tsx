@@ -7,9 +7,6 @@ import { autonomousSnapshot } from "@/observation/autonomous-board";
 import { getAgentPageModel } from "@/services/command-center";
 import { loadProductionDashboard } from "@/services/dashboard";
 import { buildRuntimeDashboard } from "@/studio/view";
-import { CliAgenticWalletGateway } from "@/wallet/agentic/cli";
-import { disconnectedAccount } from "@/wallet/agentic/parse";
-import { DEMO_USER_ID } from "@/domain/watchlist";
 
 export const metadata = { title: "Agent" };
 
@@ -19,9 +16,6 @@ export default async function AgentPage() {
   const model = getAgentPageModel();
   const dashboard = await loadProductionDashboard();
   const runtime = autonomousSnapshot();
-  const trading = await new CliAgenticWalletGateway()
-    .getStatus(DEMO_USER_ID, "agent_demo")
-    .catch(() => disconnectedAccount(DEMO_USER_ID, "agent_demo", new Date().toISOString()));
   const allowed = nextStates(model.runtimeState).map((state) => AGENT_STATE_LABEL[state]);
 
   return (
@@ -29,16 +23,16 @@ export default async function AgentPage() {
       <PageHeader
         kicker="Runtime"
         title="Agent"
-        description="Read-only runtime heartbeat. This page does not start a cycle or enable LIVE."
+        description="Agent heartbeat for the operating runtime. Start and pause live in the operator console."
       />
-      <PhaseBanner detail="The local runtime is not scheduled. Start, pause, and deploy controls are not available." />
+      <PhaseBanner detail="Paper fills are not this page. Thesis tests stay in Paper Lab. Starting the agent is on /operator." />
       <div className="mb-4">
         <AutonomousRuntimePanel snapshot={runtime} />
       </div>
       <div className="mb-4">
         <AgentIdentitySections
           view={buildRuntimeDashboard({
-            tradingConnected: trading.connectionStatus === "CONNECTED",
+            tradingConnected: dashboard.wallet.connected,
             market: dashboard.dataMode === "live" ? "LIVE_OK" : "PAPER_SAMPLE",
             researchLabel: "NOT CONFIGURED",
           })}

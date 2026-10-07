@@ -21,8 +21,8 @@ export function PortfolioPanel({ live }: { live: ProductionDashboard["livePortfo
         <p className="mt-4 text-sm text-muted">No wallet holdings are visible.</p>
       ) : (
         <ul className="mt-4 space-y-1 text-sm">
-          {live.holdings.map((item) => (
-            <li key={item.symbol}>
+          {live.holdings.map((item, index) => (
+            <li key={`${item.symbol}:${index}`}>
               {item.symbol} · {item.amount}
             </li>
           ))}

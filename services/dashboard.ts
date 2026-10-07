@@ -110,6 +110,7 @@ export interface ProductionDashboard {
   };
   liveTrades: LiveTradeRow[];
   paper: CommandCenterModel;
+  stateBackend: "MEMORY" | "REDIS" | "UNAVAILABLE";
 }
 
 export interface DashboardSources {
@@ -126,7 +127,12 @@ export interface DashboardSources {
 
 export function buildProductionDashboard(source: DashboardSources): ProductionDashboard {
   const latest = source.cycles[0] ?? null;
-  const executionMode = latest?.executionMode ?? (source.dataMode === "live" ? "LIVE_PREVIEW" : "PAPER");
+  const executionMode =
+    source.dataMode === "live"
+      ? latest?.executionMode === "LIVE" || latest?.executionMode === "LIVE_PREVIEW"
+        ? latest.executionMode
+        : "LIVE_PREVIEW"
+      : (latest?.executionMode ?? "PAPER");
   const preparations = cyclePreparations(latest);
   const preview = livePreviewFrom(latest, preparations);
   const usdt = balanceAmount(source.balances, "USDT");
@@ -137,7 +143,9 @@ export function buildProductionDashboard(source: DashboardSources): ProductionDa
     executionMode,
     board: source.board,
     disclaimer:
-      "Live panels show the Agentic Wallet and canonical runtime. Paper/Strategy Lab is simulated and is not the live portfolio.",
+      source.dataMode === "live"
+        ? "Operating mode is live market data. LIVE_PREVIEW stops before signing. Paper is only the thesis lab."
+        : "Data mode is paper. Thesis generation and paper experiments stay in Paper Lab. Set KAIROS_DATA_MODE=live for the operating dashboard.",
     agent: {
       status: agentFace(source.heartbeat, latest),
       runtimeStatus: source.heartbeat.runtimeStatus,
@@ -178,6 +186,7 @@ export function buildProductionDashboard(source: DashboardSources): ProductionDa
     },
     liveTrades: [],
     paper: source.paper,
+    stateBackend: "MEMORY",
   };
 }
 
@@ -190,7 +199,7 @@ export async function loadProductionDashboard(): Promise<ProductionDashboard> {
   const observed = readObservationSnapshot(store);
   const board = boardFromSnapshot(observed);
   const scope = walletSnap.tokenScope === "UNAVAILABLE" ? (readOperatorTokenScope() ? "OPERATOR_ATTESTED" : "TOKEN_SCOPE_UNVERIFIED") : walletSnap.tokenScope;
-  return buildProductionDashboard({
+  const view = buildProductionDashboard({
     dataMode,
     board,
     heartbeat: store.readHeartbeat(userId, agentId),
@@ -220,11 +229,24 @@ export async function loadProductionDashboard(): Promise<ProductionDashboard> {
     balances: [
       ...(walletSnap.usdt ? [{ symbol: "USDT", contractAddress: null, chainId: "56", amount: walletSnap.usdt, valueUsd: null }] : []),
       ...(walletSnap.bnb ? [{ symbol: "BNB", contractAddress: null, chainId: "56", amount: walletSnap.bnb, valueUsd: null }] : []),
-      ...walletSnap.tokens.map((item) => ({ symbol: item.symbol, contractAddress: null, chainId: "56", amount: item.amount, valueUsd: null })),
+      ...walletSnap.tokens
+        .filter((item) => {
+          const symbol = (item.symbol ?? "").toUpperCase();
+          return symbol !== "USDT" && symbol !== "BNB";
+        })
+        .map((item) => ({ symbol: item.symbol, contractAddress: null, chainId: "56", amount: item.amount, valueUsd: null })),
     ],
     tokenScope: scope,
     paper: getCommandCenterModel(),
   });
+  view.stateBackend = store.backend;
+  if (store.backend === "MEMORY") {
+    view.disclaimer = `${view.disclaimer} This process is using ephemeral memory. The runner and this dashboard share cycles only when KAIROS_STATE_BACKEND=redis.`;
+  }
+  if (!observed) {
+    view.disclaimer = `${view.disclaimer} No observation snapshot is stored yet. The public page waits for the runner to publish a cycle.`;
+  }
+  return view;
 }
 
 function boardFromSnapshot(snapshot: ReturnType<typeof readObservationSnapshot>): ObservationBoard {
@@ -286,7 +308,27 @@ function boardFromSnapshot(snapshot: ReturnType<typeof readObservationSnapshot>)
       dataQuality: row.dataQuality === "GOOD" || row.dataQuality === "DEGRADED" || row.dataQuality === "INSUFFICIENT" || row.dataQuality === "STALE" ? row.dataQuality : null,
       historyPoints: 0,
       features: [],
-      signals: [],
+      signals: (row.signals ?? []).map((signal) => ({
+        id: `${signal.strategyId}:${row.representationId}`,
+        strategyId: signal.strategyId,
+        strategyName: signal.strategyName,
+        ticker: row.ticker,
+        tokenSymbol: row.tokenSymbol,
+        representationId: row.representationId,
+        timestamp: snapshot.generatedAt,
+        action: signal.action as "BUY" | "SELL" | "HOLD" | "NO_SIGNAL",
+        evaluation: "VALID" as const,
+        confidence: signal.confidence,
+        reasons: [signal.reason],
+        evidence: [signal.reason],
+        featuresUsed: [],
+        riskHints: [],
+        validUntil: snapshot.generatedAt,
+        dataQuality: "GOOD" as const,
+        historyPoints: 0,
+        tags: [],
+        executable: false as const,
+      })),
       candles: [],
       arbitration: row.arbitration
         ? ({

@@ -32,8 +32,8 @@ export function WalletPanel({ account, balances }: { account: AgenticWalletAccou
       <p className="mt-4 text-sm text-muted">This wallet is separate from the simulated paper account. Signing material is not stored in KAIROS.</p>
       {balances.length > 0 ? (
         <ul className="mt-3 space-y-1 text-sm">
-          {balances.map((item) => (
-            <li key={`${item.contractAddress ?? "none"}:${item.symbol ?? "token"}`}>
+          {balances.map((item, index) => (
+            <li key={`${item.contractAddress ?? "none"}:${item.symbol ?? "token"}:${index}`}>
               {item.symbol ?? "Token"} · {item.amount ?? "—"}
             </li>
           ))}

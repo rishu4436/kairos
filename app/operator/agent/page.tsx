@@ -15,9 +15,9 @@ export default function OperatorAgentPage() {
       <OperatorConfigForm
         action="runtime"
         fields={[
-          { name: "runtime.executionMode", label: "Execution mode (PAPER | LIVE_PREVIEW | LIVE)", defaultValue: config.runtime.executionMode },
-          { name: "runtime.cycleIntervalMs", label: "Cycle interval (ms)", defaultValue: String(config.runtime.cycleIntervalMs) },
-          { name: "runtime.enabled", label: "Runtime enabled", defaultValue: String(config.runtime.enabled) },
+          { name: "runtime.executionMode", label: "Execution mode", kind: "select", options: ["PAPER", "LIVE_PREVIEW", "LIVE"], defaultValue: config.runtime.executionMode },
+          { name: "runtime.cycleIntervalMs", label: "Cycle interval", kind: "number", unit: "ms", defaultValue: String(config.runtime.cycleIntervalMs) },
+          { name: "runtime.enabled", label: "Runtime enabled", kind: "toggle", defaultValue: String(config.runtime.enabled) },
           { name: "confirmLive", label: "Type LIVE to confirm LIVE mode", defaultValue: "" },
         ]}
       />

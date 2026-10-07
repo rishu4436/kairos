@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { newOperatorToken, operatorCookieHeader, operatorMutationsAllowed } from "@/operator/guard";
+import { newOperatorToken, operatorMutationsAllowed } from "@/operator/guard";
 
 export const dynamic = "force-dynamic";
 
@@ -39,11 +39,6 @@ export default async function OperatorLayout({ children }: { children: ReactNode
           ))}
         </nav>
       </section>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `document.cookie=${JSON.stringify(operatorCookieHeader(token).split(";")[0] + "; Path=/; SameSite=Strict")}`,
-        }}
-      />
       {children}
     </div>
   );

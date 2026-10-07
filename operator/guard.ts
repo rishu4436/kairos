@@ -24,8 +24,10 @@ export function assertOperatorMutation(request: Request, env: NodeJS.ProcessEnv 
   return { ok: true };
 }
 
+export const OPERATOR_COOKIE = TOKEN_COOKIE;
+
 export function operatorCookieHeader(token: string): string {
-  return `${TOKEN_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Strict`;
+  return `${TOKEN_COOKIE}=${token}; Path=/; SameSite=Strict`;
 }
 
 export function newOperatorToken(): string {

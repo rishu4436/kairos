@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { InMemoryKairosStateStore, resetAutonomousStore } from "@/runtime/store";
 import { applyOperatorPatch, defaultOperatorConfig, validateOperatorConfig } from "@/operator/config";
+import { alignOperatingMode } from "@/operator/store";
+import { posturePreset } from "@/operator/posture";
 import { applyRuntimeAction, patchOperatorConfig } from "@/operator/actions";
 import { persistWalletSnapshot, readWalletSnapshot } from "@/operator/snapshots";
 import { assertPersistable } from "@/runtime/store";
@@ -89,6 +91,32 @@ describe("operator control plane", () => {
 
   it("refuses secret-like snapshot payloads", () => {
     expect(() => assertPersistable({ apiKey: "secret" })).toThrow(/STATE_INVALID/);
+  });
+
+  it("lifts paper execution to LIVE_PREVIEW only when market data is live", () => {
+    const previous = process.env.KAIROS_DATA_MODE;
+    process.env.KAIROS_DATA_MODE = "live";
+    try {
+      expect(alignOperatingMode(defaultOperatorConfig()).runtime.executionMode).toBe("LIVE_PREVIEW");
+    } finally {
+      if (previous === undefined) {
+        delete process.env.KAIROS_DATA_MODE;
+      } else {
+        process.env.KAIROS_DATA_MODE = previous;
+      }
+    }
+  });
+
+  it("auto postures stay inside the existing strategy parameter limits", () => {
+    const base = defaultOperatorConfig();
+    for (const posture of ["CONSERVATIVE", "MEDIUM", "HIGH"] as const) {
+      const next = posturePreset(posture, base);
+      expect(validateOperatorConfig(next).ok).toBe(true);
+      expect(next.risk.liveTradingEnabled).toBe(base.risk.liveTradingEnabled);
+    }
+    expect(posturePreset("CONSERVATIVE", base).strategies.dca.enabled).toBe(false);
+    expect(posturePreset("HIGH", base).strategies.dca.dipThresholdBps).toBe(300);
+    expect(posturePreset("MEDIUM", base).strategies.momentum.minReturnBps).toBe(50);
   });
 
   it("requires LIVE confirmation", () => {

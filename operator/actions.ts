@@ -6,6 +6,7 @@ import { runKairosAutonomousCycle, type AutonomousCycleOutcome } from "@/runtime
 import { LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID } from "@/domain/watchlist";
 import { observeLiveMarket } from "@/observation/live";
 import { readDataMode } from "@/lib/mode";
+import { posturePreset, type RiskPosture } from "@/operator/posture";
 
 export type OperatorAction =
   | "RUN"
@@ -13,7 +14,8 @@ export type OperatorAction =
   | "STOP"
   | "ONE_CYCLE"
   | "EXECUTION_DISABLE"
-  | "CONFIG_PATCH";
+  | "CONFIG_PATCH"
+  | "POSTURE";
 
 export function operatorAuditType(action: OperatorAction): string {
   if (action === "RUN") return "AGENT_STARTED";
@@ -98,6 +100,32 @@ export function patchOperatorConfig(
     message: `config v${next.config.version}`,
   });
   return { ok: true, config: next.config };
+}
+
+export function applyRiskPosture(
+  posture: RiskPosture,
+  store: KairosStateStore = autonomousStore(),
+  nowIso = new Date().toISOString(),
+): { ok: true; config: OperatorConfig } | { ok: false; reason: string } {
+  const current = readOperatorConfig(store);
+  const next = posturePreset(posture, current);
+  next.version = current.version + 1;
+  next.previousVersion = current.version;
+  next.updatedAt = nowIso;
+  const wrote = writeOperatorConfig(next, store);
+  if (!wrote.ok) {
+    return { ok: false, reason: wrote.reason };
+  }
+  store.appendAudit({
+    id: `POSTURE:${posture}:${next.version}`,
+    at: nowIso,
+    userId: LOCAL_RUNTIME_USER_ID,
+    agentId: DEFAULT_AGENT_ID,
+    cycleId: null,
+    type: "STRATEGY_CONFIG_UPDATED",
+    message: `Auto posture ${posture}`,
+  });
+  return { ok: true, config: next };
 }
 
 export async function requestOneCycle(

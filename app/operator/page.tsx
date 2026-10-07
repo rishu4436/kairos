@@ -1,14 +1,22 @@
 import { OperatorControls } from "@/components/operator/controls";
+import { StartChecklist } from "@/components/operator/start-checklist";
 import { readOperatorConfig } from "@/operator/store";
 import { commandState } from "@/operator/actions";
 import { readRuntimeSnapshot, readWalletSnapshot } from "@/operator/snapshots";
+import { publishWalletSnapshot } from "@/operator/wallet-publish";
+import { operatorMutationsAllowed } from "@/operator/guard";
 import { autonomousStore } from "@/runtime/store";
 import { LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID } from "@/domain/watchlist";
+import { loadProductionDashboard } from "@/services/dashboard";
 
 export const metadata = { title: "Operator" };
 export const dynamic = "force-dynamic";
 
-export default function OperatorHome() {
+export default async function OperatorHome() {
+  if (operatorMutationsAllowed()) {
+    await publishWalletSnapshot().catch(() => undefined);
+  }
+  const dashboard = await loadProductionDashboard();
   const config = readOperatorConfig();
   const runtime = readRuntimeSnapshot();
   const wallet = readWalletSnapshot();
@@ -16,6 +24,7 @@ export default function OperatorHome() {
   const latest = autonomousStore().listCycles(LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID).at(-1);
   return (
     <div className="space-y-3">
+      <StartChecklist dashboard={dashboard} control={control.control} showControls />
       <OperatorControls />
       <section className="panel">
         <p className="eyebrow">Canonical runtime</p>

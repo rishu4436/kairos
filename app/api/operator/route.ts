@@ -1,5 +1,6 @@
 import { assertOperatorMutation } from "@/operator/guard";
-import { applyRuntimeAction, patchOperatorConfig, requestOneCycle, type OperatorAction } from "@/operator/actions";
+import { applyRiskPosture, applyRuntimeAction, patchOperatorConfig, requestOneCycle, type OperatorAction } from "@/operator/actions";
+import { POSTURES, type RiskPosture } from "@/operator/posture";
 import { readOperatorConfig } from "@/operator/store";
 import { operatorMutationsAllowed } from "@/operator/guard";
 
@@ -27,6 +28,14 @@ export async function POST(request: Request): Promise<Response> {
   if (action === "RUN" || action === "PAUSE" || action === "STOP" || action === "EXECUTION_DISABLE") {
     const result = applyRuntimeAction(action);
     return Response.json(result, { status: result.ok ? 200 : 409 });
+  }
+  if (action === "POSTURE") {
+    const posture = (body as { posture?: string } | null)?.posture;
+    if (!POSTURES.includes(posture as RiskPosture)) {
+      return Response.json({ ok: false, reason: "UNKNOWN_POSTURE" }, { status: 400 });
+    }
+    const result = applyRiskPosture(posture as RiskPosture);
+    return Response.json(result, { status: result.ok ? 200 : 400 });
   }
   if (action === "CONFIG_PATCH") {
     const result = patchOperatorConfig(body?.patch ?? {});

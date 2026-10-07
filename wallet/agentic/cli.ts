@@ -20,11 +20,12 @@ export interface BawRunner {
 
 const ALLOWED_PREFIXES = ["wallet status", "wallet address", "wallet chains", "wallet balance", "wallet settings", "market-order list", "market-order swap"] as const;
 
-/** Runs a fixed `baw` argument list. It does not invoke a shell. */
+/** Runs a fixed `baw` argument list. Windows needs `baw.cmd` through the shell. Arguments stay the allowlist. */
 export function spawnBaw(args: readonly string[], timeoutMs = 8000): Promise<string> {
   assertAllowed(args);
+  const command = process.platform === "win32" ? "baw.cmd" : "baw";
   return new Promise((resolve, reject) => {
-    const child = spawn("baw", [...args], { shell: false, windowsHide: true });
+    const child = spawn(command, [...args], { shell: process.platform === "win32", windowsHide: true });
     let stdout = "";
     const timer = setTimeout(() => {
       child.kill();

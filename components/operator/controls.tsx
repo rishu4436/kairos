@@ -1,18 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import { OPERATOR_COOKIE } from "@/operator/guard";
 
 function token(): string {
   const host = document.querySelector("[data-operator-token]") as HTMLElement | null;
   return host?.dataset.operatorToken ?? "";
 }
 
+function writeCsrfCookie(value: string): void {
+  document.cookie = `${OPERATOR_COOKIE}=${value}; Path=/; SameSite=Strict`;
+}
+
 async function post(action: string, patch?: Record<string, unknown>) {
+  const csrf = token();
+  writeCsrfCookie(csrf);
   const response = await fetch("/api/operator", {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-kairos-operator": token(),
+      "x-kairos-operator": csrf,
     },
     body: JSON.stringify({ action, patch }),
   });
@@ -50,40 +57,91 @@ export function OperatorControls() {
   );
 }
 
-export function OperatorConfigForm({ fields }: { action?: string; fields: { name: string; label: string; defaultValue: string }[] }) {
+export interface OperatorField {
+  name: string;
+  label: string;
+  hint?: string;
+  kind?: "text" | "number" | "toggle" | "select";
+  defaultValue: string;
+  options?: readonly string[];
+  unit?: string;
+}
+
+export function OperatorConfigForm({
+  fields,
+  resetPatch,
+}: {
+  action?: string;
+  fields: readonly OperatorField[];
+  resetPatch?: Record<string, unknown>;
+}) {
   const [message, setMessage] = useState("");
+  function save(patch: Record<string, unknown>) {
+    void post("CONFIG_PATCH", patch).then((result) => setMessage(result.ok ? "Saved" : result.reason ?? "rejected"));
+  }
   return (
     <form
-      className="panel mt-3 space-y-3"
+      className="mt-3 space-y-3"
       onSubmit={(event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         const patch: Record<string, unknown> = {};
         for (const field of fields) {
           const raw = String(data.get(field.name) ?? "");
-          setPath(patch, field.name, coerce(raw));
+          setPath(patch, field.name, coerce(raw, field.kind));
         }
-        void post("CONFIG_PATCH", patch).then((result) => setMessage(result.ok ? "Saved" : result.reason ?? "rejected"));
+        save(patch);
       }}
     >
       {fields.map((field) => (
         <label key={field.name} className="block text-sm">
           <span className="text-muted">{field.label}</span>
-          <input name={field.name} defaultValue={field.defaultValue} className="mt-1 w-full border border-line bg-transparent px-2 py-1" />
+          {field.hint ? <span className="mt-1 block text-xs text-faint">{field.hint}</span> : null}
+          {field.kind === "toggle" ? (
+            <select name={field.name} defaultValue={field.defaultValue} className="mt-1 w-full border border-line bg-transparent px-2 py-1">
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
+            </select>
+          ) : field.kind === "select" ? (
+            <select name={field.name} defaultValue={field.defaultValue} className="mt-1 w-full border border-line bg-transparent px-2 py-1">
+              {(field.options ?? []).map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <span className="mt-1 flex items-center gap-2">
+              <input
+                name={field.name}
+                type={field.kind === "number" ? "number" : "text"}
+                step={field.kind === "number" ? "1" : undefined}
+                defaultValue={field.defaultValue}
+                className="w-full border border-line bg-transparent px-2 py-1"
+              />
+              {field.unit ? <span className="text-xs text-muted">{field.unit}</span> : null}
+            </span>
+          )}
         </label>
       ))}
-      <button type="submit" className="rounded-md border border-line px-3 py-2 text-sm">
-        SAVE
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <button type="submit" className="rounded-md border border-line px-3 py-2 text-sm">
+          SAVE
+        </button>
+        {resetPatch ? (
+          <button type="button" className="rounded-md border border-line px-3 py-2 text-sm" onClick={() => save(resetPatch)}>
+            RESET TO KAIROS DEFAULT
+          </button>
+        ) : null}
+      </div>
       {message ? <p className="text-sm text-muted">{message}</p> : null}
     </form>
   );
 }
 
-function coerce(raw: string): string | number | boolean {
-  if (raw === "true") return true;
-  if (raw === "false") return false;
-  if (/^-?\d+$/.test(raw)) return Number(raw);
+function coerce(raw: string, kind?: OperatorField["kind"]): string | number | boolean {
+  if (kind === "toggle") return raw === "true";
+  if (kind === "number" && /^-?\d+$/.test(raw)) return Number(raw);
   return raw;
 }
 
