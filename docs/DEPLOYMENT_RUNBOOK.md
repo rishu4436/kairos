@@ -1,5 +1,27 @@
 # Deployment runbook
 
+## Phase 17G completed readiness scope
+
+The throwaway BSC-testnet operating wallet is configured. The free ERC-8183
+KAIROS Market Intelligence Brief rail is configured and its BNB readiness sweep
+returns ready_to_deploy true with no critical blockers and three funding warnings.
+This result is a configuration check, not deployment authorization or proof of
+a running seller. The work hook exports read-only JSON fulfillment; official
+commercial transport/signing bootstrap remains uninstantiated.
+
+Use `C:\nvm4w\nodejs\bag.cmd doctor --project-root app/agent` and
+`C:\nvm4w\nodejs\bag.cmd deploy prepare --provider bnb --json --project-root app/agent`
+from `studio/bnb` for read-only readiness. Do not run `bag dev`, negotiate,
+publish, buy, submit, settle, deploy, or register in this phase.
+No quote was signed, job funded, faucet used, or transaction broadcast.
+
+IPFS remains selected. The managed platform reports injected upload credentials;
+do not add local storage credentials for this readiness phase.
+ERC-8183 is only external intelligence commerce. Stock execution remains KAIROS →
+deterministic risk → Binance quote/build/simulation → Agentic Wallet.
+On-chain commerce NOT_PUBLISHED; deployment NOT_DEPLOYED; ERC-8004 NOT_REGISTERED;
+trading wallet NOT_CONNECTED. Earlier gate descriptions below are historical.
+
 Paper and read-only only. This runbook does not connect the Agentic Wallet, sign, broadcast, or spend x402. Secret values are names, never literals.
 
 Phase 16 stopped before a real Agent Studio deploy. Plain `bag` on this machine is still Python 0.0.5. The npm CLI is 0.0.14 at `bag.cmd`. Set `KAIROS_BAG_BIN` to that binary for preflight. Do not commit the path.

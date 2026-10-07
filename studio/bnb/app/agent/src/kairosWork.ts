@@ -1,7 +1,12 @@
 /**
- * Studio-facing work hook.
- * The generated seller signs quotes in its own signing module. This file does not.
- * Behavior is studio/entrypoint.ts, which calls runKairosAutonomousCycle in PAPER
- * unless the server explicitly passes LIVE_PREVIEW.
+ * Studio-facing read-only intelligence work hook. The generated seller's
+ * sign/submit/settle runtime is deliberately not instantiated in this phase.
  */
-export { runStudioKairosCycle, trustedStudioMode } from "../../../../entrypoint";
+import { fulfillIntelligenceJob } from "../../../../intelligence";
+
+/** Studio 0.0.14 RunWork-compatible deliverable hook. No signer or LLM required. */
+export async function runIntelligenceWork(prompt: string): Promise<string> {
+  let job: unknown;
+  try { job = JSON.parse(prompt); } catch { job = prompt; }
+  return JSON.stringify(fulfillIntelligenceJob(job));
+}

@@ -1,5 +1,24 @@
 # KAIROS
 
+## Phase 17G: external intelligence service (2026-10-07)
+
+The free ERC-8183 rail is configured for **KAIROS Market Intelligence Brief**.
+`POST /api/intelligence` accepts only `requestId`, `ticker`,
+`requestedReportType: "MARKET_INTELLIGENCE_BRIEF"`, and an ISO `timestamp`.
+Supported public tickers are TSLA, NVDA, AAPL, MSFT, AMD, and SPY.
+The Studio work hook accepts the same object as JSON text. It reads a process-local
+public market snapshot, never starts an autonomous trading cycle, and returns
+`UNAVAILABLE` if no live snapshot exists. User positions, balances, watchlists,
+risk settings, intents, and wallet authority are excluded.
+
+ERC-8183 is the external intelligence-service rail. Stock execution remains
+KAIROS → deterministic risk → Binance quote/build/simulation → Agentic Wallet.
+Commercial signing and on-chain fulfillment are not instantiated by the work hook.
+No negotiation server was started, quote signed, job funded, rail published,
+identity registered, or Studio project deployed. Trading Wallet is NOT CONNECTED.
+The configuration readiness sweep passes; this does not verify a deployed seller.
+See [Agent Studio evidence](docs/AGENT_STUDIO_EVIDENCE.md).
+
 KAIROS is an autonomous multi-strategy market intelligence system that observes a user's watchlist, evaluates multiple strategies, and deterministically selects or rejects strategy candidates.
 
 This repository can simulate a paper fill. It does not sign or submit a transaction. This is simulated execution and does not broadcast blockchain transactions.

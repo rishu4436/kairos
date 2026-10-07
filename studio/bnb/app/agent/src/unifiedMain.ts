@@ -1,6 +1,7 @@
 /**
  * Name expected by `bag doctor` at src/unifiedMain.ts.
  * The scaffold's file with this name loads the seller, signs quotes, and can broadcast.
- * This file does not. It exposes the KAIROS paper cycle and nothing else.
+ * This phase exposes the read-only intelligence work hook. It does not start
+ * a server, load a wallet, negotiate a quote, or fulfill an on-chain job.
  */
-export { runStudioKairosCycle, trustedStudioMode } from "../../../../entrypoint";
+export { runIntelligenceWork } from "./kairosWork";

@@ -48,6 +48,16 @@ function operatingWallet() {
   }
 }
 
+function commerceRail() {
+  try {
+    const config = readFileSync(new URL("../studio/bnb/app/agent/studio.toml", import.meta.url), "utf8");
+    const rail = config.split(/^\[payments\.erc8183\]\s*$/m)[1]?.split(/^\[/m)[0] ?? "";
+    return /^enabled\s*=\s*true\s*$/m.test(rail) ? "CONFIGURED" : "NOT_CONFIGURED";
+  } catch {
+    return "NOT_CONFIGURED";
+  }
+}
+
 function resolveBagBin() {
   const configured = process.env.KAIROS_BAG_BIN?.trim();
   return configured && configured.length > 0 ? configured : "bag";
@@ -112,6 +122,8 @@ console.log("LIVE EXECUTION\tBLOCKED");
 console.log("AGENT IDENTITY\tNOT_REGISTERED");
 console.log(`OPERATING WALLET\t${operatingWallet()}`);
 console.log("STUDIO PROJECT\tCONFIGURED");
+console.log(`ERC-8183 COMMERCE RAIL\t${commerceRail()}`);
+console.log("ERC-8183 ON-CHAIN\tNOT_PUBLISHED");
 console.log("DEPLOYMENT\tNOT_DEPLOYED");
 console.log(`STUDIO CLI\t${studio.compatibility}`);
 console.log(`STUDIO CLI SOURCE\t${studio.bin}`);

@@ -1,5 +1,23 @@
 # Developer experience notes
 
+## Phase 17G Studio schema verification
+
+Use the explicit modern bag.cmd path and run `corepack pnpm` from `studio/bnb`
+to select pinned pnpm 10.24.0. Running Corepack from the repository root does
+not select this workspace's pin. No global pnpm downgrade is needed.
+
+Installed 0.0.14 recipes use canonical `[payments.seller]` USD pricing;
+zero is supported. Legacy atomic price bounds are bypassed under the canonical
+fixed-price policy. The current seller-only layout has no separate service TOML.
+The intelligence hook matches the official `RunWork` promise-of-string output,
+uses deterministic public snapshots, and needs no generic Studio LLM.
+
+ERC-8183 is an intelligence-service rail, separate from stock execution:
+KAIROS → deterministic risk → Binance quote/build/simulation → Agentic Wallet.
+Unit tests exercise typed envelopes, private-field projection, freshness, and
+execution capability rejection without importing or invoking real signing code.
+Configuration readiness does not verify an operational seller transport.
+
 Observations from the KAIROS Binance Web3 integration on 2026-10-03. These are notes from this build. Latency and rate-limit behavior were not measured, because this workspace had no API key and no credentialed call was made.
 
 ## What was straightforward

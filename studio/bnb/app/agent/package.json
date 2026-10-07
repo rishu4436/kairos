@@ -2,7 +2,7 @@
   "name": "kairos-agent",
   "version": "0.1.0",
   "private": true,
-  "description": "KAIROS operating agent. Dependency versions match the bag 0.0.14 scaffold. This package does not include the generated seller or its signing code.",
+  "description": "KAIROS read-only intelligence work hook for the free ERC-8183 rail. Dependency versions match bag 0.0.14. Commercial signing and on-chain submission are not instantiated.",
   "type": "module",
   "engines": {
     "node": ">=22"

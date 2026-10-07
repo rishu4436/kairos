@@ -1,5 +1,40 @@
 # Agent Studio evidence
 
+## Phase 17G (2026-10-07; supersedes earlier observations)
+
+- Canonical starting HEAD: `cefa391e7de7305da1092b95e41cdffe21160fde`, clean main, pull unchanged.
+- Installed modern CLI 0.0.14; inspected erc8183/config/doctor help and installed
+  agentcore sellerCore/unifiedMain/signing templates plus the config renderer.
+  No temporary scaffold or copied signing module was needed.
+- Current layout is seller-only `app/agent`; its wallet address is the provider
+  identity. No separate service/provider TOML is required.
+- Rail: ERC-8183 enabled; canonical free `price_usd = "0"`; auto-settle false;
+  quote TTL 900 seconds. X402 face removed and B402 remains disabled.
+- Service: typed read-only Market Intelligence Brief; standard strategy evaluation
+  over public provider snapshots. Private account/context fields never enter the store.
+- `deploy prepare --provider bnb --json --project-root app/agent`: target platform,
+  ready_to_deploy true, 0 blocked, 0 critical, 3 warnings, 6 informational checks.
+  `commerce_no_rail` cleared. Remaining warnings: all balances zero, insufficient
+  testnet BNB gas balance, and zero U. Observed BNB=0 and U=0.
+- This is configuration readiness only; no hosted seller, real negotiated quote,
+  storage upload, or on-chain fulfillment was exercised.
+- Doctor: no failures; config, entrypoint, single matching keystore, password
+  availability, RPC, free seller policy, ERC-8183 pricing/assets, and deploy CLI pass.
+  Warnings remain for provider none, local IPFS upload endpoint absent, zero BNB/U,
+  ERC-8004 absent, AWS credentials absent, Docker daemon unavailable, and twak absent.
+  The managed BNB readiness sweep supplies its own storage-token plan.
+- Validation: lint and production build pass; 298 tests pass with 7 live tests
+  skipped. Studio build passes with pnpm 10.24.0. Preflight reports the commerce
+  rail configured and on-chain NOT_PUBLISHED. A simultaneous build/typecheck run
+  briefly encountered Next-generated route files being replaced; standalone
+  standalone typecheck passed after the build completed.
+- Operating wallet: `0xe7a6b15AE66ddCe94C28BC47c66e60222824494E`.
+  ERC-8004 NOT_REGISTERED; ERC-8183 NOT_PUBLISHED; Studio NOT_DEPLOYED;
+  trading wallet NOT_CONNECTED; funding/signing/broadcast/x402 spending not performed.
+
+ERC-8183 serves external KAIROS intelligence. Stock execution remains KAIROS →
+deterministic risk → Binance quote/build/simulation → Agentic Wallet.
+
 Recorded on 2026-10-04 from this machine. Blank cells were not observed. They are not assumed.
 
 | Item | Evidence |

@@ -1,6 +1,6 @@
 # Operating runtime only. This file does not describe the user's Agentic Wallet.
 # KAIROS execution mode is PAPER in studio/entrypoint.ts. A request string cannot select LIVE.
-# The [wallet] block, when created later with `bag wallet new`, is the OPERATING wallet.
+# The [wallet] block is the throwaway BSC-testnet OPERATING wallet.
 # It must not be used as trading capital.
 
 [project]
@@ -8,7 +8,7 @@ name = "kairos-agent"
 
 [stack]
 runtime = "agentcore"
-protocols = ["A2A","X402"]
+protocols = ["A2A"]
 
 [network]
 default = "bsc-testnet"
@@ -31,7 +31,8 @@ price_usd = "0"
 assets = ["TEST_U","TEST_USDC","TEST_USDT"]
 
 [payments.erc8183]
-enabled = false
+# Free KAIROS Market Intelligence Brief; pricing is canonical [payments.seller].
+enabled = true
 quote_ttl_seconds = 900
 default_estimated_completion_seconds = 600
 poll_interval_seconds = 30

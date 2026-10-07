@@ -1,5 +1,7 @@
 import type { AgentCapabilityManifest } from "@/studio/types";
 import { kairosCapabilityManifest } from "@/studio/manifest";
+export { publicIntelligencePort, fulfillIntelligenceJob } from "@/studio/intelligence";
+export type { KairosPublicIntelligencePort, KairosIntelligenceJob, KairosIntelligenceBrief } from "@/studio/intelligence";
 
 export interface ExternalMarketContext {
   available: boolean;

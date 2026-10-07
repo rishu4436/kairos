@@ -1,5 +1,41 @@
 # Agent Studio
 
+## Phase 17G current state (2026-10-07)
+
+This section supersedes the earlier phase observations below. Modern CLI
+`C:\nvm4w\nodejs\bag.cmd` is 0.0.14. Its installed recipe source uses a single
+`app/agent` seller, canonical `[payments.seller].price_usd = "0"`, and
+`[payments.erc8183].enabled = true` with a 900-second quote TTL. No separate
+`app/service/studio.toml` or `[provider]` block is required by this version.
+Legacy atomic `price/min_price/max_price` are not copied into canonical pricing.
+The canonical fixed price is zero for all configured testnet assets.
+
+The sole public provider identity is agent `[wallet].address`:
+`0xe7a6b15AE66ddCe94C28BC47c66e60222824494E`. Its encrypted keystore remains
+in Git-ignored workspace `.studio/wallets/`. The Agentic trading wallet is absent.
+
+`src/unifiedMain.ts` exports `runIntelligenceWork`, a Studio RunWork-compatible
+hook returning JSON from a strict read-only job. It does not export the paper-cycle
+entrypoint. It does not bootstrap the generated seller or its signer. The installed
+official recipe's `signing.ts` owns signQuote/submit/settle separately from work;
+that code is not required by the configuration readiness sweep and is not
+instantiated here. Actual seller transport wiring is a future authorized phase.
+
+Service: KAIROS Market Intelligence Brief. Endpoint: `POST /api/intelligence`.
+Input example: `{"requestId":"brief_1","ticker":"TSLA","requestedReportType":"MARKET_INTELLIGENCE_BRIEF","timestamp":"2026-10-07T06:00:00Z"}`.
+The deliverable includes public representation, price/reference context, freshness,
+regime, session, standard strategy signals, provenance, and explicit unavailable
+markers. No private account data or trading authority is exposed. No live market
+fetch or trading cycle is triggered by an external request.
+
+ERC-8183 is only the external intelligence-service rail. Stock execution remains
+KAIROS → deterministic risk → Binance quote/build/simulation → Agentic Wallet.
+IPFS storage stays selected; the BNB managed platform reports that it injects
+an agent-scoped upload token. No storage credentials were configured.
+
+Configuration readiness passes with three funding warnings. No deployment,
+on-chain publication, registration, quote signing, funding, or x402 spending occurred.
+
 The local and Agent Studio runtime providers call `runKairosAutonomousCycle`. Studio is not deployed. A live request still does not fall through into a paper fill. The scheduler runs only after `scheduleCycle`. Tests and `next build` do not arm it.
 
 ## Installed CLI on this machine, 2026-10-07

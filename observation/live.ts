@@ -13,6 +13,7 @@ import { createBinanceGateway } from "@/services/binance/gateway";
 import { createMarketCandleGateway } from "@/services/binance/market/gateway";
 import { CANDLE_REFRESH_MS, CANDLE_RETRY_MS } from "@/strategies/parameters";
 import type { Candle } from "@/domain/candle";
+import { publishPublicMarketSnapshot } from "@/studio/intelligence";
 
 export async function liveObservationBoard(userId: string, signal?: AbortSignal): Promise<ObservationBoard> {
   if (userId !== DEMO_USER_ID) {
@@ -67,6 +68,9 @@ export async function liveObservationBoard(userId: string, signal?: AbortSignal)
       }
     }
     candles.set(key, marketHistory.queryRecent(key, 100));
+  }
+  for (const row of rows) {
+    publishPublicMarketSnapshot(row, candles.get(row.representationId) ?? [], receivedAt.getTime());
   }
   const board = {
     ok: true as const,

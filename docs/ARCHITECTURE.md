@@ -1,5 +1,29 @@
 # KAIROS architecture
 
+## Phase 17G public intelligence boundary
+
+`observation/live.ts` projects public provider rows into `studio/intelligence.ts`
+before user-specific enrichment. The projection recomputes the standard public
+strategies from public candles; it never copies user context, arbitration memory,
+positions, or policies. Freshness is reclassified at read time and stale signals
+are withheld. Snapshots are process-local; a different Studio process honestly
+returns unavailable until a trusted public ingestion source populates its cache.
+
+`KairosPublicIntelligencePort`, exported alongside `KairosExternalAgentInterface`,
+provides the typed read surface. The HTTP adapter and Studio `runIntelligenceWork`
+hook validate a fixed job schema and return a public brief. Optional public event,
+arbitration, strategy-health, and research snapshots are currently unavailable;
+private user stores are not substituted. Fulfillment imports no executor, wallet,
+signer, risk override, or autonomous runtime.
+
+The free ERC-8183 commerce capability is separate from stock execution authority;
+both real paper/live capability admission functions reject it. ERC-8183 may later
+authenticate service quotes/fulfillment through official fixed signing code.
+That transport is not instantiated here. Stock execution remains KAIROS →
+deterministic risk → Binance quote/build/simulation → Agentic Wallet.
+The rail is configured, on-chain publication NOT PERFORMED, deployment NOT DEPLOYED,
+ERC-8004 NOT_REGISTERED, and trading wallet NOT CONNECTED.
+
 This build is the skeleton. Names below match the code. Anything described as later is not implemented.
 
 ## System boundaries
