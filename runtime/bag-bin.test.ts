@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -25,9 +25,12 @@ describe("studio cli selection", () => {
 
   it("reports a missing explicit binary and does not let PATH bag replace it", () => {
     const root = mkdtempSync(join(tmpdir(), "kairos-bag-"));
-    const missing = join(root, "missing-bag.cmd");
-    const fake = join(root, "fake-bag.cmd");
-    writeFileSync(fake, "@echo 0.0.14\r\n");
+    const missing = join(root, "missing-bag");
+    const fake = join(root, process.platform === "win32" ? "fake-bag.cmd" : "fake-bag");
+    writeFileSync(fake, process.platform === "win32" ? "@echo 0.0.14\r\n" : "#!/bin/sh\necho 0.0.14\n");
+    if (process.platform !== "win32") {
+      chmodSync(fake, 0o755);
+    }
     try {
       const missingRun = execFileSync(process.execPath, ["scripts/kairos-preflight.mjs"], {
         cwd: process.cwd(),
