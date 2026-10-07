@@ -3,9 +3,9 @@ import { AutonomousRuntimePanel } from "@/components/command/autonomous-runtime"
 import { AgentIdentitySections } from "@/components/command/agent-runtime";
 import { PageHeader } from "@/components/ui/page-header";
 import { PhaseBanner } from "@/components/ui/phase-banner";
-import { readDataMode } from "@/lib/mode";
-import { autonomousSnapshot, runManualPaperCycle } from "@/observation/autonomous-board";
+import { autonomousSnapshot } from "@/observation/autonomous-board";
 import { getAgentPageModel } from "@/services/command-center";
+import { loadProductionDashboard } from "@/services/dashboard";
 import { buildRuntimeDashboard } from "@/studio/view";
 import { CliAgenticWalletGateway } from "@/wallet/agentic/cli";
 import { disconnectedAccount } from "@/wallet/agentic/parse";
@@ -17,9 +17,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AgentPage() {
   const model = getAgentPageModel();
-  if (readDataMode() === "paper") {
-    await runManualPaperCycle();
-  }
+  const dashboard = await loadProductionDashboard();
   const runtime = autonomousSnapshot();
   const trading = await new CliAgenticWalletGateway()
     .getStatus(DEMO_USER_ID, "agent_demo")
@@ -31,7 +29,7 @@ export default async function AgentPage() {
       <PageHeader
         kicker="Runtime"
         title="Agent"
-        description="The runtime state is separate from the trading lifecycle. Agent Studio is configured and undeployed; the operating wallet is configured and unfunded."
+        description="Read-only runtime heartbeat. This page does not start a cycle or enable LIVE."
       />
       <PhaseBanner detail="The local runtime is not scheduled. Start, pause, and deploy controls are not available." />
       <div className="mb-4">
@@ -41,7 +39,7 @@ export default async function AgentPage() {
         <AgentIdentitySections
           view={buildRuntimeDashboard({
             tradingConnected: trading.connectionStatus === "CONNECTED",
-            market: "PAPER_SAMPLE",
+            market: dashboard.dataMode === "live" ? "LIVE_OK" : "PAPER_SAMPLE",
             researchLabel: "NOT CONFIGURED",
           })}
         />
@@ -49,11 +47,11 @@ export default async function AgentPage() {
       <p className="eyebrow mb-3">Trading lifecycle</p>
       <section className="panel mb-4 max-w-3xl">
         <dl className="grid gap-4 sm:grid-cols-2">
-          <Item label="Runtime" value={model.runtimeLabel} />
-          <Item label="Mode" value={model.mode} />
+          <Item label="Runtime" value={dashboard.agent.status} />
+          <Item label="Mode" value={dashboard.executionMode} />
           <Item label="User" value={model.user} />
-          <Item label="Account" value={model.account} />
-          <Item label="Wallet address" value={model.address} />
+          <Item label="Last heartbeat" value={dashboard.agent.lastHeartbeat} />
+          <Item label="Wallet address" value={dashboard.wallet.address} />
           <Item label="Legal next states" value={allowed.join(" · ")} />
         </dl>
       </section>

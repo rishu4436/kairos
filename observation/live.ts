@@ -1,4 +1,5 @@
 import type { ObservationBoard } from "@/domain/observation";
+import type { MarketObservationSnapshot, ObserveMarket } from "@/runtime/observe";
 import { configuredWatchlist, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import { observeWatchlist } from "@/observation/engine";
 import { emptyHealth, observationEvents, rowFromLive } from "@/observation/board";
@@ -15,7 +16,23 @@ import { CANDLE_REFRESH_MS, CANDLE_RETRY_MS } from "@/strategies/parameters";
 import type { Candle } from "@/domain/candle";
 import { publishPublicMarketSnapshot } from "@/studio/intelligence";
 
+export const observeLiveMarket: ObserveMarket = async ({ userId, now }) => {
+  const snapshot = await liveObservationSnapshot(userId);
+  void now;
+  return snapshot;
+};
+
+export async function liveObservationSnapshot(userId: string, signal?: AbortSignal): Promise<MarketObservationSnapshot> {
+  const { board, candles } = await runLiveObservation(userId, signal);
+  return { board, candles };
+}
+
 export async function liveObservationBoard(userId: string, signal?: AbortSignal): Promise<ObservationBoard> {
+  const { board } = await runLiveObservation(userId, signal);
+  return board;
+}
+
+async function runLiveObservation(userId: string, signal?: AbortSignal): Promise<{ board: ObservationBoard; candles: Map<string, Candle[]> }> {
   if (userId !== LOCAL_RUNTIME_USER_ID) {
     throw new KairosApiError({
       category: "DATA_UNAVAILABLE",
@@ -100,12 +117,13 @@ export async function liveObservationBoard(userId: string, signal?: AbortSignal)
     nowMs: receivedAt.getTime(),
     fidelity: "live",
   });
-  return enrichBoard(board, {
+  const enriched = enrichBoard(board, {
     candles,
     asOfMs: receivedAt.getTime(),
     historyHealth,
     record: (signal) => signalLog.record(signal),
   });
+  return { board: enriched, candles };
 }
 
 export function failureBoard(

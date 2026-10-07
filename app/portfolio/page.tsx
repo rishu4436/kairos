@@ -1,4 +1,6 @@
 import { EmptyState } from "@/components/ui/empty-state";
+import { LiveTradesPanel } from "@/components/command/live-trades";
+import { PortfolioPanel } from "@/components/command/portfolio-panel";
 import { PageHeader } from "@/components/ui/page-header";
 import { PhaseBanner } from "@/components/ui/phase-banner";
 import { DEMO_USER_ID } from "@/domain/watchlist";
@@ -6,12 +8,14 @@ import { readDataMode } from "@/lib/mode";
 import { paperObservationBoard } from "@/observation/paper";
 import { sessionPaperCapability } from "@/paper/run-cycle";
 import { getPortfolioPageModel } from "@/services/command-center";
+import { loadProductionDashboard } from "@/services/dashboard";
 
 export const metadata = { title: "Portfolio" };
 
 export const dynamic = "force-dynamic";
 
-export default function PortfolioPage() {
+export default async function PortfolioPage() {
+  const dashboard = await loadProductionDashboard();
   const model = getPortfolioPageModel();
   const mode = readDataMode();
   const authority = mode === "paper" ? sessionPaperCapability() : null;
@@ -20,11 +24,19 @@ export default function PortfolioPage() {
   return (
     <>
       <PageHeader
-        kicker="Simulated paper ledger"
+        kicker="Agentic Wallet"
         title="Portfolio"
-        description="Current paper positions and simulated execution history. Values are empty until a paper account is initialized."
+        description="Live balances come from the Agentic Wallet on BSC 56. The paper ledger is a separate simulated section."
       />
-      <PhaseBanner detail="Funding, transfers, and wallet connection are not available." />
+      <PhaseBanner detail="This page is read-only. It does not sign, broadcast, or enable LIVE." />
+      <div className="mb-4">
+        <PortfolioPanel live={dashboard.livePortfolio} />
+      </div>
+      <div className="mb-6">
+        <LiveTradesPanel trades={dashboard.liveTrades} />
+      </div>
+      <h2 className="mb-3 text-base font-medium">Paper / Strategy Lab ledger</h2>
+      <p className="mb-4 text-sm text-muted">Simulated paper account. Not wallet balances.</p>
       <dl className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-3">
         <Summary label="Total equity" value={model.equity} />
         <Summary label="Available USDT" value={model.cash} />

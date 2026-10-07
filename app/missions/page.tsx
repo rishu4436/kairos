@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { LiveTradesPanel } from "@/components/command/live-trades";
 import { PageHeader } from "@/components/ui/page-header";
 import type { PaperMissionView } from "@/domain/paper-cycle-view";
 import { DEMO_USER_ID } from "@/domain/watchlist";
@@ -6,11 +7,13 @@ import { LIVE_MISSION_TRACK, PAPER_MISSION_TRACK } from "@/execution/preview";
 import { readDataMode } from "@/lib/mode";
 import { paperObservationBoard } from "@/observation/paper";
 import { sessionPaperCapability } from "@/paper/run-cycle";
+import { loadProductionDashboard } from "@/services/dashboard";
 
 export const metadata = { title: "Missions" };
 export const dynamic = "force-dynamic";
 
-export default function MissionsPage() {
+export default async function MissionsPage() {
+  const dashboard = await loadProductionDashboard();
   const mode = readDataMode();
   const authority = mode === "paper" ? sessionPaperCapability() : null;
   const history = authority ? (paperObservationBoard(DEMO_USER_ID, { authority }).paperCycle?.history ?? []) : [];
@@ -18,10 +21,13 @@ export default function MissionsPage() {
   return (
     <>
       <PageHeader
-        kicker="Paper execution history"
+        kicker="Execution history"
         title="Missions"
-        description="Each row is one simulated paper decision. This is simulated execution and does not broadcast blockchain transactions."
+        description="Live trades are wallet submissions. Paper missions are simulated and never broadcast."
       />
+      <div className="mb-4">
+        <LiveTradesPanel trades={dashboard.liveTrades} />
+      </div>
       <section className="mb-4 grid gap-3 md:grid-cols-2">
         <article className="panel">
           <p className="eyebrow">Paper mission</p>

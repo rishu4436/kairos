@@ -8,7 +8,9 @@ export function AutonomousRuntimePanel({ snapshot }: { snapshot: Snapshot }) {
   return (
     <section className="panel" aria-labelledby="autonomous-runtime-title">
       <p className="eyebrow">Kairos autonomous runtime</p>
-      <h2 id="autonomous-runtime-title" className="mt-1 text-lg">Paper cycle</h2>
+      <h2 id="autonomous-runtime-title" className="mt-1 text-lg">
+        {latest?.executionMode ?? "No cycle"}
+      </h2>
       <dl className="mt-3 grid grid-cols-2 gap-3 text-sm lg:grid-cols-4">
         <Fact label="Autonomous runtime" value={snapshot.labels.autonomousRuntime} />
         <Fact label="State backend" value={snapshot.labels.stateBackend} />
@@ -24,10 +26,12 @@ export function AutonomousRuntimePanel({ snapshot }: { snapshot: Snapshot }) {
         <Fact label="Trading wallet" value={snapshot.labels.tradingWallet} />
         <Fact label="Paper readiness" value="READY" />
         <Fact label="Live execution" value={snapshot.labels.liveExecution} />
-        <Fact label="Mode" value="PAPER" />
+        <Fact label="Mode" value={latest?.executionMode ?? "—"} />
         <Fact label="Last status" value={latest?.status ?? "OFFLINE"} />
       </dl>
-      <p className="mt-3 text-xs text-muted">Suggested next {snapshot.heartbeat.nextCycleAt ?? "after the next manual or polled cycle"}. No background loop is running.</p>
+      <p className="mt-3 text-xs text-muted">
+        Heartbeat {snapshot.heartbeat.lastCycleCompleted ?? "none"} · next {snapshot.heartbeat.nextCycleAt ?? "—"}. Control {snapshot.heartbeat.runtimeStatus}.
+      </p>
       <h3 className="mt-4 text-sm font-medium">Recent cycles</h3>
       {snapshot.cycles.length === 0 ? <p className="mt-2 text-sm text-muted">No cycle has been recorded.</p> : null}
       <ul className="mt-2 space-y-1 text-sm">

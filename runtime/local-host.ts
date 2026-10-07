@@ -7,6 +7,8 @@ import { readDataMode, type DataModeEnv } from "@/lib/mode";
 import type { ObserveMarket } from "@/runtime/observe";
 import type { KairosStateStore } from "@/runtime/store";
 import type { AgentControlState, AutonomousExecutionMode } from "@/runtime/types";
+import type { PaperAccountState, RiskPolicy } from "@/domain/models";
+import type { LivePreparationAdapters } from "@/runtime/cycle";
 
 const DEFAULT_INTERVAL_MS = 60_000;
 
@@ -20,6 +22,9 @@ export interface LocalHostOptions {
   onCycle?: (outcome: AutonomousCycleOutcome) => void;
   store?: KairosStateStore;
   observeMarket?: ObserveMarket;
+  riskPolicy?: RiskPolicy;
+  account?: PaperAccountState;
+  livePreparation?: LivePreparationAdapters | ((nowMs: number) => LivePreparationAdapters);
   ownerId?: string;
   env?: DataModeEnv;
 }
@@ -105,6 +110,10 @@ export class LocalKairosRunner {
 
   async runOnce(nowMs = this.now()): Promise<AutonomousCycleOutcome> {
     const executionMode = resolveRunnerExecutionMode(this.options.executionMode, this.options.env);
+    const livePreparation =
+      typeof this.options.livePreparation === "function"
+        ? this.options.livePreparation(nowMs)
+        : this.options.livePreparation;
     return runKairosAutonomousCycle({
       userId: this.options.userId,
       agentId: this.options.agentId,
@@ -117,6 +126,9 @@ export class LocalKairosRunner {
       researchAvailable: false,
       runPaper: executionMode === "PAPER" ? (userId, now) => runAgentCycle(userId, now) : undefined,
       observeMarket: this.options.observeMarket,
+      riskPolicy: this.options.riskPolicy,
+      account: this.options.account,
+      livePreparation,
       store: this.options.store,
       control: "RUNNING" satisfies AgentControlState,
     });

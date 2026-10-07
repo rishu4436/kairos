@@ -1,9 +1,12 @@
 import type { AgenticTokenBalance, AgenticWalletAccount } from "@/domain/agentic-wallet";
+import { readOperatorTokenScope } from "@/wallet/agentic/token-scope";
 
 export function WalletPanel({ account, balances }: { account: AgenticWalletAccount; balances: readonly AgenticTokenBalance[] }) {
   const connected = account.connectionStatus === "CONNECTED";
   const policy = account.securityPolicy;
   const usdt = balances.find((item) => item.symbol === "USDT");
+  const bnb = balances.find((item) => (item.symbol ?? "").toUpperCase() === "BNB");
+  const tokenScope = readOperatorTokenScope()?.provenance ?? "TOKEN_SCOPE_UNVERIFIED";
   return (
     <section className="panel">
       <p className="eyebrow">KAIROS decided · Binance wallet authorizes</p>
@@ -20,9 +23,10 @@ export function WalletPanel({ account, balances }: { account: AgenticWalletAccou
         <Item label="Address" value={account.walletAddress ?? "—"} />
         <Item label="Chain" value="BSC" />
         <Item label="USDT balance" value={usdt?.amount ?? "—"} />
-        <Item label="Daily limit" value={policy?.dailyLimit === null || policy === null ? "—" : String(policy.dailyLimit)} />
-        <Item label="Daily remaining" value={policy?.quotaLeft === null || policy === null ? "—" : String(policy.quotaLeft)} />
-        <Item label="Tradable token scope" value={policy === null ? "—" : policy.tradeAllTokens === true ? "All tokens" : "Allow list, not verified"} />
+        <Item label="BNB balance" value={bnb?.amount ?? "—"} />
+        <Item label="Quota used" value={policy?.quotaUsed == null ? "—" : String(policy.quotaUsed)} />
+        <Item label="Quota remaining" value={policy?.quotaLeft == null ? "—" : String(policy.quotaLeft)} />
+        <Item label="Token-scope provenance" value={tokenScope} />
         <Item label="High-risk handling" value={policy?.highRiskHandling ?? "—"} />
       </dl>
       <p className="mt-4 text-sm text-muted">This wallet is separate from the simulated paper account. Signing material is not stored in KAIROS.</p>
