@@ -110,7 +110,7 @@ describe("binance skill registry", () => {
     expect(audit).toMatchObject({ version: "1.4", requiredCliVersion: null, compatibility: "COMPATIBLE", transport: "DIRECT_API" });
     expect(tokenized?.limitation).toContain("ONDO_ONLY");
     expect(tracker).toMatchObject({ version: "1.3", status: "BLOCKED", enabled: false });
-    expect(wallet).toMatchObject({ version: "1.11.0", installed: true, executionAccess: "ISOLATED", compatibility: "COMPATIBLE" });
+    expect(wallet).toMatchObject({ version: "1.12.0", installed: true, executionAccess: "ISOLATED", requiredCliVersion: "1.10.0", compatibility: "SKILL_BLOCKED_BY_VERSION", status: "BLOCKED" });
     expect(canInvoke("binance-trading-signal")).toBe(false);
     expect(canInvoke("binance-wallet-tracker")).toBe(false);
   });

@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { DEMO_USER_ID } from "@/domain/watchlist";
+import { LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import type { AgenticWalletAccount, AgenticWalletExecutionResult, AgenticWalletSecurityPolicy, AgenticTokenBalance } from "@/domain/agentic-wallet";
 import type { AgenticSwapRequest, AgenticWalletGateway } from "@/wallet/agentic/gateway";
 import {
@@ -49,7 +49,7 @@ export class CliAgenticWalletGateway implements AgenticWalletGateway {
 
   async getStatus(userId: string, agentId: string): Promise<AgenticWalletAccount> {
     const at = new Date().toISOString();
-    if (userId !== DEMO_USER_ID) {
+    if (userId !== LOCAL_RUNTIME_USER_ID) {
       return disconnectedAccount(userId, agentId, at);
     }
     try {
@@ -77,7 +77,7 @@ export class CliAgenticWalletGateway implements AgenticWalletGateway {
   }
 
   async getSecurityPolicy(userId: string): Promise<AgenticWalletSecurityPolicy | null> {
-    if (userId !== DEMO_USER_ID) {
+    if (userId !== LOCAL_RUNTIME_USER_ID) {
       return null;
     }
     const parsed = parseCliJson(await this.run(["wallet", "settings", "--json"]));
@@ -85,7 +85,7 @@ export class CliAgenticWalletGateway implements AgenticWalletGateway {
   }
 
   async getBalances(userId: string, chainId: "56"): Promise<readonly AgenticTokenBalance[]> {
-    if (userId !== DEMO_USER_ID) {
+    if (userId !== LOCAL_RUNTIME_USER_ID) {
       return [];
     }
     const parsed = parseCliJson(await this.run(["wallet", "balance", "--binanceChainId", chainId, "--json"]));
@@ -93,7 +93,7 @@ export class CliAgenticWalletGateway implements AgenticWalletGateway {
   }
 
   async executeSwap(request: AgenticSwapRequest): Promise<AgenticWalletExecutionResult> {
-    if (request.userId !== DEMO_USER_ID) {
+    if (request.userId !== LOCAL_RUNTIME_USER_ID) {
       return errorResult("USER_WALLET_MISMATCH");
     }
     if (!/^0x[0-9a-fA-F]{40}$/.test(request.fromToken) || !/^0x[0-9a-fA-F]{40}$/.test(request.toToken)) {
@@ -124,7 +124,7 @@ export class CliAgenticWalletGateway implements AgenticWalletGateway {
   }
 
   async getOrderStatus(userId: string, orderId: string): Promise<AgenticWalletExecutionResult> {
-    if (userId !== DEMO_USER_ID || !/^[A-Za-z0-9_-]{1,80}$/.test(orderId)) {
+    if (userId !== LOCAL_RUNTIME_USER_ID || !/^[A-Za-z0-9_-]{1,80}$/.test(orderId)) {
       return errorResult("VERIFICATION_FAILED");
     }
     const parsed = parseCliJson(await this.run(["market-order", "list", "--orderId", orderId, "--json"]));

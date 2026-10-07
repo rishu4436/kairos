@@ -87,9 +87,9 @@ describe("agentic wallet readiness", () => {
 function tooling(): ToolingMetadata {
   return {
     nodeVersion: "v24.18.0",
-    cliVersion: "1.9.0",
-    requiredCliVersion: "1.9.0",
-    installedSkillVersion: "1.11.0",
+    cliVersion: "1.10.0",
+    requiredCliVersion: "1.10.0",
+    installedSkillVersion: "1.12.0",
     latestSkillVersion: "1.12.0",
     cliCompatible: true,
   };

@@ -104,7 +104,7 @@ Strategy versions, paper outcomes, and experiment outcomes feed a performance me
 
 Agent Studio runtime adapters wrap the same cycle. The checked-in Studio project supplies a read-only intelligence work hook; seller bootstrap and deployment remain inactive. Operating and trading wallets stay separate. See [AGENT_STUDIO.md](AGENT_STUDIO.md).
 
-Binance skills are inputs. KAIROS normalizes them and decides. Trading-signal CLI commands and wallet tracking are blocked on baw 1.9.0 because those skills require 1.9.1. Smart Money live read is unavailable because the skill script is not installed and the current CLI reference does not publish a URL. Token audit and Ondo tokenized-security info are direct public APIs. They are not called from the browser, and a missing result stays missing. Token security is a gate after KAIROS risk. It does not add to strategy confidence. See [BINANCE_SKILLS.md](BINANCE_SKILLS.md).
+Binance skills are inputs. KAIROS normalizes them and decides. The Agentic Wallet skill requires baw 1.10.0; this machine still has 1.9.0, so that skill is version-blocked. Trading-signal CLI commands and wallet tracking are blocked because those skills require 1.9.1. Smart Money live read is unavailable because the skill script is not installed and the current CLI reference does not publish a URL. Token audit and Ondo tokenized-security info are direct public APIs. They are not called from the browser, and a missing result stays missing. Token security is a gate after KAIROS risk. It does not add to strategy confidence. See [BINANCE_SKILLS.md](BINANCE_SKILLS.md).
 
 ```text
 MARKET → BINANCE INTELLIGENCE → STRATEGIES → KAIROS CONTEXT → ARBITRATOR → RESEARCH → RISK → SECURITY → EXECUTION

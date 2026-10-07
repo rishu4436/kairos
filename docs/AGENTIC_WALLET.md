@@ -30,6 +30,6 @@ The stock contract comes from the existing KAIROS RWA record. The wallet skill i
 
 ## Multi-user boundary
 
-The supported local CLI session has no profile or user argument. KAIROS scopes this boundary to the stable local user ID user_demo; another user receives UNCONNECTED without a CLI call. AgenticWalletGateway retains a userId parameter, but production multi-user session orchestration is unfinished. KAIROS does not invent a second credential store or a global wallet.
+The supported local CLI session has no profile or user argument. KAIROS scopes this boundary to `LOCAL_RUNTIME_USER_ID` (literal `user_demo` for persisted state); another user receives UNCONNECTED without a CLI call. AgenticWalletGateway retains a userId parameter, but production multi-user session orchestration is unfinished. KAIROS does not invent a second credential store or a global wallet.
 
 Paper portfolio values are simulated state and do not establish a live wallet balance.

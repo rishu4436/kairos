@@ -1,7 +1,7 @@
 import type { BinanceSkill, ForbiddenCapability, SkillCapability } from "@/skills/types";
 import { FORBIDDEN_CAPABILITIES } from "@/skills/types";
 
-/** Observed on this machine on 2026-10-04. `baw --version` printed 1.9.0. Node was v24.18.0. */
+/** Observed on this machine on 2026-10-07. `baw --version` printed 1.9.0. Node was v24.18.0. Official hub requires 1.10.0. */
 export const OBSERVED_BAW_VERSION = "1.9.0";
 export const OBSERVED_NODE_VERSION = "v24.18.0";
 
@@ -60,19 +60,18 @@ function skill(input: Omit<BinanceSkill, "compatibility" | "installedCliVersion"
 }
 
 /**
- * Versions are the SKILL.md files inspected on 2026-10-04.
- * Only binance-agentic-wallet is installed locally, at 1.11.0.
+ * Hub versions inspected on 2026-10-07. Local BAW remains 1.9.0, so the wallet skill is version-blocked until CLI 1.10.0.
  * The other four were read from the Binance Skills Hub and were not installed.
  */
 export const BINANCE_SKILLS: readonly BinanceSkill[] = [
   skill({
     id: "binance-agentic-wallet",
     name: "Binance Agentic Wallet",
-    version: "1.11.0",
+    version: "1.12.0",
     status: "AVAILABLE",
     capabilities: [],
     categories: ["EXECUTION"],
-    requiredCliVersion: "1.9.0",
+    requiredCliVersion: "1.10.0",
     executionAccess: "ISOLATED",
     dataAccess: "NONE",
     enabled: true,
