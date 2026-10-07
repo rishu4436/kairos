@@ -19,6 +19,7 @@ export function AutonomousRuntimePanel({ snapshot }: { snapshot: Snapshot }) {
         <Fact label="Binance data" value={snapshot.labels.binanceData} />
         <Fact label="Binance skills" value={snapshot.labels.binanceSkills} />
         <Fact label="Qwen" value={snapshot.labels.qwen} />
+        <Fact label="Gemini" value={snapshot.labels.gemini} />
         <Fact label="FMP" value={snapshot.labels.fmp} />
         <Fact label="Trading wallet" value={snapshot.labels.tradingWallet} />
         <Fact label="Paper readiness" value="READY" />

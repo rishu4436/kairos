@@ -1,4 +1,5 @@
 import type { LlmConfig } from "@/research/llm-config";
+import { GeminiReasoningProvider } from "@/research/gemini";
 import type { LlmFetch } from "@/research/llm-http";
 import { HttpReasoningProvider } from "@/research/llm-http";
 import { recordLlmAttempt } from "@/research/llm-status";
@@ -10,6 +11,7 @@ import type { ResearchContext, ResearchThesis } from "@/research/types";
 
 /** Selects one adapter. An unknown name fails closed and does not call another provider. */
 export function selectReasoningProvider(config: LlmConfig, fetchImpl?: LlmFetch): ReasoningProvider {
+  if (config.provider === "gemini") return new GeminiReasoningProvider(config, fetchImpl);
   if (config.provider === "mock") {
     return new MockReasoningProvider();
   }

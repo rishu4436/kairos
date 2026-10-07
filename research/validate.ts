@@ -24,6 +24,7 @@ export interface ValidationResult {
 
 export function validateThesis(thesis: ResearchThesis): ValidationResult {
   const reasons: string[] = [];
+  collectForbiddenInstructions({ title: thesis.title, summary: thesis.summary, hypothesis: thesis.hypothesis, observations: thesis.observations, assumptions: thesis.assumptions, supportingEvidence: thesis.supportingEvidence, contradictingEvidence: thesis.contradictingEvidence, requiredData: thesis.requiredData, invalidationConditions: thesis.invalidationConditions, riskConsiderations: thesis.riskConsiderations }, reasons);
   if (thesis.title.trim().length === 0) {
     reasons.push("Title is required.");
   }
@@ -163,6 +164,7 @@ function unknownFinancialClaim(statement: string, known: readonly string[]): boo
 
 export function validateProposal(proposal: StrategyProposal): ValidationResult {
   const reasons: string[] = [];
+  collectForbiddenInstructions({ assetScope: proposal.assetScope, sessionScope: proposal.sessionScope, regimeScope: proposal.regimeScope, features: proposal.features, entryConditions: proposal.entryConditions, exitConditions: proposal.exitConditions, positionSizingHint: proposal.positionSizingHint, invalidationConditions: proposal.invalidationConditions, parameterSet: proposal.parameterSet }, reasons);
   if (!(PROPOSAL_ACTIONS as readonly string[]).includes(proposal.action)) {
     reasons.push("Action must be BUY, SELL, or OBSERVE.");
   }
@@ -339,6 +341,19 @@ function evidenceReasons(kind: string, statement: string, source: string | null)
 function collectCode(value: string, label: string, reasons: string[]): void {
   if (CODE_PATTERN.test(value)) {
     reasons.push(`Executable code is not allowed in ${label}.`);
+  }
+}
+
+function collectForbiddenInstructions(value: unknown, reasons: string[]): void {
+  if (typeof value === "string") {
+    // Conservative bounded research policy; these operations have no place in model output.
+    if (/\b(connect|unlock|fund|access)\s+(your\s+|the\s+|a\s+)?wallet\b|\b(sign|broadcast|execute|submit|place)\s+(a\s+|the\s+|this\s+)?(transaction|trade|order)s?\b|\b(override|disable|bypass)\s+(the\s+)?(risk|safety)\b/i.test(value)) {
+      reasons.push("Wallet, execution, or risk override instructions are not allowed in research output.");
+    }
+  } else if (Array.isArray(value)) {
+    for (const item of value) collectForbiddenInstructions(item, reasons);
+  } else if (value && typeof value === "object") {
+    for (const item of Object.values(value)) collectForbiddenInstructions(item, reasons);
   }
 }
 

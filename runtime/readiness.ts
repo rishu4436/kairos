@@ -8,6 +8,7 @@ export interface RuntimeReadiness {
   stateBackend: ReadinessStatus;
   binanceWeb3: ReadinessStatus;
   qwen: ReadinessStatus;
+  gemini: ReadinessStatus;
   fmp: ReadinessStatus;
   binanceSkills: ReadinessStatus;
   agentStudio: ReadinessStatus;
@@ -33,6 +34,7 @@ export function collectReadiness(env: NodeJS.ProcessEnv = process.env): RuntimeR
     stateBackend,
     binanceWeb3: present(env.BINANCE_WEB3_API_KEY) && present(env.BINANCE_WEB3_SECRET_KEY) ? "READY" : "NOT_CONFIGURED",
     qwen: env.KAIROS_LLM_PROVIDER === "qwen" && present(env.KAIROS_LLM_API_KEY) && present(env.KAIROS_QWEN_BASE_URL) ? "READY" : "NOT_CONFIGURED",
+    gemini: env.KAIROS_LLM_PROVIDER === "gemini" && present(env.KAIROS_LLM_API_KEY) ? "READY" : "NOT_CONFIGURED",
     fmp: present(env.FMP_API_KEY) ? "READY" : "NOT_CONFIGURED",
     binanceSkills: "NOT_CONFIGURED",
     agentStudio: "INCOMPATIBLE",
@@ -54,6 +56,7 @@ export interface ReadinessLabels {
   binanceData: string;
   binanceSkills: string;
   qwen: string;
+  gemini: string;
   fmp: string;
   tradingWallet: string;
   liveExecution: string;
@@ -65,6 +68,7 @@ export function readinessLabels(env: NodeJS.ProcessEnv = process.env): Readiness
   const ready = collectReadiness(env);
   const qwenAttempt = readLlmAttempt();
   const qwenVerified = qwenAttempt?.provider === "qwen" && qwenAttempt.model === (env.KAIROS_LLM_MODEL?.trim() || "qwen3.8-max");
+  const geminiVerified = qwenAttempt?.provider === "gemini" && qwenAttempt.model === (env.KAIROS_LLM_MODEL?.trim() || "gemini-3.8-flash");
   return {
     autonomousRuntime: "LOCAL",
     stateBackend: ready.stateBackend === "READY" ? "REDIS · DURABLE" : ready.stateBackend === "STATE_BACKEND_ERROR" ? "REDIS · UNAVAILABLE" : ready.stateBackend === "NOT_CONFIGURED" ? "REDIS · NOT CONFIGURED" : "MEMORY · EPHEMERAL",
@@ -73,6 +77,7 @@ export function readinessLabels(env: NodeJS.ProcessEnv = process.env): Readiness
     binanceData: ready.binanceWeb3 === "READY" ? readLastSuccess() ? "BINANCE · LIVE" : "CONFIGURED · NOT VERIFIED" : "NOT CONFIGURED",
     binanceSkills: "NOT INSTALLED",
     qwen: ready.qwen === "READY" ? qwenVerified ? qwenAttempt!.status === "SUCCESS" ? "QWEN · CONNECTED" : "QWEN · ERROR" : "CONFIGURED · NOT VERIFIED" : "NOT CONFIGURED",
+    gemini: ready.gemini === "READY" ? geminiVerified ? qwenAttempt!.status === "SUCCESS" ? "GEMINI · CONNECTED" : "GEMINI · ERROR" : "CONFIGURED · NOT VERIFIED" : "NOT CONFIGURED",
     fmp: ready.fmp === "READY" ? "CONFIGURED · NOT VERIFIED" : "NOT CONFIGURED",
     tradingWallet: "NOT CONNECTED",
     liveExecution: "BLOCKED",

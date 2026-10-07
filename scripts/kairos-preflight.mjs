@@ -123,6 +123,7 @@ console.log(`STATE BACKEND\t${state === "READY" ? "REDIS" : state}`);
 console.log(`PERSISTENCE\t${state === "READY" ? "DURABLE" : state === "MEMORY_EPHEMERAL" ? "EPHEMERAL" : "UNVERIFIED"}`);
 console.log(`BINANCE WEB3\t${binance()}`);
 console.log(`QWEN\t${qwen()}`);
+console.log(`GEMINI\t${process.env.KAIROS_LLM_PROVIDER === "gemini" && present("KAIROS_LLM_API_KEY") ? "READY" : "NOT_CONFIGURED"}`);
 console.log(`FMP\t${fmp()}`);
 console.log("BINANCE SKILLS\tNOT_CONFIGURED");
 console.log("AGENTIC WALLET\tBLOCKED");

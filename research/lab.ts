@@ -80,9 +80,11 @@ export interface ResearchLabModel {
 }
 
 export async function loadResearchLab(userId = DEMO_USER_ID): Promise<ResearchLabModel> {
-  const attempt = readLlmAttempt();
+  const serverConfig = readLlmConfig();
+  const lastAttempt = readLlmAttempt();
+  const attempt = lastAttempt?.provider === serverConfig.provider && lastAttempt.model === serverConfig.model ? lastAttempt : null;
   const config = publicLlmStatus(
-    readLlmConfig(),
+    serverConfig,
     attempt?.status === "SUCCESS" ? { at: attempt.completedAt, latencyMs: attempt.latencyMs } : null,
   );
   const label = llmLabel(config.provider, config.configured, attempt);

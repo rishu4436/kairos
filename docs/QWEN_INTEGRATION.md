@@ -154,3 +154,6 @@ It makes one thesis request. It does not write a fixture. No live Qwen call was 
 ## Limits
 
 The adapter does not enable thinking controls, because the structured-output example for `qwen3.8-max` does not send them. If a live call rejects a schema keyword such as `anyOf`, that is a provider limitation and the local validators remain authoritative. Qwen cannot create a trade intent, change risk, reach a wallet, sign, broadcast, or promote a strategy.
+## Explicit provider selection
+
+Qwen, xAI, and Gemini are supported; mock is test-only. Selecting `KAIROS_LLM_PROVIDER=qwen` retains Qwen errors and never calls Gemini. Selecting Gemini uses the generic key/model settings for Gemini, as described in [GEMINI_INTEGRATION.md](GEMINI_INTEGRATION.md). The recorded Qwen HTTP 401 and subsequent no-response attempt remain unchanged and do not become Gemini evidence.

@@ -18,6 +18,7 @@ export interface LlmEnv {
 
 const XAI_MODEL = "grok-4.7";
 const QWEN_MODEL = "qwen3.8-max";
+const GEMINI_MODEL = "gemini-3.8-flash";
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 /** Server configuration. The key and the Qwen base URL stay in this object. */
@@ -39,6 +40,7 @@ export function readLlmConfig(env: LlmEnv | NodeJS.ProcessEnv = process.env): Ll
 }
 
 export function providerLabel(provider: string): string {
+  if (provider === "gemini") return "Gemini";
   if (provider === "qwen") {
     return "Qwen";
   }
@@ -80,6 +82,7 @@ export function publicLlmStatus(config: LlmConfig, last: { at: string; latencyMs
 }
 
 function defaultModel(provider: string): string {
+  if (provider === "gemini") return GEMINI_MODEL;
   if (provider === "qwen") {
     return QWEN_MODEL;
   }
@@ -99,7 +102,7 @@ function isConfigured(provider: string, apiKey: string, qwenBaseUrl: string): bo
   if (provider === "qwen") {
     return apiKey.length > 0 && qwenBaseUrl.length > 0;
   }
-  if (provider === "xai") {
+  if (provider === "xai" || provider === "gemini") {
     return apiKey.length > 0;
   }
   return provider.length > 0;

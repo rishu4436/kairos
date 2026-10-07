@@ -2,6 +2,8 @@
 
 The research brain cannot directly execute trades.
 
+Selectable adapters are Qwen, xAI, Gemini, and explicit test-only mock. `KAIROS_LLM_PROVIDER` chooses exactly one; failures never trigger another provider. Gemini uses the same context, canonical schemas, evidence/DSL validators, and paper lifecycle. See [Gemini integration](GEMINI_INTEGRATION.md) for private configuration and the one-request gate. Research provenance now includes context ID when available, while remaining compatible with earlier recorded records.
+
 It inspects structured market evidence, writes a falsifiable thesis, and proposes a declarative strategy. Deterministic KAIROS code validates the proposal and runs a paper experiment. The model does not create a trade intent, call the arbitrator, change a risk policy, or touch a wallet.
 
 ```text

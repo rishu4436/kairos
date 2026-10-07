@@ -67,6 +67,8 @@ export type ResearchSourceType = "MOCK" | "LLM";
 export type MarketDataSource = "LIVE_BINANCE_HISTORY" | "MOCK_FIXTURE";
 
 export interface ResearchProvenance {
+  /** Optional for compatibility with previously recorded research. */
+  contextId?: string | null;
   sourceType: ResearchSourceType;
   provider: string;
   model: string;

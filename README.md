@@ -213,3 +213,6 @@ Market data and tokenized-equity reference data point at the RWA adapters. They 
 6. Build the strategy lab on the paper ledger.
 7. Add an MCP transport in front of `services/external-access.ts` without giving it signing rights.
 8. Consider the documented market WebSocket only in a later phase. This phase polls.
+## Research provider selection
+
+KAIROS supports explicit Qwen, xAI, and Gemini research adapters, plus test-only mock. Set the server-only `KAIROS_LLM_PROVIDER` and matching generic key/model settings privately; no automatic failover occurs. Gemini defaults to `gemini-3.8-flash`, uses bounded structured output, and has no tools or trading authority. [Gemini setup and one-request proof](docs/GEMINI_INTEGRATION.md) describes configuration, validation, and the gated live test. Existing Qwen evidence is preserved.

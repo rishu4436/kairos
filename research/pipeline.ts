@@ -35,7 +35,7 @@ export async function runResearchDraft(input: {
   const thesisId = `thesis_${input.userId}_${input.context.ticker}_${input.nowMs}`;
   const thesisResponse = await input.provider.generateThesis(input.context);
   const parsedThesis = thesisResponse.ok ? parseThesisDraft(thesisResponse.value) : { ok: false as const, reasons: [thesisResponse.ok ? "" : thesisResponse.error] };
-  const provenance = provenanceFrom(thesisResponse, input.provider, createdAt, input.contextTimestamp, input.contextDataVersion);
+  const provenance = { ...provenanceFrom(thesisResponse, input.provider, createdAt, input.contextTimestamp, input.contextDataVersion), contextId: input.context.contextId };
   let thesis = blankThesis(input, thesisId, createdAt, provenance);
   if (!thesisResponse.ok) {
     thesis = { ...thesis, status: "MODEL_ERROR", rejectionReasons: [thesisResponse.error], updatedAt: createdAt };
@@ -98,7 +98,7 @@ export async function runResearchDraft(input: {
     version: "1",
     createdAt,
     status: "VALIDATING",
-    provenance: provenanceFrom(proposalResponse, input.provider, createdAt, input.contextTimestamp, input.contextDataVersion),
+    provenance: { ...provenanceFrom(proposalResponse, input.provider, createdAt, input.contextTimestamp, input.contextDataVersion), contextId: input.context.contextId },
     rejectionReasons: [],
   };
   const proposalCheck = validateProposal(proposal);
@@ -128,7 +128,7 @@ export async function runResearchDraft(input: {
     executionPolicy: "paper fee assumption, one unit, separate from the user book",
     dataset: input.dataset,
     dataSource: input.dataSource,
-    thesisSource: input.provider.configured ? "LLM" : "MOCK",
+    thesisSource: input.provider.id === "mock" ? "MOCK" : "LLM",
     result: null,
     reason: null,
     status: "RUNNING",
@@ -189,7 +189,7 @@ function provenanceFrom(
 ): ResearchProvenance {
   const failed = result.ok ? null : result.errorCategory;
   return {
-    sourceType: provider.configured ? "LLM" : "MOCK",
+    sourceType: provider.id === "mock" ? "MOCK" : "LLM",
     provider: result.provider || provider.id,
     model: result.model || provider.model,
     promptVersion: result.promptVersion,
