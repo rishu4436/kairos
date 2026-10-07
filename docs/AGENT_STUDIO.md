@@ -2,6 +2,28 @@
 
 The local and Agent Studio runtime providers call `runKairosAutonomousCycle`. Studio is not deployed. A live request still does not fall through into a paper fill. The scheduler runs only after `scheduleCycle`. Tests and `next build` do not arm it.
 
+## Installed CLI on this machine, 2026-10-07
+
+Plain `bag` is still the Python package `bnbagent-studio` 0.0.5 at `C:\Users\rishu\AppData\Local\Programs\Python\Python314\Scripts\bag.exe`. That executable is first on PATH. The official npm package is `@bnbagent/studio-cli@0.0.14`, and its binary is `C:\nvm4w\nodejs\bag.cmd`. Do not describe the npm CLI as version 0.0.5.
+
+`bag.cmd` 0.0.14 `init` creates a directory in the current working directory. The name must be letters and digits, start with a letter, and be at most 23 characters. It does not accept a path with hyphens. Safe inspection flags are `--no-onboard`, `--no-install`, and `--no-auto-topup`. A reference project was generated outside this repository and then deleted. It pinned `packageManager` to `pnpm@10.24.0`. Global pnpm remains 11.10.0 and was not downgraded. Corepack can activate pnpm 10.24.0 inside `studio/bnb` when that workspace is installed. It has not been installed.
+
+The generated layout is a workspace root plus `app/agent/studio.toml`. KAIROS already uses `app/agent` for the Next.js agent page, so the Studio project lives at `studio/bnb/app/agent/studio.toml`. `bag.cmd` reads it with `--project-root studio/bnb/app/agent`. The toml keys are the ones `bag.cmd config list-keys` printed. No extra keys were added.
+
+`[llm].provider` is `none`. KAIROS research stays on its own provider. `[payments.erc8183].enabled` and `[payments.b402_seller].enabled` are false. `[budget].enabled` is false. The `[wallet]` block is the future operating wallet. It is not the Agentic trading wallet, and no keystore was created.
+
+`studio/entrypoint.ts` is the work boundary. It calls `runKairosAutonomousCycle`. The default mode is `PAPER`. A request string of `LIVE` does not change that. Only an explicit server value of `LIVE_PREVIEW` leaves paper, and that path does not call the paper executor. The wrapper returns `signed: false` and `broadcast: false`.
+
+`studio/bnb/app/agent/src/unifiedMain.ts` exists because `bag doctor` looks for that filename. It re-exports the paper cycle. It is not the generated seller, and it does not sign.
+
+`bag.cmd doctor --project-root studio/bnb/app/agent` on 2026-10-07 parsed `studio.toml`, found the entrypoint, reached BSC testnet RPC, and treated the seller price as free. It failed because `.studio/wallets` does not exist. Warnings: `WALLET_PASSWORD` unset, LLM provider `none`, AWS credentials unset, Docker daemon not running, twak CLI absent. Those were left as they are. No keystore was created.
+
+`bag.cmd deploy prepare` was not run. Its help shows a readiness sweep with provider, wallet-balance, and storage checks. That is left for a later phase. `bag skills install` was not run. `bag dev` was not started. ERC-8004 was not registered.
+
+The global npm install warned that scripts for `esbuild`, `@azure/msal-node-extensions`, and `keytar` were blocked. They were not enabled. Local `bag.cmd --version` and help still ran.
+
+The configuration page dated 2026-08-23 still shows an older `[payments.erc8183].min_price` example and says `bag mcp serve` needs `WALLET_PASSWORD`. This CLI's `config list-keys` has no `min_price` key, and `bag mcp` is not a command. MCP in the quickstart is a face of `bag dev`. The workspace root holds the keystore and does not hold `studio.toml`. `bag deploy package` is not a subcommand of this binary. Deploy subcommands are `wallet`, `list`, `prepare`, `agent`, `verify`, `status`, `info`, `destroy`, `logs`, and `fix-gitignore`, with `--provider bnb|aws|azure|nodeops`.
+
 Agent Studio is the runtime and orchestration layer. KAIROS still owns observation, strategies, arbitration, research, risk, and the paper cycle. The runtime decides when a cycle runs. It does not decide what KAIROS does, and it does not sign.
 
 ```text

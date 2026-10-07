@@ -1,0 +1,10 @@
+{
+  "name": "kairos-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "KAIROS operating agent. The work hook calls runKairosAutonomousCycle. This package does not sign or broadcast.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  }
+}

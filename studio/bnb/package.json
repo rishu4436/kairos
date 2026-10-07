@@ -1,0 +1,6 @@
+{
+  "name": "kairos-studio-workspace",
+  "private": true,
+  "packageManager": "pnpm@10.24.0",
+  "description": "BNB Agent Studio workspace for the KAIROS operating runtime. Global pnpm is not downgraded. Corepack can activate pnpm@10.24.0 for this workspace when dependencies are installed."
+}

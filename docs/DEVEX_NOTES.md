@@ -78,4 +78,12 @@ Node is v24.18.0 and satisfies the docs' Node 22 requirement. Corepack is 0.35.0
 
 One public read did run: tokenized-securities list, type 1, User-Agent `binance-web3/1.1 (Skill)`, 769 ms, HTTP 200, code `000000`, 1366 rows. TSLA resolved to `TSLAon` on chain 56, chain 1, and `CT_501`. No wallet, no audit POST, no trade. `BINANCE_WEB3_API_KEY`, `FMP_API_KEY`, Qwen settings, and `REDIS_URL` were unset, so those providers stay `NOT_CONFIGURED`. The durable tests use an in-memory Redis command transport. A local RESP fake proved the worker client. No production Redis was contacted. Identity was not registered.
 
+Phase 17C and 17D, 2026-10-07. `npm install --global @bnbagent/studio-cli` completed. The published version is still 0.0.14 and the bin is `dist/bag.js`. Windows still resolves plain `bag` to `C:\Users\rishu\AppData\Local\Programs\Python\Python314\Scripts\bag.exe`, which is pip package `bnbagent-studio` 0.0.5. The npm binary is `C:\nvm4w\nodejs\bag.cmd` and prints `0.0.14`. PATH was not edited and the Python package was not uninstalled. The npm CLI itself is not version 0.0.5.
+
+`bag.cmd init` writes the project into the current directory. The directory name cannot contain a hyphen. `--no-onboard --no-install --no-auto-topup --llm-provider none` produced a TypeScript workspace with `packageManager: pnpm@10.24.0`, `app/agent/studio.toml`, and a seller entrypoint whose signing stays in generated `signing.ts`. That seller was not copied into KAIROS. Global pnpm stayed 11.10.0. The Studio workspace records the pnpm 10.24.0 pin and does not install dependencies.
+
+The same npm install blocked lifecycle scripts for `esbuild@0.28.2`, `@azure/msal-node-extensions@5.5.2`, and `keytar@7.9.0`. `bag.cmd --help` still ran, so those scripts were left blocked. A later wallet or bundle step that needs `keytar` or the esbuild binary should name the exact failure before anyone enables the scripts.
+
+`bag.cmd` has no `mcp` command. `deploy prepare` is a readiness sweep and was not executed. No wallet, no registration, and no deploy were run.
+
 Hot-token rankings and `POST /api/v1/dex/market/price-info` were not added. The ranking is market-wide, and the watchlist already has an RWA price. Adding them would spend the per-endpoint budget without serving the three strategies. Candle fetches are sequential, cached for 10 minutes, and retried no sooner than 60 seconds after a failure. That schedule is a local choice on top of the published 5 requests per second default. It is not a measured rate-limit result.

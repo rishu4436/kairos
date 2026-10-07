@@ -1,0 +1,6 @@
+# Matches the project emitted by bag.cmd 0.0.14.
+# pnpm 11 blocks dependency lifecycle scripts unless they are listed here.
+packages:
+  - app/agent
+allowBuilds:
+  esbuild: true

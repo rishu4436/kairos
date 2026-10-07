@@ -1,0 +1,14 @@
+# Copied from the bag 0.0.14 scaffold. Secrets and the keystore stay here.
+.studio/
+
+agentcore/.env.local
+
+node_modules/
+dist/
+
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+.claude/skills/
