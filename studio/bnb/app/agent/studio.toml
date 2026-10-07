@@ -37,7 +37,10 @@ poll_interval_seconds = 30
 auto_settle = false
 
 [storage]
-kind = "local"
+# Studio deliverables only. This is not KAIROS runtime state.
+# Upload uses STORAGE_API_URL and STORAGE_API_KEY from the uncommitted
+# workspace .studio/.env.local. Neither value is stored in this file.
+kind = "ipfs"
 
 [payments.b402_seller]
 enabled = false

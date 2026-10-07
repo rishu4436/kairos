@@ -19,6 +19,8 @@
 
 The memory backend remains the test and local default. It is not production durable. `KAIROS_STATE_BACKEND=redis` without `REDIS_URL` throws `STATE_BACKEND_NOT_CONFIGURED` and does not fall back to memory.
 
+Agent Studio IPFS is a different store. `[storage].kind = "ipfs"` in `studio/bnb/app/agent/studio.toml` is for Studio deliverables. The pinning endpoint and key are `STORAGE_API_URL` and `STORAGE_API_KEY`. They are not written into the repository. IPFS does not persist KAIROS positions, research, performance, leases, or cycles. Those stay on the KAIROS state backend. Redis is still not configured.
+
 ## Redis transport
 
 No Redis npm package was added. `ioredis` and `node-redis` are asynchronous, and this store is synchronous. Pulling either into the Next.js server graph would add a large client for `GET`, `SET NX PX`, `DEL`, `PTTL`, and `EVAL`.

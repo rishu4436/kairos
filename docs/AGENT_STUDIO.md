@@ -16,7 +16,15 @@ The generated layout is a workspace root plus `app/agent/studio.toml`. KAIROS al
 
 `studio/bnb/app/agent/src/unifiedMain.ts` exists because `bag doctor` looks for that filename. It re-exports the paper cycle. It is not the generated seller, and it does not sign.
 
-`bag.cmd doctor --project-root studio/bnb/app/agent` on 2026-10-07 parsed `studio.toml`, found the entrypoint, reached BSC testnet RPC, and treated the seller price as free. It failed because `.studio/wallets` does not exist. Warnings: `WALLET_PASSWORD` unset, LLM provider `none`, AWS credentials unset, Docker daemon not running, twak CLI absent. Those were left as they are. No keystore was created.
+`[storage].kind` is `ipfs`. That store is for Studio deliverables. KAIROS runtime state still uses the memory backend until `REDIS_URL` is set. `STORAGE_API_KEY` and `STORAGE_API_URL` are names only.
+
+The workspace `packageManager` is `pnpm@10.24.0`. Install it with Corepack from `studio/bnb`. Do not change the global pnpm 11.10.0. Dependency versions in `studio/bnb/app/agent/package.json` are the ones emitted by `bag.cmd` 0.0.14. The generated seller source was not copied.
+
+`npm run kairos:preflight` reads `KAIROS_BAG_BIN`. When that variable is empty it runs PATH `bag`. When it points at the npm binary, the report can show `0.0.14` and `COMPATIBLE`. Deployment stays `NOT_DEPLOYED` either way. The path is not committed.
+
+`bag.cmd doctor --project-root studio/bnb/app/agent` parsed `studio.toml`, found the entrypoint, and reached BSC testnet RPC. It failed because `.studio/wallets` does not exist. Warnings left in place: `WALLET_PASSWORD` unset, LLM provider `none`, `STORAGE_API_URL` unset, AWS credentials unset, Docker daemon not running, twak CLI absent. No keystore was created.
+
+`bag.cmd deploy prepare --provider bnb --json` was a readiness sweep. `ready_to_deploy` was false. It did not deploy. Critical checks were the missing keystore, missing `WALLET_PASSWORD`, and no commerce rail. The managed platform said it injects deliverable storage, so the unset pinning URL was not a BNB critical check. AWS credentials and Docker were not BNB critical checks. Commerce stays disabled. Enabling a payment rail was not done.
 
 `bag.cmd deploy prepare` was not run. Its help shows a readiness sweep with provider, wallet-balance, and storage checks. That is left for a later phase. `bag skills install` was not run. `bag dev` was not started. ERC-8004 was not registered.
 

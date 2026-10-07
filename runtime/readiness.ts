@@ -53,6 +53,8 @@ export interface ReadinessLabels {
   fmp: string;
   tradingWallet: string;
   liveExecution: string;
+  studioProject: string;
+  deployment: string;
 }
 
 export function readinessLabels(env: NodeJS.ProcessEnv = process.env): ReadinessLabels {
@@ -68,5 +70,7 @@ export function readinessLabels(env: NodeJS.ProcessEnv = process.env): Readiness
     fmp: ready.fmp === "READY" ? "CONNECTED" : "NOT CONFIGURED",
     tradingWallet: "NOT CONNECTED",
     liveExecution: "BLOCKED",
+    studioProject: "CONFIGURED",
+    deployment: "NOT DEPLOYED",
   };
 }

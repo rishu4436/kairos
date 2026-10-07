@@ -2,7 +2,13 @@
 
 Paper and read-only only. This runbook does not connect the Agentic Wallet, sign, broadcast, or spend x402. Secret values are names, never literals.
 
-Phase 16 stopped before a real Agent Studio deploy. The installed `bag` is 0.0.5. Current docs and the published package `@bnbagent/studio-cli@0.0.14` do not match that binary. Do not invent `studio.toml` for the old CLI.
+Phase 16 stopped before a real Agent Studio deploy. Plain `bag` on this machine is still Python 0.0.5. The npm CLI is 0.0.14 at `bag.cmd`. Set `KAIROS_BAG_BIN` to that binary for preflight. Do not commit the path.
+
+The Studio workspace at `studio/bnb` pins `pnpm@10.24.0`. From that directory, `corepack pnpm` uses the pin. Do not change global pnpm.
+
+Studio deliverables use `[storage].kind = "ipfs"` with `STORAGE_API_KEY` and `STORAGE_API_URL`. KAIROS cycle state still needs `KAIROS_STATE_BACKEND=redis` and `REDIS_URL`. IPFS does not replace Redis.
+
+Do not run `bag wallet new` until the operating-wallet gate is approved. Do not run `bag deploy --provider` in the readiness phase. `bag deploy prepare` is the readiness sweep only.
 
 ## 1. Dependencies
 

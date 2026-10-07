@@ -84,6 +84,10 @@ Phase 17C and 17D, 2026-10-07. `npm install --global @bnbagent/studio-cli` compl
 
 The same npm install blocked lifecycle scripts for `esbuild@0.28.2`, `@azure/msal-node-extensions@5.5.2`, and `keytar@7.9.0`. `bag.cmd --help` still ran, so those scripts were left blocked. A later wallet or bundle step that needs `keytar` or the esbuild binary should name the exact failure before anyone enables the scripts.
 
-`bag.cmd` has no `mcp` command. `deploy prepare` is a readiness sweep and was not executed. No wallet, no registration, and no deploy were run.
+`bag.cmd` has no `mcp` command. `deploy prepare` is described as a readiness sweep. Its `--backend` help says the flag selects a platform contract without deploying. No wallet, no registration, and no `bag deploy --provider` were run in the project-creation pass.
+
+Phase 17E. The Studio workspace pins `pnpm@10.24.0`. Corepack can run that pin from `studio/bnb` while `pnpm --version` outside the workspace stays 11.10.0. The scaffold's `pnpm-workspace.yaml` sets `allowBuilds.esbuild` because the generated comment says pnpm 11 otherwise blocks the esbuild binary script. That is the scaffold setting, not a blanket approval of every package script. Global npm still blocks `esbuild`, `@azure/msal-node-extensions`, and `keytar` install scripts for the global CLI. Those were not enabled.
+
+`KAIROS_BAG_BIN` exists because PATH order makes plain `bag` the Python 0.0.5 program. Preflight uses the explicit binary when the variable is set and does not hard-code a machine path. Studio IPFS and KAIROS Redis are different systems. A missing pinning key does not configure Redis.
 
 Hot-token rankings and `POST /api/v1/dex/market/price-info` were not added. The ranking is market-wide, and the watchlist already has an RWA price. Adding them would spend the per-endpoint budget without serving the three strategies. Candle fetches are sequential, cached for 10 minutes, and retried no sooner than 60 seconds after a failure. That schedule is a local choice on top of the published 5 requests per second default. It is not a measured rate-limit result.

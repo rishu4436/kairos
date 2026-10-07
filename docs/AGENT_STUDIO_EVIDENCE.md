@@ -40,4 +40,13 @@ Time to a running Studio agent was not measured, because no Studio project was c
 
 Node v24.18.0, npm 12.0.0, Corepack 0.35.0, pnpm 11.10.0, Bun 1.4.2. Current Studio docs ask for pnpm 10. pnpm was not downgraded.
 
-Current docs also describe `bag mcp` and `bag deploy --provider`. The installed CLI does not expose those commands, so they were not invoked.
+Current docs also describe `bag mcp` and `bag deploy --provider`. The PATH CLI did not expose those commands.
+
+## Phase 17D–17E
+
+| Layer | Result |
+| --- | --- |
+| CODE SUPPORT | `studio/bnb/app/agent/studio.toml` exists. Storage kind is `ipfs`. Payments and budget are disabled. `studio/entrypoint.ts` calls `runKairosAutonomousCycle` in `PAPER` unless the server sets `LIVE_PREVIEW`. |
+| LOCAL VERIFICATION | `C:\nvm4w\nodejs\bag.cmd --version` is `0.0.14`. Plain `bag` remains Python `0.0.5`. The workspace pin is `pnpm@10.24.0`, installed through Corepack. Global pnpm was not changed. |
+| DEPLOYED VERIFICATION | Not deployed. `bag.cmd deploy prepare --provider bnb --json` returned `ready_to_deploy: false` with critical checks for the missing keystore, missing `WALLET_PASSWORD`, and no commerce rail. `deploy --provider` was not run. |
+| ON-CHAIN VERIFICATION | Identity is `NOT REGISTERED`. No operating wallet and no `WALLET_PASSWORD`. |

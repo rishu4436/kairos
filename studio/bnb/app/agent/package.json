@@ -2,9 +2,27 @@
   "name": "kairos-agent",
   "version": "0.1.0",
   "private": true,
-  "description": "KAIROS operating agent. The work hook calls runKairosAutonomousCycle. This package does not sign or broadcast.",
+  "description": "KAIROS operating agent. Dependency versions match the bag 0.0.14 scaffold. This package does not include the generated seller or its signing code.",
   "type": "module",
   "engines": {
     "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@bnbagent/studio-runtime": "0.0.14",
+    "@bnbagent/sdk": "0.6.0",
+    "zod": "^3.25.0",
+    "@aws-sdk/client-secrets-manager": "^3.600.0",
+    "ai": "^7.0.29",
+    "express": "^5.1.0",
+    "@a2a-js/sdk": ">=0.3.14 <1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
   }
 }
