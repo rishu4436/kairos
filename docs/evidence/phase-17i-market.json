@@ -1,0 +1,3109 @@
+{
+  "label": "RECORDED REAL PROVIDER EVIDENCE",
+  "timestamp": "2026-10-07T07:52:48.058Z",
+  "provider": "BINANCE_WEB3",
+  "redisKey": "kairos:v1:evidence:phase17i:ctx:user_phase17i:56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93:cycle:user_phase17i:2026-10-07T07:52:48.058Z",
+  "persisted": true,
+  "replay": "PASS",
+  "contextId": "ctx:user_phase17i:56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93:cycle:user_phase17i:2026-10-07T07:52:48.058Z",
+  "cycleId": "cycle:user_phase17i:2026-10-07T07:52:48.058Z",
+  "calls": [
+    {
+      "endpoint": "/build/api/v1/dex/market/rwa/search?keyword=TSLA",
+      "httpStatus": 200,
+      "latencyMs": 878,
+      "timestamp": "2026-10-07T07:52:46.739Z"
+    },
+    {
+      "endpoint": "/build/api/v1/dex/market/rwa/platforms",
+      "httpStatus": 200,
+      "latencyMs": 309,
+      "timestamp": "2026-10-07T07:52:47.060Z"
+    },
+    {
+      "endpoint": "/build/api/v1/dex/market/rwa/tokens?binanceChainId=56",
+      "httpStatus": 200,
+      "latencyMs": 250,
+      "timestamp": "2026-10-07T07:52:47.311Z"
+    },
+    {
+      "endpoint": "/build/api/v1/dex/market/rwa/price?binanceChainId=56&tokenContractAddresses=0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+      "httpStatus": 200,
+      "latencyMs": 196,
+      "timestamp": "2026-10-07T07:52:47.790Z"
+    },
+    {
+      "endpoint": "/build/api/v1/dex/market/candles?binanceChainId=56&tokenContractAddress=0x2494b603319d4d9f9715c9f4496d9e0364b59d93&bar=15m&limit=100",
+      "httpStatus": 200,
+      "latencyMs": 260,
+      "timestamp": "2026-10-07T07:52:48.053Z"
+    }
+  ],
+  "observation": {
+    "id": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93:1791359563905",
+    "timestamp": "2026-10-07T07:52:46.750Z",
+    "userId": "user_phase17i",
+    "underlying": {
+      "ticker": "TSLA",
+      "name": "Tesla, Inc.",
+      "kind": "stock"
+    },
+    "representation": {
+      "id": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+      "underlyingTicker": "TSLA",
+      "tokenSymbol": "TSLAon",
+      "tokenName": "Tesla (Ondo)",
+      "platformId": "ondo",
+      "platformLabel": "Ondo Finance",
+      "chainId": "56",
+      "chainLabel": "BNB Smart Chain",
+      "contractAddress": "0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+      "decimals": "18",
+      "tokenToShareRatio": "1",
+      "logoUrl": "https://onchainos.bnbstatic.com/images/web3-data/public/token/logos/0801972E9B193A41F25981BCA9F31DCE.png",
+      "website": "https://ondo.finance"
+    },
+    "price": "378.63715",
+    "referencePrice": "378.63715",
+    "priceDeviation": {
+      "percent": 0,
+      "label": "reference_deviation"
+    },
+    "change24hPct": null,
+    "marketSession": "UNKNOWN",
+    "rawMarketStatus": "overnight",
+    "openState": true,
+    "reasonCode": "TRADING",
+    "reasonMessage": null,
+    "nextOpenAt": "2026-10-07T08:01:00.000Z",
+    "nextCloseAt": "2026-10-07T07:55:00.000Z",
+    "freshness": {
+      "sourceTimestamp": "2026-10-07T07:52:43.905Z",
+      "receivedAt": "2026-10-07T07:52:46.750Z",
+      "ageMs": 2845,
+      "status": "FRESH"
+    },
+    "liquidity": {
+      "volume24hUsd": "10501667420.946335",
+      "marketCapUsd": "1503680147724"
+    },
+    "source": {
+      "provider": "binance_web3",
+      "endpoints": [
+        "/api/v1/dex/market/rwa/search",
+        "/api/v1/dex/market/rwa/tokens",
+        "/api/v1/dex/market/rwa/price",
+        "/api/v1/dex/market/rwa/platforms"
+      ],
+      "fidelity": "live"
+    },
+    "metadata": {
+      "priceUpdatedAt": "2026-10-07T07:52:43.905Z",
+      "responseTimestamp": null,
+      "referencePriceNote": "Binance describes referencePrice as a per-share conversion of the on-chain token price, not an official quote from the traditional stock market."
+    }
+  },
+  "row": {
+    "id": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93:1791359563905",
+    "ticker": "TSLA",
+    "companyName": "Tesla, Inc.",
+    "tokenSymbol": "TSLAon",
+    "platformLabel": "Ondo Finance",
+    "chainLabel": "BNB Smart Chain",
+    "contractAddress": "0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+    "chainId": "56",
+    "reasonCode": "TRADING",
+    "openState": true,
+    "price": "378.63715",
+    "referencePrice": "378.63715",
+    "deviationPct": 0,
+    "change24hPct": null,
+    "session": "UNKNOWN",
+    "sessionLabel": "UNKNOWN · overnight",
+    "rawMarketStatus": "overnight",
+    "freshness": "FRESH",
+    "freshnessLabel": "FRESH · 3s ago",
+    "ageMs": 2845,
+    "sourceTimestamp": "2026-10-07T07:52:43.905Z",
+    "receivedAt": "2026-10-07T07:52:46.750Z",
+    "volume24hUsd": "10501667420.946335",
+    "nextOpenAt": "2026-10-07T08:01:00.000Z",
+    "reasonMessage": null,
+    "fidelity": "live",
+    "representationId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+    "regime": "RANGE_BOUND",
+    "regimeDetail": "20-bar return -53 bps",
+    "dataQuality": "GOOD",
+    "historyPoints": 100,
+    "features": [
+      {
+        "id": "return_15m",
+        "label": "15m return",
+        "value": "-0.21%",
+        "lookback": "1 x 15m",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "return_1h",
+        "label": "1h return",
+        "value": "0.00%",
+        "lookback": "4 x 15m",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "return_4h",
+        "label": "4h return",
+        "value": "-0.32%",
+        "lookback": "16 x 15m",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "sma_20",
+        "label": "SMA 20",
+        "value": "378.4042",
+        "lookback": "20 x 15m",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "ema_12",
+        "label": "EMA 12",
+        "value": "378.3461",
+        "lookback": "12 x 15m",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "realized_volatility_20",
+        "label": "Volatility",
+        "value": "0.14%",
+        "lookback": "20 return sample",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "rolling_high_20",
+        "label": "Rolling high",
+        "value": "380.1625",
+        "lookback": "20 x 15m high",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "rolling_low_20",
+        "label": "Rolling low",
+        "value": "377.4950",
+        "lookback": "20 x 15m low",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "range_20",
+        "label": "Range",
+        "value": "2.6675",
+        "lookback": "20 x 15m high-low",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "volume_change",
+        "label": "Volume change",
+        "value": "-99.98%",
+        "lookback": "1 bar",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "trend",
+        "label": "Trend",
+        "value": "DOWN",
+        "lookback": "SMA 8 vs SMA 20",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "momentum_1h",
+        "label": "Momentum",
+        "value": "0.00%",
+        "lookback": "4 x 15m close return",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "distance_from_mean",
+        "label": "Distance from mean",
+        "value": "-0.06%",
+        "lookback": "close vs SMA 20",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "reference_deviation",
+        "label": "Reference deviation",
+        "value": "0.00%",
+        "lookback": "latest observation",
+        "sufficient": true,
+        "note": null
+      },
+      {
+        "id": "data_freshness",
+        "label": "Data freshness",
+        "value": "FRESH",
+        "lookback": "source timestamp",
+        "sufficient": true,
+        "note": null
+      }
+    ],
+    "signals": [
+      {
+        "id": "2026-10-07T07:52:48.058Z:momentum:56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+        "strategyId": "momentum",
+        "strategyName": "Momentum",
+        "ticker": "TSLA",
+        "tokenSymbol": "TSLAon",
+        "representationId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+        "timestamp": "2026-10-07T07:52:48.058Z",
+        "action": "HOLD",
+        "evaluation": "VALID",
+        "confidence": 0.42,
+        "reasons": [
+          "1h return 0.00%.",
+          "Close is below the 20-period average.",
+          "Trend DOWN.",
+          "Volatility is within the 0.80% cap."
+        ],
+        "evidence": [
+          "1h return 0.00%.",
+          "Close is below the 20-period average.",
+          "Trend DOWN.",
+          "Volatility is within the 0.80% cap.",
+          "Data age: 3s.",
+          "Regime: RANGE_BOUND."
+        ],
+        "featuresUsed": [
+          "return_1h",
+          "sma_20",
+          "trend",
+          "realized_volatility_20",
+          "data_freshness"
+        ],
+        "riskHints": [
+          "A strategy signal is not an order."
+        ],
+        "validUntil": "2026-10-07T08:07:48.058Z",
+        "dataQuality": "GOOD",
+        "historyPoints": 100,
+        "tags": [],
+        "executable": false
+      },
+      {
+        "id": "2026-10-07T07:52:48.058Z:mean-reversion:56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+        "strategyId": "mean-reversion",
+        "strategyName": "Mean reversion",
+        "ticker": "TSLA",
+        "tokenSymbol": "TSLAon",
+        "representationId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+        "timestamp": "2026-10-07T07:52:48.058Z",
+        "action": "HOLD",
+        "evaluation": "VALID",
+        "confidence": 0.4,
+        "reasons": [
+          "Distance from the 20-bar mean: -0.06%.",
+          "Entry band is ±1.20%.",
+          "Regime: RANGE_BOUND.",
+          "Volatility regime does not suppress the rule."
+        ],
+        "evidence": [
+          "Distance from the 20-bar mean: -0.06%.",
+          "Entry band is ±1.20%.",
+          "Regime: RANGE_BOUND.",
+          "Volatility regime does not suppress the rule.",
+          "Data age: 3s."
+        ],
+        "featuresUsed": [
+          "distance_from_mean",
+          "sma_20",
+          "data_freshness"
+        ],
+        "riskHints": [
+          "A strategy signal is not an order."
+        ],
+        "validUntil": "2026-10-07T08:07:48.058Z",
+        "dataQuality": "GOOD",
+        "historyPoints": 100,
+        "tags": [],
+        "executable": false
+      },
+      {
+        "id": "2026-10-07T07:52:48.058Z:weekend:56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+        "strategyId": "weekend",
+        "strategyName": "Weekend / off-hours",
+        "ticker": "TSLA",
+        "tokenSymbol": "TSLAon",
+        "representationId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+        "timestamp": "2026-10-07T07:52:48.058Z",
+        "action": "NO_SIGNAL",
+        "evaluation": "INSUFFICIENT_DATA",
+        "confidence": 0,
+        "reasons": [
+          "Market session is unknown."
+        ],
+        "evidence": [
+          "Market session is unknown."
+        ],
+        "featuresUsed": [],
+        "riskHints": [
+          "A strategy signal is not an order."
+        ],
+        "validUntil": "2026-10-07T08:07:48.058Z",
+        "dataQuality": "INSUFFICIENT",
+        "historyPoints": 100,
+        "tags": [],
+        "executable": false
+      }
+    ],
+    "candles": [
+      {
+        "timeMs": 1791285300000,
+        "open": "382.0733",
+        "high": "382.4562",
+        "low": "382.0733",
+        "close": "382.4562"
+      },
+      {
+        "timeMs": 1791286200000,
+        "open": "382.4562",
+        "high": "382.6257",
+        "low": "382.2916",
+        "close": "382.3760"
+      },
+      {
+        "timeMs": 1791287100000,
+        "open": "382.3760",
+        "high": "382.3760",
+        "low": "381.8787",
+        "close": "382.1485"
+      },
+      {
+        "timeMs": 1791288900000,
+        "open": "382.1485",
+        "high": "382.1485",
+        "low": "381.7907",
+        "close": "381.7907"
+      },
+      {
+        "timeMs": 1791289800000,
+        "open": "381.7907",
+        "high": "381.7907",
+        "low": "381.2789",
+        "close": "381.2789"
+      },
+      {
+        "timeMs": 1791290700000,
+        "open": "381.2789",
+        "high": "381.2789",
+        "low": "381.2336",
+        "close": "381.2336"
+      },
+      {
+        "timeMs": 1791291600000,
+        "open": "381.2336",
+        "high": "381.3860",
+        "low": "381.2336",
+        "close": "381.3860"
+      },
+      {
+        "timeMs": 1791292500000,
+        "open": "381.3860",
+        "high": "382.9256",
+        "low": "380.7497",
+        "close": "382.3332"
+      },
+      {
+        "timeMs": 1791293400000,
+        "open": "382.3332",
+        "high": "16044.5843",
+        "low": "378.3434",
+        "close": "378.3434"
+      },
+      {
+        "timeMs": 1791294300000,
+        "open": "378.3434",
+        "high": "381.1622",
+        "low": "378.1447",
+        "close": "381.1622"
+      },
+      {
+        "timeMs": 1791295200000,
+        "open": "381.1622",
+        "high": "381.1622",
+        "low": "377.0988",
+        "close": "377.0988"
+      },
+      {
+        "timeMs": 1791296100000,
+        "open": "377.0988",
+        "high": "382.9418",
+        "low": "377.0988",
+        "close": "380.9533"
+      },
+      {
+        "timeMs": 1791297000000,
+        "open": "380.9533",
+        "high": "380.9657",
+        "low": "380.9533",
+        "close": "380.9657"
+      },
+      {
+        "timeMs": 1791297900000,
+        "open": "380.9657",
+        "high": "381.0812",
+        "low": "380.9657",
+        "close": "381.0412"
+      },
+      {
+        "timeMs": 1791298800000,
+        "open": "381.0412",
+        "high": "381.2650",
+        "low": "381.0412",
+        "close": "381.2650"
+      },
+      {
+        "timeMs": 1791299700000,
+        "open": "381.2650",
+        "high": "381.2650",
+        "low": "380.3199",
+        "close": "380.3199"
+      },
+      {
+        "timeMs": 1791300600000,
+        "open": "380.3199",
+        "high": "381.2064",
+        "low": "380.3199",
+        "close": "381.2064"
+      },
+      {
+        "timeMs": 1791301500000,
+        "open": "381.2064",
+        "high": "381.2064",
+        "low": "381.1031",
+        "close": "381.1031"
+      },
+      {
+        "timeMs": 1791302400000,
+        "open": "381.1031",
+        "high": "381.3583",
+        "low": "381.1031",
+        "close": "381.3583"
+      },
+      {
+        "timeMs": 1791303300000,
+        "open": "381.3583",
+        "high": "381.3583",
+        "low": "380.1708",
+        "close": "380.4394"
+      },
+      {
+        "timeMs": 1791304200000,
+        "open": "380.4394",
+        "high": "381.7280",
+        "low": "380.4394",
+        "close": "381.7280"
+      },
+      {
+        "timeMs": 1791305100000,
+        "open": "381.7280",
+        "high": "382.2261",
+        "low": "378.8100",
+        "close": "382.2261"
+      },
+      {
+        "timeMs": 1791306000000,
+        "open": "382.2261",
+        "high": "382.2261",
+        "low": "379.5559",
+        "close": "379.5559"
+      },
+      {
+        "timeMs": 1791307800000,
+        "open": "379.5559",
+        "high": "380.2397",
+        "low": "379.5559",
+        "close": "380.2397"
+      },
+      {
+        "timeMs": 1791308700000,
+        "open": "380.2397",
+        "high": "380.7584",
+        "low": "380.2397",
+        "close": "380.7584"
+      },
+      {
+        "timeMs": 1791309600000,
+        "open": "380.7584",
+        "high": "380.7584",
+        "low": "379.7671",
+        "close": "380.1433"
+      },
+      {
+        "timeMs": 1791313200000,
+        "open": "380.1433",
+        "high": "380.5885",
+        "low": "380.1433",
+        "close": "380.5885"
+      },
+      {
+        "timeMs": 1791315900000,
+        "open": "380.5885",
+        "high": "380.5885",
+        "low": "380.1625",
+        "close": "380.1625"
+      },
+      {
+        "timeMs": 1791324000000,
+        "open": "380.1625",
+        "high": "380.1625",
+        "low": "379.5702",
+        "close": "379.5702"
+      },
+      {
+        "timeMs": 1791331200000,
+        "open": "379.5702",
+        "high": "379.8312",
+        "low": "379.5702",
+        "close": "379.8312"
+      },
+      {
+        "timeMs": 1791333000000,
+        "open": "379.8312",
+        "high": "379.8312",
+        "low": "379.5632",
+        "close": "379.5632"
+      },
+      {
+        "timeMs": 1791333900000,
+        "open": "379.5632",
+        "high": "379.5632",
+        "low": "379.3813",
+        "close": "379.3813"
+      },
+      {
+        "timeMs": 1791339300000,
+        "open": "379.3813",
+        "high": "379.3813",
+        "low": "377.8856",
+        "close": "377.9423"
+      },
+      {
+        "timeMs": 1791340200000,
+        "open": "377.9423",
+        "high": "378.6406",
+        "low": "377.9423",
+        "close": "378.6406"
+      },
+      {
+        "timeMs": 1791341100000,
+        "open": "378.6406",
+        "high": "378.6406",
+        "low": "377.8190",
+        "close": "377.9989"
+      },
+      {
+        "timeMs": 1791342000000,
+        "open": "377.9989",
+        "high": "377.9989",
+        "low": "377.4950",
+        "close": "377.4950"
+      },
+      {
+        "timeMs": 1791342900000,
+        "open": "377.4950",
+        "high": "377.7551",
+        "low": "377.4950",
+        "close": "377.7551"
+      },
+      {
+        "timeMs": 1791343800000,
+        "open": "377.7551",
+        "high": "377.9949",
+        "low": "377.7551",
+        "close": "377.9949"
+      },
+      {
+        "timeMs": 1791344700000,
+        "open": "377.9949",
+        "high": "377.9949",
+        "low": "377.6428",
+        "close": "377.6428"
+      },
+      {
+        "timeMs": 1791348300000,
+        "open": "377.6428",
+        "high": "378.3478",
+        "low": "377.6428",
+        "close": "378.2978"
+      },
+      {
+        "timeMs": 1791349200000,
+        "open": "378.2978",
+        "high": "378.2978",
+        "low": "378.0824",
+        "close": "378.0824"
+      },
+      {
+        "timeMs": 1791350100000,
+        "open": "378.0824",
+        "high": "378.1203",
+        "low": "377.9058",
+        "close": "378.1203"
+      },
+      {
+        "timeMs": 1791351000000,
+        "open": "378.1203",
+        "high": "378.3342",
+        "low": "377.9929",
+        "close": "378.3305"
+      },
+      {
+        "timeMs": 1791353700000,
+        "open": "378.3305",
+        "high": "378.3305",
+        "low": "378.0839",
+        "close": "378.1638"
+      },
+      {
+        "timeMs": 1791354600000,
+        "open": "378.1638",
+        "high": "378.1993",
+        "low": "377.9940",
+        "close": "378.1893"
+      },
+      {
+        "timeMs": 1791355500000,
+        "open": "378.1893",
+        "high": "378.1893",
+        "low": "377.9595",
+        "close": "377.9595"
+      },
+      {
+        "timeMs": 1791356400000,
+        "open": "377.9595",
+        "high": "378.9663",
+        "low": "377.9595",
+        "close": "378.9663"
+      },
+      {
+        "timeMs": 1791359100000,
+        "open": "378.9663",
+        "high": "378.9663",
+        "low": "378.1591",
+        "close": "378.1591"
+      }
+    ],
+    "arbitration": {
+      "asset": {
+        "id": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+        "ticker": "TSLA",
+        "userId": "user_phase17i"
+      },
+      "timestamp": "2026-10-07T07:52:48.058Z",
+      "decision": "NO_OPPORTUNITY",
+      "selectedStrategy": null,
+      "selectedStrategyName": null,
+      "selectedAction": null,
+      "score": null,
+      "confidence": null,
+      "candidates": [
+        {
+          "strategyId": "momentum",
+          "strategyName": "Momentum",
+          "status": "implemented",
+          "eligible": false,
+          "candidateStatus": "REJECTED",
+          "action": "HOLD",
+          "evaluation": "VALID",
+          "confidence": 0.42,
+          "score": 0.495,
+          "components": {
+            "signalStrength": 0.3,
+            "regimeFit": 0.25,
+            "sessionFit": 0.25,
+            "dataQuality": 1,
+            "evidenceQuality": 1,
+            "strategyHealth": 1,
+            "conflictPenalty": 0,
+            "stalePenalty": 0,
+            "uncertaintyPenalty": 0
+          },
+          "rejectionReason": "No selection signal.",
+          "evidence": [
+            "1h return 0.00%.",
+            "Close is below the 20-period average.",
+            "Trend DOWN.",
+            "Volatility is within the 0.80% cap.",
+            "Data age: 3s.",
+            "Regime: RANGE_BOUND."
+          ],
+          "health": {
+            "strategyId": "momentum",
+            "status": "implemented",
+            "recentEvaluations": 1,
+            "validSignals": 0,
+            "failedEvaluations": 0,
+            "dataFailures": 0
+          }
+        },
+        {
+          "strategyId": "mean-reversion",
+          "strategyName": "Mean reversion",
+          "status": "implemented",
+          "eligible": false,
+          "candidateStatus": "REJECTED",
+          "action": "HOLD",
+          "evaluation": "VALID",
+          "confidence": 0.4,
+          "score": 0.63,
+          "components": {
+            "signalStrength": 0.3,
+            "regimeFit": 1,
+            "sessionFit": 0.25,
+            "dataQuality": 1,
+            "evidenceQuality": 1,
+            "strategyHealth": 1,
+            "conflictPenalty": 0,
+            "stalePenalty": 0,
+            "uncertaintyPenalty": 0
+          },
+          "rejectionReason": "No selection signal.",
+          "evidence": [
+            "Distance from the 20-bar mean: -0.06%.",
+            "Entry band is ±1.20%.",
+            "Regime: RANGE_BOUND.",
+            "Volatility regime does not suppress the rule.",
+            "Data age: 3s."
+          ],
+          "health": {
+            "strategyId": "mean-reversion",
+            "status": "implemented",
+            "recentEvaluations": 1,
+            "validSignals": 0,
+            "failedEvaluations": 0,
+            "dataFailures": 0
+          }
+        },
+        {
+          "strategyId": "weekend",
+          "strategyName": "Weekend / off-hours",
+          "status": "implemented",
+          "eligible": false,
+          "candidateStatus": "INSUFFICIENT_DATA",
+          "action": "NO_SIGNAL",
+          "evaluation": "INSUFFICIENT_DATA",
+          "confidence": 0,
+          "score": 0,
+          "components": {
+            "signalStrength": 0.15,
+            "regimeFit": 0.6,
+            "sessionFit": 0,
+            "dataQuality": 1,
+            "evidenceQuality": 0.3333,
+            "strategyHealth": 0.25,
+            "conflictPenalty": 0,
+            "stalePenalty": 0,
+            "uncertaintyPenalty": 0
+          },
+          "rejectionReason": "Insufficient data.",
+          "evidence": [
+            "Market session is unknown."
+          ],
+          "health": {
+            "strategyId": "weekend",
+            "status": "implemented",
+            "recentEvaluations": 1,
+            "validSignals": 0,
+            "failedEvaluations": 0,
+            "dataFailures": 1
+          }
+        }
+      ],
+      "conflicts": [],
+      "evidence": {
+        "summary": "No opportunity. No strategy is selected.",
+        "supports": [],
+        "penalties": [
+          "No strategy produced a selection signal.",
+          "An external provider did not return a signal. That is not evidence that no signal exists. The score was not changed."
+        ],
+        "rejected": [
+          {
+            "strategyId": "momentum",
+            "strategyName": "Momentum",
+            "reason": "No selection signal."
+          },
+          {
+            "strategyId": "mean-reversion",
+            "strategyName": "Mean reversion",
+            "reason": "No selection signal."
+          },
+          {
+            "strategyId": "weekend",
+            "strategyName": "Weekend / off-hours",
+            "reason": "Insufficient data."
+          }
+        ]
+      },
+      "dataQuality": "GOOD",
+      "marketRegime": "RANGE_BOUND",
+      "marketSession": "UNKNOWN",
+      "validUntil": "2026-10-07T08:07:48.058Z",
+      "version": "1.0",
+      "cooldownHeld": false,
+      "loopPhase": "WAITING_FOR_RISK",
+      "externalConfirmation": "SOURCE_UNAVAILABLE",
+      "externalConflict": "NONE",
+      "securityGate": "UNAVAILABLE",
+      "externalFreshness": "NONE",
+      "historicalHealth": "NONE",
+      "historicalSample": "NONE"
+    },
+    "kairos": {
+      "contextId": "ctx:user_phase17i:56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93:cycle:user_phase17i:2026-10-07T07:52:48.058Z",
+      "cycleId": "cycle:user_phase17i:2026-10-07T07:52:48.058Z",
+      "userId": "user_phase17i",
+      "agentId": "agent_user_phase17i",
+      "assetId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+      "timestamp": "2026-10-07T07:52:48.058Z",
+      "snapshotTimestamp": "2026-10-07T07:52:48.058Z",
+      "sourceTimestamps": {
+        "market": "2026-10-07T07:52:43.905Z",
+        "reference": "2026-10-07T07:52:43.905Z",
+        "history": "2026-10-07T07:45:00.000Z",
+        "externalSignals": null,
+        "security": "2026-10-07T07:50:06.293Z",
+        "events": null,
+        "position": "2026-10-07T07:52:48.058Z"
+      },
+      "identity": {
+        "underlyingTicker": "TSLA",
+        "underlyingName": "Tesla, Inc.",
+        "representationId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+        "tokenSymbol": "TSLAon",
+        "chainId": "56",
+        "chainLabel": "BNB Smart Chain",
+        "contractAddress": "0x2494b603319d4d9f9715c9f4496d9e0364b59d93"
+      },
+      "watchlist": [
+        "TSLA"
+      ],
+      "market": {
+        "status": "AVAILABLE",
+        "freshness": "FRESH",
+        "provenance": {
+          "source": "BINANCE_RWA_API",
+          "observedAt": "2026-10-07T07:52:43.905Z",
+          "effectiveAt": "2026-10-07T07:52:43.905Z"
+        },
+        "value": {
+          "price": "378.63715",
+          "session": "UNKNOWN",
+          "sessionLabel": "UNKNOWN · overnight",
+          "rawMarketStatus": "overnight",
+          "fidelity": "live"
+        },
+        "reason": null
+      },
+      "reference": {
+        "status": "AVAILABLE",
+        "freshness": "FRESH",
+        "provenance": {
+          "source": "BINANCE_RWA_API",
+          "observedAt": "2026-10-07T07:52:43.905Z",
+          "effectiveAt": "2026-10-07T07:52:43.905Z"
+        },
+        "value": {
+          "referencePrice": "378.63715",
+          "deviationPct": 0
+        },
+        "reason": null
+      },
+      "history": {
+        "status": "AVAILABLE",
+        "freshness": "STALE",
+        "provenance": {
+          "source": "BINANCE_MARKET_CANDLES",
+          "observedAt": "2026-10-07T07:45:00.000Z",
+          "effectiveAt": "2026-10-07T07:45:00.000Z"
+        },
+        "value": {
+          "points": 100,
+          "latestTimestampMs": 1791359100000,
+          "latestClose": "378.16"
+        },
+        "reason": null
+      },
+      "features": {
+        "status": "AVAILABLE",
+        "freshness": "FRESH",
+        "provenance": {
+          "source": "KAIROS_FEATURE_ENGINE",
+          "observedAt": "2026-10-07T07:52:48.058Z",
+          "effectiveAt": "2026-10-07T07:52:48.058Z"
+        },
+        "value": {
+          "features": [
+            {
+              "id": "return_15m",
+              "value": "-0.21%",
+              "sufficient": true
+            },
+            {
+              "id": "return_1h",
+              "value": "0.00%",
+              "sufficient": true
+            },
+            {
+              "id": "return_4h",
+              "value": "-0.32%",
+              "sufficient": true
+            },
+            {
+              "id": "sma_20",
+              "value": "378.4042",
+              "sufficient": true
+            },
+            {
+              "id": "ema_12",
+              "value": "378.3461",
+              "sufficient": true
+            },
+            {
+              "id": "realized_volatility_20",
+              "value": "0.14%",
+              "sufficient": true
+            },
+            {
+              "id": "rolling_high_20",
+              "value": "380.1625",
+              "sufficient": true
+            },
+            {
+              "id": "rolling_low_20",
+              "value": "377.4950",
+              "sufficient": true
+            },
+            {
+              "id": "range_20",
+              "value": "2.6675",
+              "sufficient": true
+            },
+            {
+              "id": "volume_change",
+              "value": "-99.98%",
+              "sufficient": true
+            },
+            {
+              "id": "trend",
+              "value": "DOWN",
+              "sufficient": true
+            },
+            {
+              "id": "momentum_1h",
+              "value": "0.00%",
+              "sufficient": true
+            },
+            {
+              "id": "distance_from_mean",
+              "value": "-0.06%",
+              "sufficient": true
+            },
+            {
+              "id": "reference_deviation",
+              "value": "0.00%",
+              "sufficient": true
+            },
+            {
+              "id": "data_freshness",
+              "value": "FRESH",
+              "sufficient": true
+            }
+          ]
+        },
+        "reason": null
+      },
+      "regime": {
+        "status": "AVAILABLE",
+        "freshness": "FRESH",
+        "provenance": {
+          "source": "KAIROS_FEATURE_ENGINE",
+          "observedAt": "2026-10-07T07:52:48.058Z",
+          "effectiveAt": "2026-10-07T07:52:48.058Z"
+        },
+        "value": {
+          "regime": "RANGE_BOUND",
+          "detail": "20-bar return -53 bps",
+          "sufficient": true
+        },
+        "reason": null
+      },
+      "session": {
+        "status": "AVAILABLE",
+        "freshness": "FRESH",
+        "provenance": {
+          "source": "KAIROS_SESSION",
+          "observedAt": "2026-10-07T07:52:43.905Z",
+          "effectiveAt": "2026-10-07T07:52:43.905Z"
+        },
+        "value": {
+          "session": "UNKNOWN",
+          "label": "UNKNOWN · overnight"
+        },
+        "reason": null
+      },
+      "dataQuality": {
+        "status": "AVAILABLE",
+        "freshness": "FRESH",
+        "provenance": {
+          "source": "KAIROS_FEATURE_ENGINE",
+          "observedAt": "2026-10-07T07:52:43.905Z",
+          "effectiveAt": "2026-10-07T07:52:43.905Z"
+        },
+        "value": {
+          "status": "GOOD",
+          "historyPoints": 100,
+          "latestAgeMs": 2845,
+          "referenceAgeMs": 2845,
+          "missingFields": []
+        },
+        "reason": null
+      },
+      "strategySignals": {
+        "status": "AVAILABLE",
+        "freshness": "FRESH",
+        "provenance": {
+          "source": "KAIROS_STRATEGY_ENGINE",
+          "observedAt": "2026-10-07T07:52:48.058Z",
+          "effectiveAt": "2026-10-07T07:52:48.058Z"
+        },
+        "value": {
+          "signals": [
+            {
+              "strategyId": "momentum",
+              "strategyName": "Momentum",
+              "version": "1",
+              "action": "HOLD",
+              "evaluation": "VALID",
+              "confidence": 0.42,
+              "timestamp": "2026-10-07T07:52:48.058Z",
+              "validUntil": "2026-10-07T08:07:48.058Z",
+              "source": "KAIROS_STRATEGY_ENGINE"
+            },
+            {
+              "strategyId": "mean-reversion",
+              "strategyName": "Mean reversion",
+              "version": "1",
+              "action": "HOLD",
+              "evaluation": "VALID",
+              "confidence": 0.4,
+              "timestamp": "2026-10-07T07:52:48.058Z",
+              "validUntil": "2026-10-07T08:07:48.058Z",
+              "source": "KAIROS_STRATEGY_ENGINE"
+            },
+            {
+              "strategyId": "weekend",
+              "strategyName": "Weekend / off-hours",
+              "version": "1",
+              "action": "NO_SIGNAL",
+              "evaluation": "INSUFFICIENT_DATA",
+              "confidence": 0,
+              "timestamp": "2026-10-07T07:52:48.058Z",
+              "validUntil": "2026-10-07T08:07:48.058Z",
+              "source": "KAIROS_STRATEGY_ENGINE"
+            }
+          ]
+        },
+        "reason": null
+      },
+      "strategyHealth": {
+        "status": "AVAILABLE",
+        "freshness": "UNKNOWN",
+        "provenance": {
+          "source": "KAIROS_STRATEGY_HEALTH",
+          "observedAt": null,
+          "effectiveAt": null
+        },
+        "value": {
+          "reports": [
+            {
+              "strategyId": "momentum",
+              "strategyVersion": "1",
+              "status": "UNKNOWN",
+              "sample": "INSUFFICIENT",
+              "sampleSize": 0,
+              "expectancy": null,
+              "source": "KAIROS_STRATEGY_HEALTH"
+            },
+            {
+              "strategyId": "mean-reversion",
+              "strategyVersion": "1",
+              "status": "UNKNOWN",
+              "sample": "INSUFFICIENT",
+              "sampleSize": 0,
+              "expectancy": null,
+              "source": "KAIROS_STRATEGY_HEALTH"
+            },
+            {
+              "strategyId": "weekend",
+              "strategyVersion": "1",
+              "status": "UNKNOWN",
+              "sample": "INSUFFICIENT",
+              "sampleSize": 0,
+              "expectancy": null,
+              "source": "KAIROS_STRATEGY_HEALTH"
+            }
+          ]
+        },
+        "reason": null
+      },
+      "strategyPerformance": {
+        "status": "INSUFFICIENT",
+        "freshness": "UNKNOWN",
+        "provenance": {
+          "source": null,
+          "observedAt": null,
+          "effectiveAt": null
+        },
+        "value": null,
+        "reason": "No measured performance is stored."
+      },
+      "externalSignals": {
+        "status": "UNAVAILABLE",
+        "freshness": "UNKNOWN",
+        "provenance": {
+          "source": null,
+          "observedAt": null,
+          "effectiveAt": null
+        },
+        "value": null,
+        "reason": "No external signal read is stored for this asset."
+      },
+      "tokenSecurity": {
+        "status": "UNAVAILABLE",
+        "freshness": "STALE",
+        "provenance": {
+          "source": "BINANCE_TOKEN_AUDIT",
+          "observedAt": "2026-10-07T07:50:06.293Z",
+          "effectiveAt": "2026-10-07T07:50:06.293Z"
+        },
+        "value": {
+          "gate": "UNAVAILABLE",
+          "label": "UNKNOWN",
+          "riskLevel": null,
+          "riskLevelEnum": null,
+          "chainId": "56",
+          "contractAddress": "0x2494b603319d4d9f9715c9f4496d9e0364b59d93"
+        },
+        "reason": "Token security assessment is unavailable."
+      },
+      "securityEvents": {
+        "status": "UNAVAILABLE",
+        "freshness": "UNKNOWN",
+        "provenance": {
+          "source": null,
+          "observedAt": null,
+          "effectiveAt": null
+        },
+        "value": null,
+        "reason": "No security event is stored."
+      },
+      "researchContext": {
+        "status": "UNAVAILABLE",
+        "freshness": "UNKNOWN",
+        "provenance": {
+          "source": null,
+          "observedAt": null,
+          "effectiveAt": null
+        },
+        "value": null,
+        "reason": "No research record is stored for this user and asset."
+      },
+      "researchCandidates": {
+        "status": "UNAVAILABLE",
+        "freshness": "UNKNOWN",
+        "provenance": {
+          "source": null,
+          "observedAt": null,
+          "effectiveAt": null
+        },
+        "value": null,
+        "reason": "No research candidate is stored."
+      },
+      "positionContext": {
+        "status": "AVAILABLE",
+        "freshness": "FRESH",
+        "provenance": {
+          "source": "KAIROS_PAPER_LEDGER",
+          "observedAt": "2026-10-07T07:52:48.058Z",
+          "effectiveAt": null
+        },
+        "value": {
+          "state": "NO_POSITION",
+          "quantity": null,
+          "averageEntry": null,
+          "currentMark": null,
+          "unrealizedPnL": null,
+          "notional": null,
+          "originStrategy": null,
+          "strategyVersion": null,
+          "openedAt": null,
+          "representationId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+          "positionId": null,
+          "correlationId": null,
+          "addCount": 0,
+          "lastAddAt": null,
+          "appliedReductions": [],
+          "entry": null,
+          "risk": null,
+          "lastDecision": null,
+          "lastDecisionAt": null,
+          "reduceCount": 0,
+          "lastReduceAt": null,
+          "thesisState": null,
+          "entryContextId": null,
+          "highestMark": null,
+          "previousSnapshot": null,
+          "alternateStrategyId": null,
+          "exitClass": null,
+          "managementPolicy": null
+        },
+        "reason": null
+      },
+      "eventContext": {
+        "status": "AVAILABLE",
+        "freshness": "UNKNOWN",
+        "provenance": {
+          "source": "BINANCE_TOKENIZED_SECURITY",
+          "observedAt": null,
+          "effectiveAt": null
+        },
+        "value": {
+          "providerAnswered": true,
+          "events": []
+        },
+        "reason": "The provider answered. No event is inside its effective window."
+      },
+      "newsContext": {
+        "status": "UNAVAILABLE",
+        "freshness": "UNKNOWN",
+        "provenance": {
+          "source": null,
+          "observedAt": null,
+          "effectiveAt": null
+        },
+        "value": null,
+        "reason": "NOT_CONFIGURED"
+      },
+      "earningsContext": {
+        "status": "UNAVAILABLE",
+        "freshness": "UNKNOWN",
+        "provenance": {
+          "source": null,
+          "observedAt": null,
+          "effectiveAt": null
+        },
+        "value": null,
+        "reason": "NOT_CONFIGURED"
+      },
+      "freshness": {
+        "market": "FRESH",
+        "reference": "FRESH",
+        "history": "STALE",
+        "externalSignals": "UNKNOWN",
+        "security": "STALE",
+        "events": "UNKNOWN",
+        "position": "FRESH"
+      },
+      "quality": "DEGRADED",
+      "conflicts": [
+        {
+          "code": "HISTORY_TIMESTAMP_GAP",
+          "severity": "DEGRADE",
+          "message": "Candle history has a timestamp gap. The series was not rewritten."
+        },
+        {
+          "code": "SECURITY_UNAVAILABLE",
+          "severity": "DEGRADE",
+          "message": "Token security was returned as unavailable. It was not treated as a pass."
+        }
+      ],
+      "opportunity": {
+        "state": "BLOCKED",
+        "reason": "Security state is unknown."
+      },
+      "transitions": [],
+      "timeline": [
+        {
+          "id": "tl:2026-10-07T07:52:48.058Z:news-unavailable",
+          "at": "2026-10-07T07:52:48.058Z",
+          "clock": "07:52",
+          "label": "News unavailable",
+          "detail": "FMP is not configured. Missing news is not the same as no news.",
+          "origin": "UNAVAILABLE",
+          "source": "News"
+        }
+      ],
+      "walletAccess": false,
+      "createsOrders": false,
+      "externalAbsence": "SOURCE_UNAVAILABLE",
+      "summaryLines": [
+        {
+          "label": "MARKET",
+          "value": "UNKNOWN"
+        },
+        {
+          "label": "REGIME",
+          "value": "RANGE_BOUND"
+        },
+        {
+          "label": "SESSION",
+          "value": "UNKNOWN · overnight"
+        },
+        {
+          "label": "MOMENTUM",
+          "value": "VALID"
+        },
+        {
+          "label": "MEAN REVERSION",
+          "value": "VALID"
+        },
+        {
+          "label": "WEEKEND / OFF-HOURS",
+          "value": "INSUFFICIENT_DATA"
+        },
+        {
+          "label": "SMART MONEY",
+          "value": "UNAVAILABLE"
+        },
+        {
+          "label": "STRATEGY HEALTH",
+          "value": "UNKNOWN"
+        },
+        {
+          "label": "EVENT",
+          "value": "NONE"
+        },
+        {
+          "label": "EARNINGS",
+          "value": "NOT_CONFIGURED"
+        },
+        {
+          "label": "NEWS",
+          "value": "NOT_CONFIGURED"
+        },
+        {
+          "label": "SECURITY",
+          "value": "UNKNOWN"
+        },
+        {
+          "label": "POSITION",
+          "value": "NO POSITION"
+        },
+        {
+          "label": "DATA QUALITY",
+          "value": "DEGRADED"
+        },
+        {
+          "label": "OPPORTUNITY",
+          "value": "BLOCKED"
+        }
+      ],
+      "summaryText": "TSLA\n\nMARKET:\nUNKNOWN\n\nREGIME:\nRANGE_BOUND\n\nSESSION:\nUNKNOWN · overnight\n\nMOMENTUM:\nVALID\n\nMEAN REVERSION:\nVALID\n\nWEEKEND / OFF-HOURS:\nINSUFFICIENT_DATA\n\nSMART MONEY:\nUNAVAILABLE\n\nSTRATEGY HEALTH:\nUNKNOWN\n\nEVENT:\nNONE\n\nEARNINGS:\nNOT_CONFIGURED\n\nNEWS:\nNOT_CONFIGURED\n\nSECURITY:\nUNKNOWN\n\nPOSITION:\nNO POSITION\n\nDATA QUALITY:\nDEGRADED\n\nOPPORTUNITY:\nBLOCKED",
+      "validation": {
+        "ok": true,
+        "admitsArbitration": true,
+        "reasons": []
+      }
+    },
+    "binanceIntelligence": {
+      "smartMoney": {
+        "source": "binance-trading-signal",
+        "timestamp": null,
+        "freshness": "UNKNOWN",
+        "status": "NOT AVAILABLE",
+        "detail": null,
+        "walletCount": null
+      },
+      "tokenSecurity": {
+        "source": "query-token-audit",
+        "timestamp": "2026-10-07T07:50:06.293Z",
+        "freshness": "FRESH",
+        "status": "SECURITY_AUDIT_UNAVAILABLE",
+        "detail": null
+      },
+      "tokenizedSecurityStatus": {
+        "source": "binance-tokenized-securities-info",
+        "timestamp": null,
+        "freshness": "UNKNOWN",
+        "status": "NOT AVAILABLE",
+        "detail": "CAPABILITY_LIMITATION: ONDO_ONLY",
+        "limitation": "ONDO_ONLY"
+      },
+      "corporateAction": {
+        "source": "binance-tokenized-securities-info",
+        "timestamp": null,
+        "freshness": "UNKNOWN",
+        "status": "NOT AVAILABLE",
+        "detail": null
+      },
+      "alignment": "NO_EXTERNAL_SIGNAL"
+    }
+  },
+  "context": {
+    "contextId": "ctx:user_phase17i:56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93:cycle:user_phase17i:2026-10-07T07:52:48.058Z",
+    "cycleId": "cycle:user_phase17i:2026-10-07T07:52:48.058Z",
+    "userId": "user_phase17i",
+    "agentId": "agent_user_phase17i",
+    "assetId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+    "timestamp": "2026-10-07T07:52:48.058Z",
+    "snapshotTimestamp": "2026-10-07T07:52:48.058Z",
+    "sourceTimestamps": {
+      "market": "2026-10-07T07:52:43.905Z",
+      "reference": "2026-10-07T07:52:43.905Z",
+      "history": "2026-10-07T07:45:00.000Z",
+      "externalSignals": null,
+      "security": "2026-10-07T07:50:06.293Z",
+      "events": null,
+      "position": "2026-10-07T07:52:48.058Z"
+    },
+    "identity": {
+      "underlyingTicker": "TSLA",
+      "underlyingName": "Tesla, Inc.",
+      "representationId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+      "tokenSymbol": "TSLAon",
+      "chainId": "56",
+      "chainLabel": "BNB Smart Chain",
+      "contractAddress": "0x2494b603319d4d9f9715c9f4496d9e0364b59d93"
+    },
+    "watchlist": [
+      "TSLA"
+    ],
+    "market": {
+      "status": "AVAILABLE",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "BINANCE_RWA_API",
+        "observedAt": "2026-10-07T07:52:43.905Z",
+        "effectiveAt": "2026-10-07T07:52:43.905Z"
+      },
+      "value": {
+        "price": "378.63715",
+        "session": "UNKNOWN",
+        "sessionLabel": "UNKNOWN · overnight",
+        "rawMarketStatus": "overnight",
+        "fidelity": "live"
+      },
+      "reason": null
+    },
+    "reference": {
+      "status": "AVAILABLE",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "BINANCE_RWA_API",
+        "observedAt": "2026-10-07T07:52:43.905Z",
+        "effectiveAt": "2026-10-07T07:52:43.905Z"
+      },
+      "value": {
+        "referencePrice": "378.63715",
+        "deviationPct": 0
+      },
+      "reason": null
+    },
+    "history": {
+      "status": "AVAILABLE",
+      "freshness": "STALE",
+      "provenance": {
+        "source": "BINANCE_MARKET_CANDLES",
+        "observedAt": "2026-10-07T07:45:00.000Z",
+        "effectiveAt": "2026-10-07T07:45:00.000Z"
+      },
+      "value": {
+        "points": 100,
+        "latestTimestampMs": 1791359100000,
+        "latestClose": "378.16"
+      },
+      "reason": null
+    },
+    "features": {
+      "status": "AVAILABLE",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "KAIROS_FEATURE_ENGINE",
+        "observedAt": "2026-10-07T07:52:48.058Z",
+        "effectiveAt": "2026-10-07T07:52:48.058Z"
+      },
+      "value": {
+        "features": [
+          {
+            "id": "return_15m",
+            "value": "-0.21%",
+            "sufficient": true
+          },
+          {
+            "id": "return_1h",
+            "value": "0.00%",
+            "sufficient": true
+          },
+          {
+            "id": "return_4h",
+            "value": "-0.32%",
+            "sufficient": true
+          },
+          {
+            "id": "sma_20",
+            "value": "378.4042",
+            "sufficient": true
+          },
+          {
+            "id": "ema_12",
+            "value": "378.3461",
+            "sufficient": true
+          },
+          {
+            "id": "realized_volatility_20",
+            "value": "0.14%",
+            "sufficient": true
+          },
+          {
+            "id": "rolling_high_20",
+            "value": "380.1625",
+            "sufficient": true
+          },
+          {
+            "id": "rolling_low_20",
+            "value": "377.4950",
+            "sufficient": true
+          },
+          {
+            "id": "range_20",
+            "value": "2.6675",
+            "sufficient": true
+          },
+          {
+            "id": "volume_change",
+            "value": "-99.98%",
+            "sufficient": true
+          },
+          {
+            "id": "trend",
+            "value": "DOWN",
+            "sufficient": true
+          },
+          {
+            "id": "momentum_1h",
+            "value": "0.00%",
+            "sufficient": true
+          },
+          {
+            "id": "distance_from_mean",
+            "value": "-0.06%",
+            "sufficient": true
+          },
+          {
+            "id": "reference_deviation",
+            "value": "0.00%",
+            "sufficient": true
+          },
+          {
+            "id": "data_freshness",
+            "value": "FRESH",
+            "sufficient": true
+          }
+        ]
+      },
+      "reason": null
+    },
+    "regime": {
+      "status": "AVAILABLE",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "KAIROS_FEATURE_ENGINE",
+        "observedAt": "2026-10-07T07:52:48.058Z",
+        "effectiveAt": "2026-10-07T07:52:48.058Z"
+      },
+      "value": {
+        "regime": "RANGE_BOUND",
+        "detail": "20-bar return -53 bps",
+        "sufficient": true
+      },
+      "reason": null
+    },
+    "session": {
+      "status": "AVAILABLE",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "KAIROS_SESSION",
+        "observedAt": "2026-10-07T07:52:43.905Z",
+        "effectiveAt": "2026-10-07T07:52:43.905Z"
+      },
+      "value": {
+        "session": "UNKNOWN",
+        "label": "UNKNOWN · overnight"
+      },
+      "reason": null
+    },
+    "dataQuality": {
+      "status": "AVAILABLE",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "KAIROS_FEATURE_ENGINE",
+        "observedAt": "2026-10-07T07:52:43.905Z",
+        "effectiveAt": "2026-10-07T07:52:43.905Z"
+      },
+      "value": {
+        "status": "GOOD",
+        "historyPoints": 100,
+        "latestAgeMs": 2845,
+        "referenceAgeMs": 2845,
+        "missingFields": []
+      },
+      "reason": null
+    },
+    "strategySignals": {
+      "status": "AVAILABLE",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "KAIROS_STRATEGY_ENGINE",
+        "observedAt": "2026-10-07T07:52:48.058Z",
+        "effectiveAt": "2026-10-07T07:52:48.058Z"
+      },
+      "value": {
+        "signals": [
+          {
+            "strategyId": "momentum",
+            "strategyName": "Momentum",
+            "version": "1",
+            "action": "HOLD",
+            "evaluation": "VALID",
+            "confidence": 0.42,
+            "timestamp": "2026-10-07T07:52:48.058Z",
+            "validUntil": "2026-10-07T08:07:48.058Z",
+            "source": "KAIROS_STRATEGY_ENGINE"
+          },
+          {
+            "strategyId": "mean-reversion",
+            "strategyName": "Mean reversion",
+            "version": "1",
+            "action": "HOLD",
+            "evaluation": "VALID",
+            "confidence": 0.4,
+            "timestamp": "2026-10-07T07:52:48.058Z",
+            "validUntil": "2026-10-07T08:07:48.058Z",
+            "source": "KAIROS_STRATEGY_ENGINE"
+          },
+          {
+            "strategyId": "weekend",
+            "strategyName": "Weekend / off-hours",
+            "version": "1",
+            "action": "NO_SIGNAL",
+            "evaluation": "INSUFFICIENT_DATA",
+            "confidence": 0,
+            "timestamp": "2026-10-07T07:52:48.058Z",
+            "validUntil": "2026-10-07T08:07:48.058Z",
+            "source": "KAIROS_STRATEGY_ENGINE"
+          }
+        ]
+      },
+      "reason": null
+    },
+    "strategyHealth": {
+      "status": "AVAILABLE",
+      "freshness": "UNKNOWN",
+      "provenance": {
+        "source": "KAIROS_STRATEGY_HEALTH",
+        "observedAt": null,
+        "effectiveAt": null
+      },
+      "value": {
+        "reports": [
+          {
+            "strategyId": "momentum",
+            "strategyVersion": "1",
+            "status": "UNKNOWN",
+            "sample": "INSUFFICIENT",
+            "sampleSize": 0,
+            "expectancy": null,
+            "source": "KAIROS_STRATEGY_HEALTH"
+          },
+          {
+            "strategyId": "mean-reversion",
+            "strategyVersion": "1",
+            "status": "UNKNOWN",
+            "sample": "INSUFFICIENT",
+            "sampleSize": 0,
+            "expectancy": null,
+            "source": "KAIROS_STRATEGY_HEALTH"
+          },
+          {
+            "strategyId": "weekend",
+            "strategyVersion": "1",
+            "status": "UNKNOWN",
+            "sample": "INSUFFICIENT",
+            "sampleSize": 0,
+            "expectancy": null,
+            "source": "KAIROS_STRATEGY_HEALTH"
+          }
+        ]
+      },
+      "reason": null
+    },
+    "strategyPerformance": {
+      "status": "INSUFFICIENT",
+      "freshness": "UNKNOWN",
+      "provenance": {
+        "source": null,
+        "observedAt": null,
+        "effectiveAt": null
+      },
+      "value": null,
+      "reason": "No measured performance is stored."
+    },
+    "externalSignals": {
+      "status": "UNAVAILABLE",
+      "freshness": "UNKNOWN",
+      "provenance": {
+        "source": null,
+        "observedAt": null,
+        "effectiveAt": null
+      },
+      "value": null,
+      "reason": "No external signal read is stored for this asset."
+    },
+    "tokenSecurity": {
+      "status": "UNAVAILABLE",
+      "freshness": "STALE",
+      "provenance": {
+        "source": "BINANCE_TOKEN_AUDIT",
+        "observedAt": "2026-10-07T07:50:06.293Z",
+        "effectiveAt": "2026-10-07T07:50:06.293Z"
+      },
+      "value": {
+        "gate": "UNAVAILABLE",
+        "label": "UNKNOWN",
+        "riskLevel": null,
+        "riskLevelEnum": null,
+        "chainId": "56",
+        "contractAddress": "0x2494b603319d4d9f9715c9f4496d9e0364b59d93"
+      },
+      "reason": "Token security assessment is unavailable."
+    },
+    "securityEvents": {
+      "status": "UNAVAILABLE",
+      "freshness": "UNKNOWN",
+      "provenance": {
+        "source": null,
+        "observedAt": null,
+        "effectiveAt": null
+      },
+      "value": null,
+      "reason": "No security event is stored."
+    },
+    "researchContext": {
+      "status": "UNAVAILABLE",
+      "freshness": "UNKNOWN",
+      "provenance": {
+        "source": null,
+        "observedAt": null,
+        "effectiveAt": null
+      },
+      "value": null,
+      "reason": "No research record is stored for this user and asset."
+    },
+    "researchCandidates": {
+      "status": "UNAVAILABLE",
+      "freshness": "UNKNOWN",
+      "provenance": {
+        "source": null,
+        "observedAt": null,
+        "effectiveAt": null
+      },
+      "value": null,
+      "reason": "No research candidate is stored."
+    },
+    "positionContext": {
+      "status": "AVAILABLE",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "KAIROS_PAPER_LEDGER",
+        "observedAt": "2026-10-07T07:52:48.058Z",
+        "effectiveAt": null
+      },
+      "value": {
+        "state": "NO_POSITION",
+        "quantity": null,
+        "averageEntry": null,
+        "currentMark": null,
+        "unrealizedPnL": null,
+        "notional": null,
+        "originStrategy": null,
+        "strategyVersion": null,
+        "openedAt": null,
+        "representationId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+        "positionId": null,
+        "correlationId": null,
+        "addCount": 0,
+        "lastAddAt": null,
+        "appliedReductions": [],
+        "entry": null,
+        "risk": null,
+        "lastDecision": null,
+        "lastDecisionAt": null,
+        "reduceCount": 0,
+        "lastReduceAt": null,
+        "thesisState": null,
+        "entryContextId": null,
+        "highestMark": null,
+        "previousSnapshot": null,
+        "alternateStrategyId": null,
+        "exitClass": null,
+        "managementPolicy": null
+      },
+      "reason": null
+    },
+    "eventContext": {
+      "status": "AVAILABLE",
+      "freshness": "UNKNOWN",
+      "provenance": {
+        "source": "BINANCE_TOKENIZED_SECURITY",
+        "observedAt": null,
+        "effectiveAt": null
+      },
+      "value": {
+        "providerAnswered": true,
+        "events": []
+      },
+      "reason": "The provider answered. No event is inside its effective window."
+    },
+    "newsContext": {
+      "status": "UNAVAILABLE",
+      "freshness": "UNKNOWN",
+      "provenance": {
+        "source": null,
+        "observedAt": null,
+        "effectiveAt": null
+      },
+      "value": null,
+      "reason": "NOT_CONFIGURED"
+    },
+    "earningsContext": {
+      "status": "UNAVAILABLE",
+      "freshness": "UNKNOWN",
+      "provenance": {
+        "source": null,
+        "observedAt": null,
+        "effectiveAt": null
+      },
+      "value": null,
+      "reason": "NOT_CONFIGURED"
+    },
+    "freshness": {
+      "market": "FRESH",
+      "reference": "FRESH",
+      "history": "STALE",
+      "externalSignals": "UNKNOWN",
+      "security": "STALE",
+      "events": "UNKNOWN",
+      "position": "FRESH"
+    },
+    "quality": "DEGRADED",
+    "conflicts": [
+      {
+        "code": "HISTORY_TIMESTAMP_GAP",
+        "severity": "DEGRADE",
+        "message": "Candle history has a timestamp gap. The series was not rewritten."
+      },
+      {
+        "code": "SECURITY_UNAVAILABLE",
+        "severity": "DEGRADE",
+        "message": "Token security was returned as unavailable. It was not treated as a pass."
+      }
+    ],
+    "opportunity": {
+      "state": "BLOCKED",
+      "reason": "Security state is unknown."
+    },
+    "transitions": [],
+    "timeline": [
+      {
+        "id": "tl:2026-10-07T07:52:48.058Z:news-unavailable",
+        "at": "2026-10-07T07:52:48.058Z",
+        "clock": "07:52",
+        "label": "News unavailable",
+        "detail": "FMP is not configured. Missing news is not the same as no news.",
+        "origin": "UNAVAILABLE",
+        "source": "News"
+      }
+    ],
+    "walletAccess": false,
+    "createsOrders": false,
+    "externalAbsence": "SOURCE_UNAVAILABLE",
+    "summaryLines": [
+      {
+        "label": "MARKET",
+        "value": "UNKNOWN"
+      },
+      {
+        "label": "REGIME",
+        "value": "RANGE_BOUND"
+      },
+      {
+        "label": "SESSION",
+        "value": "UNKNOWN · overnight"
+      },
+      {
+        "label": "MOMENTUM",
+        "value": "VALID"
+      },
+      {
+        "label": "MEAN REVERSION",
+        "value": "VALID"
+      },
+      {
+        "label": "WEEKEND / OFF-HOURS",
+        "value": "INSUFFICIENT_DATA"
+      },
+      {
+        "label": "SMART MONEY",
+        "value": "UNAVAILABLE"
+      },
+      {
+        "label": "STRATEGY HEALTH",
+        "value": "UNKNOWN"
+      },
+      {
+        "label": "EVENT",
+        "value": "NONE"
+      },
+      {
+        "label": "EARNINGS",
+        "value": "NOT_CONFIGURED"
+      },
+      {
+        "label": "NEWS",
+        "value": "NOT_CONFIGURED"
+      },
+      {
+        "label": "SECURITY",
+        "value": "UNKNOWN"
+      },
+      {
+        "label": "POSITION",
+        "value": "NO POSITION"
+      },
+      {
+        "label": "DATA QUALITY",
+        "value": "DEGRADED"
+      },
+      {
+        "label": "OPPORTUNITY",
+        "value": "BLOCKED"
+      }
+    ],
+    "summaryText": "TSLA\n\nMARKET:\nUNKNOWN\n\nREGIME:\nRANGE_BOUND\n\nSESSION:\nUNKNOWN · overnight\n\nMOMENTUM:\nVALID\n\nMEAN REVERSION:\nVALID\n\nWEEKEND / OFF-HOURS:\nINSUFFICIENT_DATA\n\nSMART MONEY:\nUNAVAILABLE\n\nSTRATEGY HEALTH:\nUNKNOWN\n\nEVENT:\nNONE\n\nEARNINGS:\nNOT_CONFIGURED\n\nNEWS:\nNOT_CONFIGURED\n\nSECURITY:\nUNKNOWN\n\nPOSITION:\nNO POSITION\n\nDATA QUALITY:\nDEGRADED\n\nOPPORTUNITY:\nBLOCKED",
+    "validation": {
+      "ok": true,
+      "admitsArbitration": true,
+      "reasons": []
+    }
+  },
+  "research": {
+    "userId": "user_phase17i",
+    "agentId": "agent_user_phase17i",
+    "assetId": "56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+    "ticker": "TSLA",
+    "watchlist": [
+      "TSLA"
+    ],
+    "observation": {
+      "price": "378.63715",
+      "session": "UNKNOWN",
+      "regime": "RANGE_BOUND",
+      "freshness": "FRESH · 3s ago"
+    },
+    "features": [
+      {
+        "id": "return_15m",
+        "value": "-0.21%",
+        "bps": null
+      },
+      {
+        "id": "return_1h",
+        "value": "0.00%",
+        "bps": null
+      },
+      {
+        "id": "return_4h",
+        "value": "-0.32%",
+        "bps": null
+      },
+      {
+        "id": "sma_20",
+        "value": "378.4042",
+        "bps": null
+      },
+      {
+        "id": "ema_12",
+        "value": "378.3461",
+        "bps": null
+      },
+      {
+        "id": "realized_volatility_20",
+        "value": "0.14%",
+        "bps": null
+      },
+      {
+        "id": "rolling_high_20",
+        "value": "380.1625",
+        "bps": null
+      },
+      {
+        "id": "rolling_low_20",
+        "value": "377.4950",
+        "bps": null
+      },
+      {
+        "id": "range_20",
+        "value": "2.6675",
+        "bps": null
+      },
+      {
+        "id": "volume_change",
+        "value": "-99.98%",
+        "bps": null
+      },
+      {
+        "id": "trend",
+        "value": "DOWN",
+        "bps": null
+      },
+      {
+        "id": "momentum_1h",
+        "value": "0.00%",
+        "bps": null
+      },
+      {
+        "id": "distance_from_mean",
+        "value": "-0.06%",
+        "bps": null
+      },
+      {
+        "id": "reference_deviation",
+        "value": "0.00%",
+        "bps": null
+      },
+      {
+        "id": "data_freshness",
+        "value": "FRESH",
+        "bps": null
+      }
+    ],
+    "signals": [
+      {
+        "strategyId": "momentum",
+        "action": "HOLD"
+      },
+      {
+        "strategyId": "mean-reversion",
+        "action": "HOLD"
+      },
+      {
+        "strategyId": "weekend",
+        "action": "NO_SIGNAL"
+      }
+    ],
+    "arbitration": {
+      "decision": "NO_OPPORTUNITY",
+      "action": null
+    },
+    "paperPerformance": null,
+    "priorExperiments": [],
+    "contextId": "ctx:user_phase17i:56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93:cycle:user_phase17i:2026-10-07T07:52:48.058Z",
+    "eventContext": {
+      "status": "AVAILABLE",
+      "providerAnswered": true,
+      "events": []
+    },
+    "newsContext": {
+      "status": "UNAVAILABLE",
+      "providerConnected": false,
+      "reason": "NOT_CONFIGURED",
+      "items": null
+    },
+    "earningsContext": {
+      "status": "UNAVAILABLE",
+      "reason": "NOT_CONFIGURED",
+      "eventId": null,
+      "expectedEarningsDate": null,
+      "reportTime": null,
+      "state": null,
+      "window": null,
+      "actualEps": null,
+      "estimatedEps": null,
+      "revenue": null,
+      "estimatedRevenue": null
+    },
+    "tokenSecurity": {
+      "available": false,
+      "supported": false,
+      "riskLevel": null,
+      "riskLevelEnum": null,
+      "source": "BINANCE_TOKEN_AUDIT"
+    },
+    "securityEvents": [],
+    "strategyHealth": [
+      {
+        "strategyId": "momentum",
+        "status": "UNKNOWN",
+        "sampleSize": 0,
+        "expectancy": null
+      },
+      {
+        "strategyId": "mean-reversion",
+        "status": "UNKNOWN",
+        "sampleSize": 0,
+        "expectancy": null
+      },
+      {
+        "strategyId": "weekend",
+        "status": "UNKNOWN",
+        "sampleSize": 0,
+        "expectancy": null
+      }
+    ],
+    "strategyPerformance": [],
+    "candidatePerformance": [],
+    "positionContext": {
+      "status": "AVAILABLE",
+      "state": "NO_POSITION",
+      "quantity": null,
+      "averageEntry": null,
+      "currentMark": null,
+      "unrealizedPnL": null,
+      "originStrategy": null,
+      "thesisState": null
+    }
+  },
+  "history": {
+    "bar": "15m",
+    "count": 100,
+    "firstAt": "2026-10-05T08:00:00.000Z",
+    "lastAt": "2026-10-07T07:45:00.000Z",
+    "ageMs": 468058,
+    "candles": [
+      {
+        "timestampMs": 1791187200000,
+        "open": "371.115192",
+        "high": "371.986980",
+        "low": "371.108606",
+        "close": "371.646386",
+        "volume": "2453.201312",
+        "tradeCount": 6
+      },
+      {
+        "timestampMs": 1791188100000,
+        "open": "371.646386",
+        "high": "371.646386",
+        "low": "371.362597",
+        "close": "371.362597",
+        "volume": "10.060376",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791190800000,
+        "open": "371.362597",
+        "high": "371.362597",
+        "low": "371.188376",
+        "close": "371.188376",
+        "volume": "21.825876",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791193500000,
+        "open": "371.188376",
+        "high": "371.188376",
+        "low": "370.289155",
+        "close": "370.289155",
+        "volume": "57.829035",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791198000000,
+        "open": "370.289155",
+        "high": "370.289155",
+        "low": "368.666902",
+        "close": "368.666902",
+        "volume": "33.190721",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791203400000,
+        "open": "368.666902",
+        "high": "368.666902",
+        "low": "367.619042",
+        "close": "367.698955",
+        "volume": "1969.952566",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791207000000,
+        "open": "367.698955",
+        "high": "370.631708",
+        "low": "367.698955",
+        "close": "370.631708",
+        "volume": "926.579269",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791207900000,
+        "open": "370.631708",
+        "high": "375.456257",
+        "low": "370.631708",
+        "close": "375.096931",
+        "volume": "11639.641321",
+        "tradeCount": 3
+      },
+      {
+        "timestampMs": 1791208800000,
+        "open": "375.096931",
+        "high": "378.193092",
+        "low": "374.594195",
+        "close": "378.083269",
+        "volume": "8129.394834",
+        "tradeCount": 6
+      },
+      {
+        "timestampMs": 1791210600000,
+        "open": "378.083269",
+        "high": "378.083269",
+        "low": "375.268678",
+        "close": "375.268678",
+        "volume": "5.016029",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791211500000,
+        "open": "375.268678",
+        "high": "375.613720",
+        "low": "375.268678",
+        "close": "375.613720",
+        "volume": "10.117720",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791212400000,
+        "open": "375.613720",
+        "high": "377.596666",
+        "low": "375.613720",
+        "close": "377.596666",
+        "volume": "6539.799332",
+        "tradeCount": 3
+      },
+      {
+        "timestampMs": 1791213300000,
+        "open": "377.596666",
+        "high": "377.596666",
+        "low": "376.727755",
+        "close": "377.345424",
+        "volume": "540.167455",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791214200000,
+        "open": "377.345424",
+        "high": "377.511034",
+        "low": "377.345424",
+        "close": "377.511034",
+        "volume": "107.630174",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791216900000,
+        "open": "377.511034",
+        "high": "377.622245",
+        "low": "377.049733",
+        "close": "377.049733",
+        "volume": "3618.869880",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791218700000,
+        "open": "377.049733",
+        "high": "378.513001",
+        "low": "377.049733",
+        "close": "378.513001",
+        "volume": "1742.484602",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791221400000,
+        "open": "378.513001",
+        "high": "380.432135",
+        "low": "378.513001",
+        "close": "380.432135",
+        "volume": "2023.350676",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791222300000,
+        "open": "380.432135",
+        "high": "380.432135",
+        "low": "379.474970",
+        "close": "379.474970",
+        "volume": "3953.201086",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791223200000,
+        "open": "379.474970",
+        "high": "379.474970",
+        "low": "378.951254",
+        "close": "378.951254",
+        "volume": "2494.368313",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791224100000,
+        "open": "378.951254",
+        "high": "379.292465",
+        "low": "378.951254",
+        "close": "379.292465",
+        "volume": "251.850197",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791225000000,
+        "open": "379.292465",
+        "high": "379.680660",
+        "low": "379.292465",
+        "close": "379.680660",
+        "volume": "40.042224",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791225900000,
+        "open": "379.680660",
+        "high": "380.021155",
+        "low": "379.680660",
+        "close": "380.021155",
+        "volume": "1504.883772",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791237600000,
+        "open": "380.021155",
+        "high": "380.021155",
+        "low": "378.931347",
+        "close": "378.931347",
+        "volume": "32.168592",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791246600000,
+        "open": "378.931347",
+        "high": "379.524095",
+        "low": "378.931347",
+        "close": "379.524095",
+        "volume": "174.851631",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791249300000,
+        "open": "379.524095",
+        "high": "380.428160",
+        "low": "379.524095",
+        "close": "380.428160",
+        "volume": "4.519893",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791250200000,
+        "open": "380.428160",
+        "high": "380.428160",
+        "low": "379.485495",
+        "close": "379.485495",
+        "volume": "53.364226",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791254700000,
+        "open": "379.485495",
+        "high": "379.485495",
+        "low": "379.188641",
+        "close": "379.188641",
+        "volume": "59.666747",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791255600000,
+        "open": "379.188641",
+        "high": "379.506176",
+        "low": "379.188641",
+        "close": "379.506176",
+        "volume": "624.979534",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791256500000,
+        "open": "379.506176",
+        "high": "379.506176",
+        "low": "379.050895",
+        "close": "379.050895",
+        "volume": "6.023551",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791259200000,
+        "open": "379.050895",
+        "high": "380.530167",
+        "low": "379.050895",
+        "close": "380.530167",
+        "volume": "32.787248",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791261000000,
+        "open": "380.530167",
+        "high": "380.530167",
+        "low": "380.113109",
+        "close": "380.113109",
+        "volume": "128.806658",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791261900000,
+        "open": "380.113109",
+        "high": "380.272977",
+        "low": "379.766968",
+        "close": "379.766968",
+        "volume": "49.253550",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791262800000,
+        "open": "379.766968",
+        "high": "379.988246",
+        "low": "379.766968",
+        "close": "379.988246",
+        "volume": "3591.652156",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791263700000,
+        "open": "379.988246",
+        "high": "380.178085",
+        "low": "379.988246",
+        "close": "380.178085",
+        "volume": "160.469758",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791264600000,
+        "open": "380.178085",
+        "high": "380.178085",
+        "low": "380.038204",
+        "close": "380.078170",
+        "volume": "1499.903631",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791265500000,
+        "open": "380.078170",
+        "high": "380.150965",
+        "low": "380.071034",
+        "close": "380.150965",
+        "volume": "2399.782467",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791266400000,
+        "open": "380.150965",
+        "high": "380.702186",
+        "low": "379.550728",
+        "close": "379.550728",
+        "volume": "40.639439",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791267300000,
+        "open": "379.550728",
+        "high": "380.546009",
+        "low": "379.550728",
+        "close": "380.400961",
+        "volume": "3301.266303",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791268200000,
+        "open": "380.400961",
+        "high": "380.540848",
+        "low": "380.390970",
+        "close": "380.490888",
+        "volume": "2700.416792",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791269100000,
+        "open": "380.490888",
+        "high": "380.510971",
+        "low": "380.234096",
+        "close": "380.339954",
+        "volume": "5418.805480",
+        "tradeCount": 3
+      },
+      {
+        "timestampMs": 1791270000000,
+        "open": "380.339954",
+        "high": "380.339954",
+        "low": "379.995167",
+        "close": "380.125059",
+        "volume": "1300.009895",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791270900000,
+        "open": "380.125059",
+        "high": "380.125059",
+        "low": "379.883237",
+        "close": "379.922773",
+        "volume": "3383.520867",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791271800000,
+        "open": "379.922773",
+        "high": "379.922773",
+        "low": "379.702974",
+        "close": "379.702974",
+        "volume": "2549.032932",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791272700000,
+        "open": "379.702974",
+        "high": "380.010347",
+        "low": "379.702974",
+        "close": "380.010347",
+        "volume": "38.003868",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791274500000,
+        "open": "380.010347",
+        "high": "381.190449",
+        "low": "380.010347",
+        "close": "380.247535",
+        "volume": "43.196169",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791275400000,
+        "open": "380.247535",
+        "high": "380.247535",
+        "low": "379.955698",
+        "close": "379.958321",
+        "volume": "498.534828",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791276300000,
+        "open": "379.958321",
+        "high": "380.691973",
+        "low": "379.958321",
+        "close": "380.691973",
+        "volume": "160.302530",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791279000000,
+        "open": "380.691973",
+        "high": "380.691973",
+        "low": "380.524251",
+        "close": "380.524251",
+        "volume": "295.664143",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791280800000,
+        "open": "380.524251",
+        "high": "380.870201",
+        "low": "380.524251",
+        "close": "380.692038",
+        "volume": "430.284163",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791281700000,
+        "open": "380.692038",
+        "high": "381.044105",
+        "low": "380.692038",
+        "close": "381.044105",
+        "volume": "2042.185315",
+        "tradeCount": 3
+      },
+      {
+        "timestampMs": 1791283500000,
+        "open": "381.044105",
+        "high": "382.288453",
+        "low": "381.044105",
+        "close": "381.690110",
+        "volume": "10.678881",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791284400000,
+        "open": "381.690110",
+        "high": "382.665707",
+        "low": "381.690110",
+        "close": "382.073319",
+        "volume": "2541.336704",
+        "tradeCount": 5
+      },
+      {
+        "timestampMs": 1791285300000,
+        "open": "382.073319",
+        "high": "382.456236",
+        "low": "382.073319",
+        "close": "382.456236",
+        "volume": "22.488427",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791286200000,
+        "open": "382.456236",
+        "high": "382.625712",
+        "low": "382.291600",
+        "close": "382.375957",
+        "volume": "4991.275894",
+        "tradeCount": 5
+      },
+      {
+        "timestampMs": 1791287100000,
+        "open": "382.375957",
+        "high": "382.375957",
+        "low": "381.878688",
+        "close": "382.148461",
+        "volume": "5596.693352",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791288900000,
+        "open": "382.148461",
+        "high": "382.148461",
+        "low": "381.790702",
+        "close": "381.790702",
+        "volume": "950.175054",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791289800000,
+        "open": "381.790702",
+        "high": "381.790702",
+        "low": "381.278919",
+        "close": "381.278919",
+        "volume": "34.940293",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791290700000,
+        "open": "381.278919",
+        "high": "381.278919",
+        "low": "381.233648",
+        "close": "381.233648",
+        "volume": "300.077622",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791291600000,
+        "open": "381.233648",
+        "high": "381.386016",
+        "low": "381.233648",
+        "close": "381.386016",
+        "volume": "3.328141",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791292500000,
+        "open": "381.386016",
+        "high": "382.925639",
+        "low": "380.749673",
+        "close": "382.333247",
+        "volume": "3174.861211",
+        "tradeCount": 4
+      },
+      {
+        "timestampMs": 1791293400000,
+        "open": "382.333247",
+        "high": "16044.584263",
+        "low": "378.343401",
+        "close": "378.343401",
+        "volume": "5213.315933",
+        "tradeCount": 3
+      },
+      {
+        "timestampMs": 1791294300000,
+        "open": "378.343401",
+        "high": "381.162246",
+        "low": "378.144667",
+        "close": "381.162246",
+        "volume": "39.897061",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791295200000,
+        "open": "381.162246",
+        "high": "381.162246",
+        "low": "377.098769",
+        "close": "377.098769",
+        "volume": "225.832508",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791296100000,
+        "open": "377.098769",
+        "high": "382.941831",
+        "low": "377.098769",
+        "close": "380.953344",
+        "volume": "13201.083252",
+        "tradeCount": 7
+      },
+      {
+        "timestampMs": 1791297000000,
+        "open": "380.953344",
+        "high": "380.965654",
+        "low": "380.953344",
+        "close": "380.965654",
+        "volume": "831.264195",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791297900000,
+        "open": "380.965654",
+        "high": "381.081216",
+        "low": "380.965654",
+        "close": "381.041187",
+        "volume": "2245.307059",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791298800000,
+        "open": "381.041187",
+        "high": "381.265010",
+        "low": "381.041187",
+        "close": "381.265010",
+        "volume": "599.830206",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791299700000,
+        "open": "381.265010",
+        "high": "381.265010",
+        "low": "380.319925",
+        "close": "380.319925",
+        "volume": "4172.485783",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791300600000,
+        "open": "380.319925",
+        "high": "381.206419",
+        "low": "380.319925",
+        "close": "381.206419",
+        "volume": "8084.205677",
+        "tradeCount": 4
+      },
+      {
+        "timestampMs": 1791301500000,
+        "open": "381.206419",
+        "high": "381.206419",
+        "low": "381.103107",
+        "close": "381.103107",
+        "volume": "1235.875697",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791302400000,
+        "open": "381.103107",
+        "high": "381.358317",
+        "low": "381.103107",
+        "close": "381.358317",
+        "volume": "561.684745",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791303300000,
+        "open": "381.358317",
+        "high": "381.358317",
+        "low": "380.170849",
+        "close": "380.439422",
+        "volume": "421.047194",
+        "tradeCount": 3
+      },
+      {
+        "timestampMs": 1791304200000,
+        "open": "380.439422",
+        "high": "381.727963",
+        "low": "380.439422",
+        "close": "381.727963",
+        "volume": "9.998978",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791305100000,
+        "open": "381.727963",
+        "high": "382.226063",
+        "low": "378.810012",
+        "close": "382.226063",
+        "volume": "319.059695",
+        "tradeCount": 3
+      },
+      {
+        "timestampMs": 1791306000000,
+        "open": "382.226063",
+        "high": "382.226063",
+        "low": "379.555857",
+        "close": "379.555857",
+        "volume": "42.276458",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791307800000,
+        "open": "379.555857",
+        "high": "380.239713",
+        "low": "379.555857",
+        "close": "380.239713",
+        "volume": "464.954042",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791308700000,
+        "open": "380.239713",
+        "high": "380.758352",
+        "low": "380.239713",
+        "close": "380.758352",
+        "volume": "595.760558",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791309600000,
+        "open": "380.758352",
+        "high": "380.758352",
+        "low": "379.767083",
+        "close": "380.143268",
+        "volume": "26193.706347",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791313200000,
+        "open": "380.143268",
+        "high": "380.588461",
+        "low": "380.143268",
+        "close": "380.588461",
+        "volume": "5621.667317",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791315900000,
+        "open": "380.588461",
+        "high": "380.588461",
+        "low": "380.162532",
+        "close": "380.162532",
+        "volume": "1446.586417",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791324000000,
+        "open": "380.162532",
+        "high": "380.162532",
+        "low": "379.570161",
+        "close": "379.570161",
+        "volume": "102.172800",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791331200000,
+        "open": "379.570161",
+        "high": "379.831193",
+        "low": "379.570161",
+        "close": "379.831193",
+        "volume": "10.001335",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791333000000,
+        "open": "379.831193",
+        "high": "379.831193",
+        "low": "379.563183",
+        "close": "379.563183",
+        "volume": "1944.981348",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791333900000,
+        "open": "379.563183",
+        "high": "379.563183",
+        "low": "379.381322",
+        "close": "379.381322",
+        "volume": "89.467202",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791339300000,
+        "open": "379.381322",
+        "high": "379.381322",
+        "low": "377.885598",
+        "close": "377.942269",
+        "volume": "1152.000747",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791340200000,
+        "open": "377.942269",
+        "high": "378.640636",
+        "low": "377.942269",
+        "close": "378.640636",
+        "volume": "19.896097",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791341100000,
+        "open": "378.640636",
+        "high": "378.640636",
+        "low": "377.819010",
+        "close": "377.998867",
+        "volume": "435.922587",
+        "tradeCount": 4
+      },
+      {
+        "timestampMs": 1791342000000,
+        "open": "377.998867",
+        "high": "377.998867",
+        "low": "377.495008",
+        "close": "377.495008",
+        "volume": "4.566048",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791342900000,
+        "open": "377.495008",
+        "high": "377.755132",
+        "low": "377.495008",
+        "close": "377.755132",
+        "volume": "644.375204",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791343800000,
+        "open": "377.755132",
+        "high": "377.994945",
+        "low": "377.755132",
+        "close": "377.994945",
+        "volume": "2095.203762",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791344700000,
+        "open": "377.994945",
+        "high": "377.994945",
+        "low": "377.642844",
+        "close": "377.642844",
+        "volume": "3.036815",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791348300000,
+        "open": "377.642844",
+        "high": "378.347772",
+        "low": "377.642844",
+        "close": "378.297813",
+        "volume": "1100.081770",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791349200000,
+        "open": "378.297813",
+        "high": "378.297813",
+        "low": "378.082417",
+        "close": "378.082417",
+        "volume": "400.009546",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791350100000,
+        "open": "378.082417",
+        "high": "378.120256",
+        "low": "377.905843",
+        "close": "378.120256",
+        "volume": "4323.090372",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791351000000,
+        "open": "378.120256",
+        "high": "378.334228",
+        "low": "377.992930",
+        "close": "378.330462",
+        "volume": "3435.104302",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791353700000,
+        "open": "378.330462",
+        "high": "378.330462",
+        "low": "378.083897",
+        "close": "378.163828",
+        "volume": "1000.076977",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791354600000,
+        "open": "378.163828",
+        "high": "378.199258",
+        "low": "377.993975",
+        "close": "378.189266",
+        "volume": "9513.012344",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791355500000,
+        "open": "378.189266",
+        "high": "378.189266",
+        "low": "377.959455",
+        "close": "377.959455",
+        "volume": "2700.116000",
+        "tradeCount": 1
+      },
+      {
+        "timestampMs": 1791356400000,
+        "open": "377.959455",
+        "high": "378.966316",
+        "low": "377.959455",
+        "close": "378.966316",
+        "volume": "16808.193039",
+        "tradeCount": 2
+      },
+      {
+        "timestampMs": 1791359100000,
+        "open": "378.966316",
+        "high": "378.966316",
+        "low": "378.159090",
+        "close": "378.159090",
+        "volume": "3.161425",
+        "tradeCount": 1
+      }
+    ]
+  },
+  "quoteRequested": false,
+  "walletConnected": false,
+  "executionPrepared": false
+}

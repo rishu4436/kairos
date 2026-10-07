@@ -1,5 +1,26 @@
 # Binance Skills evidence
 
+## Phase 17I real public reads
+
+Rechecked the upstream `skills/binance-web3/` skill documents on 2026-10-07.
+Versions remain tokenized-securities-info 1.1 and query-token-audit 1.4. Their
+public request formats match KAIROS's existing request builder and normalizer.
+Both capabilities are AVAILABLE; neither skill package was installed.
+The documented public HTTP requests were INVOKED and REAL RESPONSES OBSERVED;
+no skill runtime, wallet authentication, install, or baw upgrade was used.
+
+At `2026-10-07T07:50:06.294Z`, the public list resolved TSLA / TSLAon on BSC 56,
+contract `0x2494b603319d4d9f9715c9f4496d9e0364b59d93` (HTTP 200, 591 ms).
+Exactly one audit POST for that chain/contract returned HTTP 200, success true,
+and UNSUPPORTED (726 ms). Availability/support are false and all risk, tax, and
+risk-item fields remain null. This is not a low-risk assessment.
+Trading signal was NOT_ATTEMPTED. The older genuine public-read evidence below
+remains historical evidence and does not imply installation.
+
+Sanitized record: [Phase 17I skills](evidence/phase-17i-skills.json).
+Sources: [token audit skill](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/query-token-audit/SKILL.md),
+[tokenized-securities skill](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-tokenized-securities-info/SKILL.md).
+
 Recorded 2026-10-07 from the current [Binance Skills Hub](https://github.com/binance/binance-skills-hub) `main` tree and from one public read. The in-process adapter registry is older and is not this evidence.
 
 ## Hub metadata

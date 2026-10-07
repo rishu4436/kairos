@@ -1,5 +1,30 @@
 # Developer experience notes
 
+## Phase 17I provider proof
+
+Use Node's `--env-file=.env.local` only for the explicitly gated evidence suites.
+Default tests do not load private credentials or call external services. The
+older Binance integration test now also requires BINANCE_WEB3_LIVE_TEST=1;
+credential presence alone cannot trigger it in CI.
+
+Gates/files: BINANCE_WEB3_LIVE_TEST for signed discovery and market-evidence;
+BINANCE_SKILLS_LIVE_TEST for public-live; QWEN_LIVE_TEST for context-evidence.
+The market harness permits only market paths on the existing signed client,
+selects a provider-returned Ondo BSC representation, uses the existing mapper,
+feature engine, strategy registry, arbitrator, research projection and Redis
+adapter. No feature formulas or thresholds were changed. Exact context/inputs
+are reloaded over a new Redis connection before the Qwen call.
+
+Qwen has a one-outbound-request bound and a recorded-attempt guard. Its real
+attempt failed HTTP 401, so do not advertise Qwen as connected. Provider labels
+now distinguish credential configuration from an observed runtime response.
+The UI proof panel labels replay as RECORDED REAL PROVIDER EVIDENCE and displays
+the actual failed result. Recorded token price is not wallet equity.
+
+Safe evidence files reject known local credentials, auth/signature headers and
+Redis URLs before writing. Record failures rather than substituting paper data.
+See [evidence index](EVIDENCE_INDEX.md) for actual results and timestamps.
+
 ## Phase 17H real Redis validation
 
 Upstash Connect → TCP supplies the Redis TLS URL; REST credentials alone cannot

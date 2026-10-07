@@ -1,0 +1,34 @@
+{
+  "label": "RECORDED REAL PROVIDER EVIDENCE",
+  "startedAt": "2026-10-07T07:50:47.805Z",
+  "latencyMs": 820,
+  "endpoint": "/api/v1/dex/market/rwa/search",
+  "result": "SUCCESS",
+  "ticker": "TSLA",
+  "representations": [
+    {
+      "chainId": "56",
+      "contractAddress": "0x2494b603319d4d9f9715c9f4496d9e0364b59d93",
+      "tokenSymbol": "TSLAon",
+      "platformId": "ondo"
+    },
+    {
+      "chainId": "CT_501",
+      "contractAddress": "KeGv7bsfR4MheC1CkmnAVceoApjrkvBhHYjWb67ondo",
+      "tokenSymbol": "TSLAon",
+      "platformId": "ondo"
+    },
+    {
+      "chainId": "1",
+      "contractAddress": "0xf6b1117ec07684d3958cad8beb1b302bfd21103f",
+      "tokenSymbol": "TSLAon",
+      "platformId": "ondo"
+    },
+    {
+      "chainId": "56",
+      "contractAddress": "0x5b1910eaad6450e50f816082aa078c41f10c292f",
+      "tokenSymbol": "TSLAB",
+      "platformId": "bstock"
+    }
+  ]
+}

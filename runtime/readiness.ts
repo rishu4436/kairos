@@ -1,4 +1,6 @@
 import { probeRedis } from "@/runtime/redis-health.mjs";
+import { readLastSuccess } from "@/observation/health-memory";
+import { readLlmAttempt } from "@/research/llm-status";
 
 export type ReadinessStatus = "READY" | "NOT_CONFIGURED" | "INCOMPATIBLE" | "BLOCKED" | "OPTIONAL" | "MEMORY_EPHEMERAL" | "STATE_BACKEND_ERROR";
 
@@ -61,15 +63,17 @@ export interface ReadinessLabels {
 
 export function readinessLabels(env: NodeJS.ProcessEnv = process.env): ReadinessLabels {
   const ready = collectReadiness(env);
+  const qwenAttempt = readLlmAttempt();
+  const qwenVerified = qwenAttempt?.provider === "qwen" && qwenAttempt.model === (env.KAIROS_LLM_MODEL?.trim() || "qwen3.8-max");
   return {
     autonomousRuntime: "LOCAL",
     stateBackend: ready.stateBackend === "READY" ? "REDIS · DURABLE" : ready.stateBackend === "STATE_BACKEND_ERROR" ? "REDIS · UNAVAILABLE" : ready.stateBackend === "NOT_CONFIGURED" ? "REDIS · NOT CONFIGURED" : "MEMORY · EPHEMERAL",
     identity: "NOT REGISTERED",
     operatingWallet: "NOT CONFIGURED",
-    binanceData: ready.binanceWeb3 === "READY" ? "CONNECTED" : "NOT CONFIGURED",
+    binanceData: ready.binanceWeb3 === "READY" ? readLastSuccess() ? "BINANCE · LIVE" : "CONFIGURED · NOT VERIFIED" : "NOT CONFIGURED",
     binanceSkills: "NOT INSTALLED",
-    qwen: ready.qwen === "READY" ? "CONNECTED" : "NOT CONFIGURED",
-    fmp: ready.fmp === "READY" ? "CONNECTED" : "NOT CONFIGURED",
+    qwen: ready.qwen === "READY" ? qwenVerified ? qwenAttempt!.status === "SUCCESS" ? "QWEN · CONNECTED" : "QWEN · ERROR" : "CONFIGURED · NOT VERIFIED" : "NOT CONFIGURED",
+    fmp: ready.fmp === "READY" ? "CONFIGURED · NOT VERIFIED" : "NOT CONFIGURED",
     tradingWallet: "NOT CONNECTED",
     liveExecution: "BLOCKED",
     studioProject: "CONFIGURED",

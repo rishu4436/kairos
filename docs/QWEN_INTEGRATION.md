@@ -1,5 +1,26 @@
 # Qwen integration
 
+## Phase 17I actual provider attempt
+
+Configured locally with private credentials; this alone does not mean connected.
+At `2026-10-07T07:54:13.483Z`, the existing QwenReasoningProvider sent exactly one
+strict JSON Schema thesis request on the bounded research projection reloaded
+from the real Binance TSLA context in Redis. Requested model: `qwen3.8-max`;
+prompt version: 1.1; latency: 840 ms; HTTP 401 / AUTHENTICATION_ERROR.
+No response model, thesis, or proposal was returned. Real Qwen intelligence is
+NOT VERIFIED. FMP news/earnings remained UNAVAILABLE in the supplied context.
+
+The single-request guard prevents an accidental retry or second proposal call.
+KAIROS's existing pipeline ordinarily calls generateThesis and then
+generateStrategyProposal separately. The thesis schema has no proposal field.
+This phase therefore did not run a proposal/experiment or promote a strategy.
+Another network request requires explicit user authorization. The endpoint/model
+was not silently changed. No tools, search, wallet, or execution was provided.
+
+Record: [actual Qwen result](evidence/phase-17i-qwen.json).
+Gate: `QWEN_LIVE_TEST=1` with the dedicated context-evidence integration test.
+The pre-existing KAIROS_LLM_LIVE_TEST gates are separate and were not run.
+
 Qwen is one `ReasoningProvider`. It does not replace xAI, and the research pipeline does not read Qwen response objects. The research brain cannot directly execute trades.
 
 ## Official references

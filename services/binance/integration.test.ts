@@ -3,7 +3,9 @@ import { BinanceWeb3Client } from "@/services/binance/client";
 import { readBinanceConfig } from "@/services/binance/config";
 import { searchRwaTokens } from "@/services/binance/rwa-data";
 
-const enabled = Boolean(process.env.BINANCE_WEB3_API_KEY);
+const enabled = process.env.BINANCE_WEB3_LIVE_TEST === "1"
+  && Boolean(process.env.BINANCE_WEB3_API_KEY)
+  && Boolean(process.env.BINANCE_WEB3_SECRET_KEY);
 
 describe.skipIf(!enabled)("Binance Web3 integration", () => {
   it("resolves NVDA through the official search endpoint", async () => {

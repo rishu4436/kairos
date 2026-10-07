@@ -1,5 +1,6 @@
 import { AGENT_STATE_DETAIL, AGENT_STATE_LABEL, AGENT_STATES, nextStates } from "@/agent/states";
 import { AutonomousRuntimePanel } from "@/components/command/autonomous-runtime";
+import { RecordedIntelligenceEvidence } from "@/components/command/recorded-intelligence";
 import { AgentIdentitySections } from "@/components/command/agent-runtime";
 import { PageHeader } from "@/components/ui/page-header";
 import { PhaseBanner } from "@/components/ui/phase-banner";
@@ -31,11 +32,14 @@ export default async function AgentPage() {
       <PageHeader
         kicker="Runtime"
         title="Agent"
-        description="The runtime state is separate from the trading lifecycle. Agent Studio is not configured, and no operating wallet has been created."
+        description="The runtime state is separate from the trading lifecycle. Agent Studio is configured and undeployed; the operating wallet is configured and unfunded."
       />
       <PhaseBanner detail="The local runtime is not scheduled. Start, pause, and deploy controls are not available." />
       <div className="mb-4">
         <AutonomousRuntimePanel snapshot={runtime} />
+      </div>
+      <div className="mb-4">
+        <RecordedIntelligenceEvidence />
       </div>
       <div className="mb-4">
         <AgentIdentitySections
