@@ -22,6 +22,10 @@ import { FAILURE_POLICY, type AgentControlState, type AssetCycleResult, type Aut
 import type { StrategyContext } from "@/strategies/context";
 import type { QuoteGateway } from "@/services/binance/trading/gateway";
 import type { TransactionSimulationGateway } from "@/services/binance/transaction/gateway";
+import { readOperatorConfig } from "@/operator/store";
+import { persistObservationSnapshot, persistRuntimeSnapshot } from "@/operator/snapshots";
+import type { OperatorConfig } from "@/operator/config";
+import { riskPolicyFromOperator } from "@/operator/config";
 
 const LEASE_TTL_MS = 60_000;
 const assetLocks = new Set<string>();
@@ -52,6 +56,7 @@ export interface AutonomousCycleInput {
   riskPolicy?: RiskPolicy;
   account?: PaperAccountState;
   livePreparation?: LivePreparationAdapters;
+  operatorConfig?: OperatorConfig;
   /** Optional research work. A throw is non-blocking. */
   researchStep?: () => void;
   shadowContext?: StrategyContext | null;
@@ -71,8 +76,14 @@ export interface AutonomousCycleOutcome extends KairosCycleResult {
   liveGate: "TRANSACTION_SIMULATED" | "READY_FOR_WALLET" | "WALLET_DISABLED" | null;
 }
 
-export async function runKairosAutonomousCycle(input: AutonomousCycleInput): Promise<AutonomousCycleOutcome> {
-  const store = input.store ?? autonomousStore();
+export async function runKairosAutonomousCycle(raw: AutonomousCycleInput): Promise<AutonomousCycleOutcome> {
+  const store = raw.store ?? autonomousStore();
+  const frozenConfig = raw.operatorConfig ?? readOperatorConfig(store);
+  const input: AutonomousCycleInput = {
+    ...raw,
+    operatorConfig: frozenConfig,
+    riskPolicy: raw.riskPolicy ?? riskPolicyFromOperator(frozenConfig),
+  };
   const startedAt = new Date(input.startedAtMs).toISOString();
   const cycleId = `cycle_${input.userId}_${input.agentId}_${input.startedAtMs}`;
   const transitions: { state: KairosCycleState; at: string }[] = [{ state: "CREATED", at: startedAt }];
@@ -149,6 +160,7 @@ export async function runKairosAutonomousCycle(input: AutonomousCycleInput): Pro
       errors.push(failure("MARKET_DATA_ERROR", error instanceof Error ? error.message : "Observation failed."));
       return finish(input, store, cycleId, startedAt, "DEGRADED", [], [], errors, warnings, [], true, input.executionMode !== "PAPER", null, transitions, [], null);
     }
+    persistObservationSnapshot(snapshot.board, store);
     if (!snapshot.board.ok) {
       errors.push(failure("MARKET_DATA_ERROR", snapshot.board.error?.message ?? "Observation board is not usable."));
       return finish(input, store, cycleId, startedAt, "DEGRADED", [], [], errors, warnings, [], true, input.executionMode !== "PAPER", null, transitions, [], null);
@@ -218,6 +230,7 @@ export async function runKairosAutonomousCycle(input: AutonomousCycleInput): Pro
         safetyMode: control === "RISK_REDUCTION_ONLY" ? "RISK_REDUCTION_ONLY" : "NORMAL",
         venue: "live",
         candles: snapshot.candles,
+        operatorConfig: frozenConfig,
       });
       if (plan.kind === "NO_TRADE") {
         assets.push({
@@ -505,8 +518,23 @@ function finish(
     walletSubmitted: false,
     preparations,
     liveGate,
+    configVersion: input.operatorConfig?.version,
   };
   store.saveCycle(result);
+  persistRuntimeSnapshot(
+    {
+      status: status === "FAILED" ? "DEGRADED" : status === "DEGRADED" ? "DEGRADED" : input.control === "PAUSED" ? "PAUSED" : input.control === "STOPPED" ? "STOPPED" : "RUNNING",
+      executionMode: input.executionMode,
+      configVersion: input.operatorConfig?.version ?? null,
+      lastHeartbeat: completedAt,
+      lastCompletedCycle: completedAt,
+      nextScheduledCycle: result.nextSuggestedRunAt,
+      lastCycleStatus: status,
+      reason: errors[0]?.message ?? warnings[0] ?? null,
+      observedAt: completedAt,
+    },
+    store,
+  );
   store.appendAudit({
     id: `${cycleId}:${status}`,
     at: completedAt,

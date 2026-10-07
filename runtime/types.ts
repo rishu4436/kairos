@@ -86,6 +86,7 @@ export interface KairosCycleResult {
   nextSuggestedRunAt: string;
   createdIntentIds: readonly string[];
   transitions: readonly { state: KairosCycleState; at: string }[];
+  configVersion?: number;
 }
 
 export interface AgentHeartbeatRecord {

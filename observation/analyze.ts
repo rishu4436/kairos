@@ -17,6 +17,7 @@ import { paperResearchEvaluations, reviewShadowCandidates } from "@/lifecycle/un
 import { readAssetIntelligence } from "@/skills/store";
 import { buildBinanceIntelligenceView } from "@/skills/view";
 import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
+import { defaultOperatorConfig, type OperatorConfig } from "@/operator/config";
 
 const arbitrator = new StrategyArbitrator();
 
@@ -28,16 +29,25 @@ export function enrichBoard(
     historyHealth: ObservationBoard["health"]["history"];
     record?: (signal: SignalView) => void;
     strategies?: readonly IntelligenceStrategy[];
+    operator?: OperatorConfig;
   },
 ): ObservationBoard {
-  const strategies = input.strategies ?? createStrategyRegistry().list();
+  const operator = input.operator ?? defaultOperatorConfig();
+  const strategies = input.strategies ?? createStrategyRegistry().list().filter((item) => {
+    const id = item.metadata.id;
+    if (id === "momentum") return operator.strategies.momentum.enabled;
+    if (id === "mean-reversion") return operator.strategies["mean-reversion"].enabled;
+    if (id === "weekend") return operator.strategies.weekend.enabled;
+    if (id === "dca") return operator.strategies.dca.enabled;
+    return true;
+  });
   const events = [...board.events];
   const recent: SignalView[] = [];
   const watchlist = [...new Set(board.rows.map((row) => row.ticker))];
   const cycleId = `cycle:${board.userId}:${new Date(input.asOfMs).toISOString()}`;
   const rows = board.rows.map((row) => {
     const candles = input.candles.get(row.representationId) ?? [];
-    const analysis = analyzeRow(row, candles, input.asOfMs, strategies, board.userId, watchlist, cycleId);
+    const analysis = analyzeRow(row, candles, input.asOfMs, strategies, board.userId, watchlist, cycleId, operator);
     events.push(...analysis.events);
     for (const signal of analysis.signals) {
       recent.push(signal);
@@ -62,6 +72,7 @@ function analyzeRow(
   userId: string,
   watchlist: readonly string[],
   cycleId: string,
+  operator: OperatorConfig,
 ): { row: ObservationRow; signals: SignalView[]; events: ObservationEventView[] } {
   const asOf = new Date(asOfMs).toISOString();
   const clock = formatClock(asOf);
@@ -86,6 +97,11 @@ function analyzeRow(
     earningsState: underlying.earnings?.status ?? null,
     newsAvailability: underlying.newsStatus === "AVAILABLE" ? "AVAILABLE" as const : underlying.newsStatus === "STALE" ? "STALE" as const : "UNAVAILABLE" as const,
     recentEventCount: underlying.newsItems?.length ?? null,
+    operator: {
+      configVersion: operator.version,
+      strategies: operator.strategies,
+      dca: null,
+    },
   };
   const events: ObservationEventView[] = [
     event(asOf, clock, "HISTORY_UPDATED", row.ticker, null, `${row.ticker} history ${candles.length === 0 ? "is empty" : `holds ${candles.length} candles`}`),

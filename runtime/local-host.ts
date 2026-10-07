@@ -9,6 +9,9 @@ import type { KairosStateStore } from "@/runtime/store";
 import type { AgentControlState, AutonomousExecutionMode } from "@/runtime/types";
 import type { PaperAccountState, RiskPolicy } from "@/domain/models";
 import type { LivePreparationAdapters } from "@/runtime/cycle";
+import { autonomousStore } from "@/runtime/store";
+import { readOperatorCommand, writeControl, writeOperatorCommand } from "@/operator/commands";
+import { readOperatorConfig } from "@/operator/store";
 
 const DEFAULT_INTERVAL_MS = 60_000;
 
@@ -80,7 +83,18 @@ export class LocalKairosRunner {
   }
 
   due(nowMs = this.now()): boolean {
-    return this.started && !this.stopping && this.scheduler.due(nowMs);
+    if (!this.started || this.stopping) {
+      return false;
+    }
+    const store = this.options.store ?? autonomousStore();
+    if (readOperatorCommand(store).kind === "ONE_SHOT") {
+      return true;
+    }
+    const control = store.readControl(this.options.userId, this.options.agentId);
+    if (control === "PAUSED" || control === "STOPPED") {
+      return false;
+    }
+    return this.scheduler.due(nowMs);
   }
 
   async tick(nowMs = this.now()): Promise<AutonomousCycleOutcome | null> {
@@ -96,6 +110,11 @@ export class LocalKairosRunner {
         this.scheduler.recordSuccess(nowMs);
       }
       this.options.onCycle?.(outcome);
+      const store = this.options.store ?? autonomousStore();
+      if (readOperatorCommand(store).kind === "ONE_SHOT") {
+        writeControl("PAUSED", store, new Date(nowMs).toISOString());
+        writeOperatorCommand({ kind: "IDLE", requestedAt: new Date(nowMs).toISOString() }, store);
+      }
       return outcome;
     } catch {
       this.scheduler.recordFailure(nowMs);
@@ -109,7 +128,8 @@ export class LocalKairosRunner {
   }
 
   async runOnce(nowMs = this.now()): Promise<AutonomousCycleOutcome> {
-    const executionMode = resolveRunnerExecutionMode(this.options.executionMode, this.options.env);
+    const operator = readOperatorConfig(this.options.store ?? autonomousStore());
+    const executionMode = resolveRunnerExecutionMode(this.options.executionMode ?? operator.runtime.executionMode, this.options.env);
     const livePreparation =
       typeof this.options.livePreparation === "function"
         ? this.options.livePreparation(nowMs)
@@ -130,6 +150,7 @@ export class LocalKairosRunner {
       account: this.options.account,
       livePreparation,
       store: this.options.store,
+      operatorConfig: operator,
       control: "RUNNING" satisfies AgentControlState,
     });
   }
@@ -148,7 +169,7 @@ export class LocalKairosRunner {
   }
 
   private interval(): number {
-    const configured = this.options.intervalMs ?? positiveInterval(process.env.KAIROS_CYCLE_INTERVAL_MS);
+    const configured = this.options.intervalMs ?? readOperatorConfig(this.options.store ?? autonomousStore()).runtime.cycleIntervalMs ?? positiveInterval(process.env.KAIROS_CYCLE_INTERVAL_MS);
     return configured;
   }
 

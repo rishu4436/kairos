@@ -27,26 +27,27 @@ export const meanReversionStrategy: IntelligenceStrategy = {
     version: MEAN_REVERSION_PARAMS.version,
   },
   evaluate(context) {
+    const params = context.operator?.strategies["mean-reversion"] ?? MEAN_REVERSION_PARAMS;
     const stale = rejectStale(context, "mean-reversion", MEAN_REVERSION_PARAMS.version);
     if (stale) {
       return stale;
     }
-    if (context.candles.length < MEAN_REVERSION_PARAMS.minCandles || context.price === null) {
+    if (context.candles.length < params.minCandles || context.price === null) {
       return blocked(
         context,
         "mean-reversion",
         MEAN_REVERSION_PARAMS.version,
         "INSUFFICIENT_DATA",
-        `Mean reversion needs ${MEAN_REVERSION_PARAMS.minCandles} candles and a price. Received ${context.candles.length} candles.`,
+        `Mean reversion needs ${params.minCandles} candles and a price. Received ${context.candles.length} candles.`,
       );
     }
-    const mean = sma(context.candles, MEAN_REVERSION_PARAMS.period);
+    const mean = sma(context.candles, params.period);
     const last = context.candles[context.candles.length - 1].close;
     const distance = mean === null ? null : simpleReturnBps(last, mean);
     if (distance === null) {
       return blocked(context, "mean-reversion", MEAN_REVERSION_PARAMS.version, "INSUFFICIENT_DATA", "The rolling mean was not available.");
     }
-    const threshold = BigInt(MEAN_REVERSION_PARAMS.entryBps);
+    const threshold = BigInt(params.entryBps);
     const stretchedDown = distance <= -threshold;
     const stretchedUp = distance >= threshold;
     const highVol = context.regime.regime === "HIGH_VOLATILITY";
@@ -57,11 +58,11 @@ export const meanReversionStrategy: IntelligenceStrategy = {
       action = "SELL";
     }
     const magnitude = Number(distance < 0n ? -distance : distance);
-    const confidence = action === "HOLD" ? 0.4 : clampConfidence(0.55 + (magnitude - MEAN_REVERSION_PARAMS.entryBps) / 500, 0.55, 0.82);
+    const confidence = action === "HOLD" ? 0.4 : clampConfidence(0.55 + (magnitude - params.entryBps) / 500, 0.55, 0.82);
     const printed = featureById(context.features.features, "distance_from_mean")?.value ?? "unavailable";
     const reasons = [
       `Distance from the 20-bar mean: ${printed}.`,
-      `Entry band is ±${(MEAN_REVERSION_PARAMS.entryBps / 100).toFixed(2)}%.`,
+      `Entry band is ±${(params.entryBps / 100).toFixed(2)}%.`,
       `Regime: ${context.regime.regime}.`,
       highVol ? "High volatility suppresses the reversion side." : "Volatility regime does not suppress the rule.",
     ];

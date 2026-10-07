@@ -13,6 +13,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/paper-lab", label: "Paper Lab" },
   { href: "/risk", label: "Risk" },
   { href: "/agent", label: "Agent" },
+  { href: "/operator", label: "Operator" },
 ];
 
 export function isNavActive(pathname: string, href: string): boolean {

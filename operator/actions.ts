@@ -1,0 +1,155 @@
+import { autonomousStore, type KairosStateStore } from "@/runtime/store";
+import { applyOperatorPatch, type OperatorConfig } from "@/operator/config";
+import { readOperatorConfig, writeOperatorConfig } from "@/operator/store";
+import { readOperatorCommand, writeControl, writeOperatorCommand } from "@/operator/commands";
+import { runKairosAutonomousCycle, type AutonomousCycleOutcome } from "@/runtime/cycle";
+import { LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID } from "@/domain/watchlist";
+import { observeLiveMarket } from "@/observation/live";
+import { readDataMode } from "@/lib/mode";
+
+export type OperatorAction =
+  | "RUN"
+  | "PAUSE"
+  | "STOP"
+  | "ONE_CYCLE"
+  | "EXECUTION_DISABLE"
+  | "CONFIG_PATCH";
+
+export function operatorAuditType(action: OperatorAction): string {
+  if (action === "RUN") return "AGENT_STARTED";
+  if (action === "PAUSE") return "AGENT_PAUSED";
+  if (action === "STOP") return "AGENT_STOPPED";
+  if (action === "ONE_CYCLE") return "ONE_CYCLE_REQUESTED";
+  if (action === "EXECUTION_DISABLE") return "EXECUTION_DISABLED";
+  return "OPERATOR_CONFIG_UPDATED";
+}
+
+export function applyRuntimeAction(
+  action: Exclude<OperatorAction, "CONFIG_PATCH" | "ONE_CYCLE">,
+  store: KairosStateStore = autonomousStore(),
+  nowIso = new Date().toISOString(),
+): { ok: true } | { ok: false; reason: string } {
+  if (action === "RUN") {
+    if (!writeControl("RUNNING", store, nowIso)) {
+      return { ok: false, reason: "CONTROL_CONFLICT" };
+    }
+    writeOperatorCommand({ kind: "IDLE", requestedAt: nowIso }, store);
+  } else if (action === "PAUSE") {
+    writeControl("PAUSED", store, nowIso);
+  } else if (action === "STOP") {
+    writeControl("STOPPED", store, nowIso);
+  } else {
+    const current = readOperatorConfig(store);
+    const next = applyOperatorPatch(current, { executionAdmissionDisabled: true }, nowIso);
+    if (!next.ok) {
+      return { ok: false, reason: next.reason };
+    }
+    const wrote = writeOperatorConfig(next.config, store);
+    if (!wrote.ok) {
+      return { ok: false, reason: wrote.reason };
+    }
+  }
+  store.appendAudit({
+    id: `${action}:${nowIso}`,
+    at: nowIso,
+    userId: LOCAL_RUNTIME_USER_ID,
+    agentId: DEFAULT_AGENT_ID,
+    cycleId: null,
+    type: operatorAuditType(action),
+    message: action,
+  });
+  return { ok: true };
+}
+
+export function patchOperatorConfig(
+  patch: Partial<OperatorConfig> & Record<string, unknown>,
+  store: KairosStateStore = autonomousStore(),
+  nowIso = new Date().toISOString(),
+): { ok: true; config: OperatorConfig } | { ok: false; reason: string } {
+  const current = readOperatorConfig(store);
+  const normalized = normalizePatch(patch);
+  if (normalized.runtime?.executionMode === "LIVE" && patch.confirmLive !== true && patch.confirmLive !== "LIVE") {
+    return { ok: false, reason: "LIVE_CONFIRMATION_REQUIRED" };
+  }
+  const next = applyOperatorPatch(current, normalized, nowIso);
+  if (!next.ok) {
+    store.appendAudit({
+      id: `CONFIG_REJECTED:${nowIso}`,
+      at: nowIso,
+      userId: LOCAL_RUNTIME_USER_ID,
+      agentId: DEFAULT_AGENT_ID,
+      cycleId: null,
+      type: "OPERATOR_CONFIG_REJECTED",
+      message: next.reason,
+    });
+    return next;
+  }
+  const wrote = writeOperatorConfig(next.config, store);
+  if (!wrote.ok) {
+    return { ok: false, reason: wrote.reason };
+  }
+  store.appendAudit({
+    id: `CONFIG:${next.config.version}`,
+    at: nowIso,
+    userId: LOCAL_RUNTIME_USER_ID,
+    agentId: DEFAULT_AGENT_ID,
+    cycleId: null,
+    type: "OPERATOR_CONFIG_UPDATED",
+    message: `config v${next.config.version}`,
+  });
+  return { ok: true, config: next.config };
+}
+
+export async function requestOneCycle(
+  store: KairosStateStore = autonomousStore(),
+  nowMs = Date.now(),
+): Promise<AutonomousCycleOutcome> {
+  const nowIso = new Date(nowMs).toISOString();
+  writeOperatorCommand({ kind: "ONE_SHOT", requestedAt: nowIso }, store);
+  writeControl("RUNNING", store, nowIso);
+  store.appendAudit({
+    id: `ONE_CYCLE:${nowIso}`,
+    at: nowIso,
+    userId: LOCAL_RUNTIME_USER_ID,
+    agentId: DEFAULT_AGENT_ID,
+    cycleId: null,
+    type: "ONE_CYCLE_REQUESTED",
+    message: "ONE_CYCLE",
+  });
+  const live = readDataMode() === "live";
+  const outcome = await runKairosAutonomousCycle({
+    userId: LOCAL_RUNTIME_USER_ID,
+    agentId: DEFAULT_AGENT_ID,
+    runtimeMode: "LOCAL",
+    executionMode: readOperatorConfig(store).runtime.executionMode,
+    cycleTrigger: "MANUAL",
+    startedAtMs: nowMs,
+    ownerId: `operator-one:${nowMs}`,
+    marketAvailable: true,
+    researchAvailable: false,
+    observeMarket: live ? observeLiveMarket : undefined,
+    store,
+    control: "RUNNING",
+  });
+  writeControl("PAUSED", store, new Date().toISOString());
+  writeOperatorCommand({ kind: "IDLE", requestedAt: new Date().toISOString() }, store);
+  return outcome;
+}
+
+export function commandState(store: KairosStateStore = autonomousStore()) {
+  return { control: store.readControl(LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID), command: readOperatorCommand(store) };
+}
+
+function normalizePatch(patch: Partial<OperatorConfig> & Record<string, unknown>): Partial<OperatorConfig> & Record<string, unknown> {
+  const risk = patch.risk as { allowedAssets?: unknown } | undefined;
+  if (risk && typeof risk.allowedAssets === "string") {
+    return {
+      ...patch,
+      risk: {
+        ...risk,
+        allowedAssets: risk.allowedAssets.split(",").map((item) => item.trim()).filter(Boolean),
+      } as unknown as OperatorConfig["risk"],
+    };
+  }
+  return patch;
+}

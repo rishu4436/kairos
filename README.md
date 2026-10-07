@@ -5,7 +5,8 @@ KAIROS is an autonomous multi-strategy tokenized-equity trading agent. Productio
 ## Implemented capabilities
 
 - Canonical underlying/representation discovery, prices, candles, freshness, sessions, regimes, and features.
-- Momentum, mean reversion, and weekend/off-hours strategies, deterministic arbitration, and position management.
+- Momentum, mean reversion, weekend/off-hours (observation/dislocation HOLD only), and deterministic DCA strategies, arbitration, and position management.
+- Local Operator Console (`/operator`) for a single self-hosted owner: RUN/PAUSE/STOP, config, risk, and strategy settings. The public dashboard is read-only.
 - User-scoped risk policies, trade intents, execution simulation, paper accounting, idempotency, and lifecycle history.
 - Research Brain with Qwen, Gemini, and xAI adapters, strict output schemas, evidence validation, and a declarative Strategy DSL. Mock reasoning is explicitly selected for development/tests.
 - Strategy Lab experiments, shadow candidates, measured performance, and guarded promotion analysis.
@@ -25,6 +26,21 @@ See [Architecture](docs/ARCHITECTURE.md), [Research Brain](docs/RESEARCH_BRAIN.m
 ## Local setup
 
 Use Node.js 22 or newer. Install the root dependencies with `npm ci`, copy `.env.example` to ignored `.env.local`, configure only the services you need, and run `npm run dev`. The always-on local host is `npm run kairos:runner`.
+
+### Operator setup
+
+1. Clone the repository and install dependencies.
+2. Copy `.env.example` to ignored `.env.local`.
+3. Set Binance Web3 credentials for live observation.
+4. Configure Agentic Wallet address and operator-attested token scope.
+5. Optionally set `KAIROS_LLM_PROVIDER` and `KAIROS_LLM_API_KEY` (never `NEXT_PUBLIC_`).
+6. Set `KAIROS_OPERATOR_ENABLED=true` only on the self-hosted owner instance.
+7. Start `npm run kairos:runner` and `npm run dev`.
+8. Open `/operator` (control plane) and `/` (read-only dashboard).
+9. Choose PAPER, LIVE_PREVIEW, or LIVE (LIVE needs an explicit confirmation).
+10. Configure strategies and risk, then RUN.
+
+Public dashboard = sanitized persisted snapshots. Local operator console = owner control plane. LLM theses stay paper-first and never auto-promote into the live registry.
 
 The example lists variable names without credential values. Defaults are paper market mode and ephemeral memory state. Paper mode requires supplied market inputs; startup does not fabricate prices, positions, experiments, or research. Portfolio and mission views read the stored paper book or show empty state.
 

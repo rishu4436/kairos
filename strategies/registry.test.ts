@@ -11,6 +11,7 @@ describe("strategy registry", () => {
       "momentum",
       "mean-reversion",
       "weekend",
+      "dca",
     ]);
     expect(registry.get("momentum")?.metadata.name).toBe("Momentum");
     expect(registry.get("momentum")?.metadata.status).toBe("implemented");
@@ -54,7 +55,7 @@ describe("strategy registry", () => {
     expect(arbitrage?.status).toBe("coming_soon");
     expect(arbitrage?.name).toBe("Cross-representation arbitrage");
     expect(registry.get("arbitrage")).toBeUndefined();
-    expect(catalog.filter((strategy) => strategy.status === "implemented")).toHaveLength(3);
+    expect(catalog.filter((strategy) => strategy.status === "implemented")).toHaveLength(4);
     expect(catalog.map((strategy) => strategy.id)).toEqual(
       expect.arrayContaining(["earnings", "event", "volatility", "relative-value", "rebalancing", "correlation", "agent-generated"]),
     );

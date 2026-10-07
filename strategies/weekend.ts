@@ -7,7 +7,7 @@ import { WEEKEND_PARAMS } from "@/strategies/parameters";
 import { blocked, clampConfidence, makeSignal } from "@/strategies/signal-base";
 import { rejectStale } from "@/strategies/momentum";
 
-const OFF_HOURS = new Set<MarketSessionState>(WEEKEND_PARAMS.offHours);
+const DEFAULT_OFF_HOURS = new Set<MarketSessionState>(WEEKEND_PARAMS.offHours);
 
 /**
  * Off-hours reference check, version 1.
@@ -38,7 +38,10 @@ export const weekendStrategy: IntelligenceStrategy = {
     if (context.session === "UNKNOWN") {
       return blocked(context, "weekend", WEEKEND_PARAMS.version, "INSUFFICIENT_DATA", "Market session is unknown.");
     }
-    if (!OFF_HOURS.has(context.session)) {
+    const params = context.operator?.strategies.weekend;
+    const offHours = new Set<MarketSessionState>(params?.allowedSessions ?? [...DEFAULT_OFF_HOURS]);
+    const minDeviation = params?.minDeviationBps ?? WEEKEND_PARAMS.minDeviationBps;
+    if (!offHours.has(context.session)) {
       return makeSignal(context, {
         strategyId: "weekend",
         version: WEEKEND_PARAMS.version,
@@ -61,7 +64,7 @@ export const weekendStrategy: IntelligenceStrategy = {
       );
     }
     const gap = context.referenceDeviationBps < 0n ? -context.referenceDeviationBps : context.referenceDeviationBps;
-    const material = gap >= BigInt(WEEKEND_PARAMS.minDeviationBps);
+    const material = gap >= BigInt(minDeviation);
     const printed = `${context.referenceDeviationBps > 0n ? "+" : context.referenceDeviationBps < 0n ? "" : ""}${(Number(context.referenceDeviationBps) / 100).toFixed(2)}%`;
     if (!material) {
       return makeSignal(context, {

@@ -141,7 +141,10 @@ Implemented strategies evaluate an observation context and return an `Analytical
 
 - Momentum
 - Mean reversion
-- Weekend / off-hours
+- Weekend / off-hours (observation / dislocation, HOLD only)
+- DCA (time-based or dip-based tranches; position-management owned by DCA)
+
+Operator config is versioned and frozen per cycle as `cycleConfigSnapshot` / `configVersion`. The public dashboard reads sanitized Redis/memory snapshots and does not call the Agentic Wallet CLI. `/operator` is the self-hosted owner control plane.
 
 `ReasoningProvider` in `arbitration/reasoning.ts` is an unimplemented interface. A later model may explain a decision. It does not gain authority over risk limits, wallet permissions, or signing.
 

@@ -36,6 +36,11 @@ export interface StrategyContext {
   earningsState?: string | null;
   newsAvailability?: "AVAILABLE" | "UNAVAILABLE" | "STALE" | null;
   recentEventCount?: number | null;
+  operator?: {
+    configVersion: number;
+    strategies: import("@/operator/config").OperatorConfig["strategies"];
+    dca: import("@/strategies/dca-math").DcaAssetState | null;
+  };
 }
 
 export function buildStrategyContext(input: {

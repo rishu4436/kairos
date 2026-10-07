@@ -8,10 +8,10 @@ import type { AgentHeartbeatRecord, AutonomousExecutionMode, KairosCycleResult }
 import { emptyLivePreview, previewFromPreparation, type LivePreviewModel } from "@/execution/preview";
 import { LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID } from "@/domain/watchlist";
 import { readOperatorTokenScope, type TokenScopeAdmission } from "@/wallet/agentic/token-scope";
-import { CliAgenticWalletGateway } from "@/wallet/agentic/cli";
-import { disconnectedAccount } from "@/wallet/agentic/parse";
-import { loadDemoObservationBoard } from "@/observation/load-board";
 import { getCommandCenterModel, type CommandCenterModel } from "@/services/command-center";
+import { readObservationSnapshot, readWalletSnapshot } from "@/operator/snapshots";
+import { failureBoard } from "@/observation/live";
+import { KairosApiError } from "@/services/binance/errors";
 
 const IMPLEMENTED = ["momentum", "mean-reversion", "weekend"] as const;
 
@@ -183,26 +183,145 @@ export function buildProductionDashboard(source: DashboardSources): ProductionDa
 
 export async function loadProductionDashboard(): Promise<ProductionDashboard> {
   const dataMode = readDataMode();
-  const board = await loadDemoObservationBoard();
   const store = autonomousStore();
   const userId = LOCAL_RUNTIME_USER_ID;
   const agentId = DEFAULT_AGENT_ID;
-  const walletGateway = new CliAgenticWalletGateway();
-  const wallet = await walletGateway.getStatus(userId, agentId).catch(() => disconnectedAccount(userId, agentId, new Date().toISOString()));
-  const balances =
-    wallet.connectionStatus === "CONNECTED" ? await walletGateway.getBalances(userId, "56").catch(() => []) : [];
-  const scope = readOperatorTokenScope();
+  const walletSnap = readWalletSnapshot(store);
+  const observed = readObservationSnapshot(store);
+  const board = boardFromSnapshot(observed);
+  const scope = walletSnap.tokenScope === "UNAVAILABLE" ? (readOperatorTokenScope() ? "OPERATOR_ATTESTED" : "TOKEN_SCOPE_UNVERIFIED") : walletSnap.tokenScope;
   return buildProductionDashboard({
     dataMode,
     board,
     heartbeat: store.readHeartbeat(userId, agentId),
     cycles: store.listCycles(userId, agentId).slice(-8).reverse(),
     audits: store.listAudits(userId, agentId).slice(-40).reverse(),
-    wallet,
-    balances,
-    tokenScope: scope ? "OPERATOR_ATTESTED" : "TOKEN_SCOPE_UNVERIFIED",
+    wallet: {
+      userId,
+      agentId,
+      provider: "binance-agentic-wallet",
+      accountId: null,
+      walletAddress: walletSnap.address,
+      supportedChains: [{ binanceChainId: walletSnap.chainId, name: "BSC" }],
+      connectionStatus: walletSnap.connectionStatus === "CONNECTED" ? "CONNECTED" : "UNCONNECTED",
+      securityPolicy:
+        walletSnap.quotaRemaining == null && walletSnap.quotaUsed == null && walletSnap.highRiskHandling == null
+          ? null
+          : {
+              dailyLimit: null,
+              quotaUsed: walletSnap.quotaUsed == null ? null : Number(walletSnap.quotaUsed),
+              quotaLeft: walletSnap.quotaRemaining == null ? null : Number(walletSnap.quotaRemaining),
+              quotaDate: null,
+              tradeAllTokens: false,
+              highRiskHandling: walletSnap.highRiskHandling === "NeedConfirmation" || walletSnap.highRiskHandling === "AutoReject" ? walletSnap.highRiskHandling : null,
+            },
+      lastUpdated: walletSnap.observedAt,
+    },
+    balances: [
+      ...(walletSnap.usdt ? [{ symbol: "USDT", contractAddress: null, chainId: "56", amount: walletSnap.usdt, valueUsd: null }] : []),
+      ...(walletSnap.bnb ? [{ symbol: "BNB", contractAddress: null, chainId: "56", amount: walletSnap.bnb, valueUsd: null }] : []),
+      ...walletSnap.tokens.map((item) => ({ symbol: item.symbol, contractAddress: null, chainId: "56", amount: item.amount, valueUsd: null })),
+    ],
+    tokenScope: scope,
     paper: getCommandCenterModel(),
   });
+}
+
+function boardFromSnapshot(snapshot: ReturnType<typeof readObservationSnapshot>): ObservationBoard {
+  if (!snapshot) {
+    return failureBoard(
+      new KairosApiError({
+        category: "DATA_UNAVAILABLE",
+        safeMessage: "No observation snapshot is stored.",
+        technicalMessage: "Public dashboard reads persisted snapshots only.",
+      }),
+      "live",
+    );
+  }
+  return {
+    ok: snapshot.ok,
+    dataMode: "live",
+    refreshIntervalMs: 15_000,
+    freshMaxMs: 30_000,
+    agingMaxMs: 120_000,
+    generatedAt: snapshot.generatedAt,
+    userId: LOCAL_RUNTIME_USER_ID,
+    watchlistId: "snapshot",
+    health: {
+      connection: snapshot.ok ? "connected" : "offline",
+      reason: snapshot.ok ? null : "Observation snapshot unavailable",
+      httpStatus: null,
+      lastSuccessAt: snapshot.observedAt,
+      rwa: snapshot.ok ? "ok" : "error",
+      market: snapshot.ok ? "ok" : "error",
+      history: snapshot.ok ? "ok" : "skipped",
+    },
+    rows: snapshot.rows.map((row) => ({
+      id: row.representationId,
+      ticker: row.ticker,
+      companyName: row.ticker,
+      tokenSymbol: row.tokenSymbol,
+      platformLabel: row.platform,
+      chainLabel: row.chain,
+      contractAddress: row.contract,
+      price: row.price,
+      referencePrice: row.referencePrice,
+      deviationPct: null,
+      change24hPct: null,
+      session: "UNKNOWN",
+      sessionLabel: row.session,
+      rawMarketStatus: null,
+      freshness: "FRESH",
+      freshnessLabel: "SNAPSHOT",
+      ageMs: null,
+      sourceTimestamp: snapshot.generatedAt,
+      receivedAt: snapshot.observedAt,
+      volume24hUsd: null,
+      nextOpenAt: null,
+      reasonMessage: null,
+      fidelity: "live",
+      representationId: row.representationId,
+      regime: row.regime,
+      regimeDetail: null,
+      dataQuality: row.dataQuality === "GOOD" || row.dataQuality === "DEGRADED" || row.dataQuality === "INSUFFICIENT" || row.dataQuality === "STALE" ? row.dataQuality : null,
+      historyPoints: 0,
+      features: [],
+      signals: [],
+      candles: [],
+      arbitration: row.arbitration
+        ? ({
+            asset: { id: row.representationId, ticker: row.ticker, userId: LOCAL_RUNTIME_USER_ID },
+            timestamp: snapshot.generatedAt,
+            decision: row.arbitration,
+            selectedStrategy: null,
+            selectedStrategyName: row.selectedStrategy,
+            selectedAction: row.selectedAction,
+            score: null,
+            confidence: null,
+            candidates: [],
+            conflicts: [],
+            evidence: { summary: row.reasons ?? "", supports: [], penalties: [], rejected: [] },
+            dataQuality: "INSUFFICIENT",
+            marketRegime: "UNKNOWN",
+            marketSession: "UNKNOWN",
+            validUntil: snapshot.generatedAt,
+            version: "1.0",
+            cooldownHeld: false,
+            loopPhase: "WAITING_FOR_RISK",
+            externalConfirmation: "NO_SIGNAL",
+            externalConflict: "NONE",
+            securityGate: "NOT_EVALUATED",
+            externalFreshness: "NONE",
+            historicalHealth: "NONE",
+            historicalSample: "NONE",
+          } as ObservationRow["arbitration"])
+        : null,
+    })),
+    unresolved: [],
+    events: [],
+    recentEvaluations: [],
+    error: snapshot.ok ? null : { category: "DATA_UNAVAILABLE", message: "Observation snapshot unavailable", httpStatus: null },
+  };
 }
 
 function agentFace(heartbeat: AgentHeartbeatRecord, latest: KairosCycleResult | null): AgentFaceStatus {

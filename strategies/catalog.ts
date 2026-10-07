@@ -3,6 +3,7 @@ import { meanReversionStrategy } from "@/strategies/mean-reversion";
 import { momentumStrategy } from "@/strategies/momentum";
 import { StrategyRegistry } from "@/strategies/registry";
 import { weekendStrategy } from "@/strategies/weekend";
+import { dcaStrategy } from "@/strategies/dca";
 
 const comingSoon = (
   id: string,
@@ -42,6 +43,7 @@ export function createStrategyRegistry(): StrategyRegistry {
   registry.register(momentumStrategy);
   registry.register(meanReversionStrategy);
   registry.register(weekendStrategy);
+  registry.register(dcaStrategy);
   return registry;
 }
 

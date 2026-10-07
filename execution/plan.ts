@@ -4,7 +4,7 @@ import { scaleDecimal, type Candle } from "@/domain/candle";
 import { classifySeries } from "@/domain/candle-quality";
 import type { AgentId, UserId } from "@/domain/ids";
 import type { PaperAccountState, RiskPolicy, TradeVenue } from "@/domain/models";
-import { mul, parseDecimal, type Scaled } from "@/domain/money";
+import { formatDecimal, mul, parseDecimal, type Scaled } from "@/domain/money";
 import type { ObservationRow } from "@/domain/observation";
 import { summarizePortfolio } from "@/domain/portfolio";
 import { createManagementIntent, createTradeIntent, type AgentTradeIntent } from "@/paper/intent";
@@ -15,6 +15,9 @@ import { paperAccountId } from "@/paper/store";
 import { DEFAULT_ADD_POLICY } from "@/position/policy";
 import type { PositionDecision } from "@/position/types";
 import type { RiskEffect } from "@/risk/validate";
+import type { OperatorConfig } from "@/operator/config";
+import { capTradeNotional } from "@/execution/capital";
+import { dcaEligibleKey, emptyDcaState, readDcaState, writeDcaState } from "@/strategies/dca-state";
 
 export interface IntentPlanInput {
   userId: UserId;
@@ -27,6 +30,7 @@ export interface IntentPlanInput {
   safetyMode?: "NORMAL" | "RISK_REDUCTION_ONLY";
   venue: TradeVenue;
   candles?: ReadonlyMap<string, readonly Candle[]>;
+  operatorConfig?: OperatorConfig;
 }
 
 export type IntentPlan =
@@ -99,6 +103,9 @@ function planEntry(
   if (!decision || !executable || !decision.selectedStrategy || (action !== "BUY" && action !== "SELL")) {
     return skip(row, action === "HOLD" ? "HOLD is not a trade intent" : "No executable selection");
   }
+  if (input.operatorConfig?.executionAdmissionDisabled) {
+    return skip(row, "EXECUTION_DISABLED");
+  }
   if (input.safetyMode === "RISK_REDUCTION_ONLY" && action === "BUY") {
     return skip(row, "RISK_REDUCTION_ONLY blocks a new long.");
   }
@@ -127,6 +134,40 @@ function planEntry(
   if (!sized.ok) {
     return skip(row, sized.reason);
   }
+  if (action === "BUY" && input.operatorConfig) {
+    const reserved = parseDecimal(input.operatorConfig.capital.reserveCapitalNotional);
+    const deployable = input.account.cash - reserved;
+    const capped = capTradeNotional({
+      proposed: sized.notional,
+      config: input.operatorConfig,
+      strategyId: decision.selectedStrategy,
+      remainingDeployable: deployable > 0n ? deployable : 0n,
+      remainingPosition: input.riskPolicy.maxPositionNotional - (held ? mul(held.currentPrice, held.quantity) : 0n),
+      remainingAllocation: summary.equity > 0n ? (summary.equity * BigInt(input.riskPolicy.maxAllocationBps)) / 10_000n - summary.invested : 0n,
+      availableBalance: input.account.cash,
+    });
+    if (!capped.ok) {
+      return skip(row, capped.reason);
+    }
+    if (capped.notional < sized.notional) {
+      const resized = sizePaperOrder({
+        action,
+        observedPrice: observed,
+        cash: input.account.cash,
+        equity: summary.equity,
+        invested: summary.invested,
+        heldQuantity: held?.quantity ?? 0n,
+        existingMarketValue: held ? mul(held.currentPrice, held.quantity) : 0n,
+        riskPolicy: input.riskPolicy,
+        paperPolicy,
+        maxIncrementalNotional: capped.notional,
+      });
+      if (!resized.ok) {
+        return skip(row, resized.reason);
+      }
+      Object.assign(sized, resized);
+    }
+  }
   const created = createTradeIntent({
     userId: input.userId,
     agentId: input.agentId,
@@ -153,6 +194,9 @@ function planEntry(
     return skip(row, created.reason);
   }
   const risk = assessTradeIntent(created.intent, input.riskPolicy, input.account, input.nowMs, action === "BUY" ? "INCREASE_RISK" : "CLOSE_RISK", input.venue);
+  if (risk.allowed && decision.selectedStrategy === "dca" && input.operatorConfig) {
+    admitDcaTranche(input, row.representationId, row.ticker, observed, sized.notional);
+  }
   return {
     kind: "READY",
     ticker: row.ticker,
@@ -266,6 +310,31 @@ function planOpenPosition(
     heldQuantity: held.quantity,
     dedupKey: `${row.representationId}|${strategyId}|${decision.action}`,
   };
+}
+
+function admitDcaTranche(input: IntentPlanInput, assetId: string, ticker: string, price: Scaled, notional: Scaled): void {
+  const params = input.operatorConfig!.strategies.dca;
+  const current = readDcaState(input.userId, input.agentId, assetId) ?? emptyDcaState(assetId, ticker, params.mode, params.reference);
+  const priceText = (Number(price) / 1_000_000).toFixed(6);
+  const spent = parseDecimal(current.budgetSpent) + notional;
+  const key = dcaEligibleKey({
+    mode: params.mode,
+    nowMs: input.nowMs,
+    intervalMs: params.intervalMs,
+    dipThresholdBps: params.dipThresholdBps,
+    referencePrice: price,
+    lastFillPrice: current.lastFillPrice,
+  });
+  writeDcaState(input.userId, input.agentId, {
+    ...current,
+    initialReference: current.initialReference ?? priceText,
+    lastFillPrice: priceText,
+    lastFillAtMs: input.nowMs,
+    lastEligibleKey: key,
+    tranchesCompleted: current.tranchesCompleted + 1,
+    budgetSpent: formatDecimal(spent, 6),
+    status: current.tranchesCompleted + 1 >= params.maxTranches ? "COMPLETE" : "ACTIVE",
+  });
 }
 
 function skip(row: ObservationRow, reason: string, positionDecision: PositionDecision | null = null): IntentPlan {

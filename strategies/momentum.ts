@@ -28,35 +28,36 @@ export const momentumStrategy: IntelligenceStrategy = {
     version: MOMENTUM_PARAMS.version,
   },
   evaluate(context): ReturnType<IntelligenceStrategy["evaluate"]> {
+    const params = context.operator?.strategies.momentum ?? MOMENTUM_PARAMS;
     const stale = rejectStale(context, "momentum", MOMENTUM_PARAMS.version);
     if (stale) {
       return stale;
     }
-    if (context.candles.length < MOMENTUM_PARAMS.minCandles || context.price === null) {
+    if (context.candles.length < params.minCandles || context.price === null) {
       return blocked(
         context,
         "momentum",
         MOMENTUM_PARAMS.version,
         "INSUFFICIENT_DATA",
-        `Momentum needs ${MOMENTUM_PARAMS.minCandles} candles and a price. Received ${context.candles.length} candles.`,
+        `Momentum needs ${params.minCandles} candles and a price. Received ${context.candles.length} candles.`,
       );
     }
     const last = context.candles[context.candles.length - 1];
-    const prior = context.candles[context.candles.length - 1 - MOMENTUM_PARAMS.momentumBars];
+    const prior = context.candles[context.candles.length - 1 - params.momentumBars];
     const momentum = simpleReturnBps(last.close, prior.close);
-    const mean = sma(context.candles, MOMENTUM_PARAMS.trendPeriod);
+    const mean = sma(context.candles, params.trendPeriod);
     const vol = realizedVolBps(context.candles, 20);
     const trend = featureById(context.features.features, "trend");
     if (momentum === null || mean === null || vol === null || !trend?.sufficient || trend.value === null) {
       return blocked(context, "momentum", MOMENTUM_PARAMS.version, "INSUFFICIENT_DATA", "Momentum inputs were not available.");
     }
-    const volatile = vol > BigInt(MOMENTUM_PARAMS.maxVolatilityBps);
-    const up = momentum >= BigInt(MOMENTUM_PARAMS.minReturnBps) && last.close > mean && trend.value === "UP" && !volatile;
-    const down = momentum <= -BigInt(MOMENTUM_PARAMS.minReturnBps) && last.close < mean && trend.value === "DOWN" && !volatile;
+    const volatile = vol > BigInt(params.maxVolatilityBps);
+    const up = momentum >= BigInt(params.minReturnBps) && last.close > mean && trend.value === "UP" && !volatile;
+    const down = momentum <= -BigInt(params.minReturnBps) && last.close < mean && trend.value === "DOWN" && !volatile;
     const action = up ? "BUY" : down ? "SELL" : "HOLD";
     const evaluation = action === "HOLD" ? "VALID" : "SIGNAL";
     const magnitude = Number(momentum < 0n ? -momentum : momentum);
-    const confidence = action === "HOLD" ? 0.42 : clampConfidence(0.55 + (magnitude - MOMENTUM_PARAMS.minReturnBps) / 400, 0.55, 0.84);
+    const confidence = action === "HOLD" ? 0.42 : clampConfidence(0.55 + (magnitude - params.minReturnBps) / 400, 0.55, 0.84);
     const returnText = featureById(context.features.features, "return_1h")?.value ?? "unavailable";
     const reasons = [
       `1h return ${returnText}.`,
