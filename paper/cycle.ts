@@ -21,11 +21,12 @@ import type { AgentEventType } from "@/domain/events";
 import { recordPaperFill } from "@/lifecycle/recorder";
 import { openPaperGateway, type PaperExecutionGateway } from "@/paper/gateway";
 import { priorPaperFill, rememberPaperFill } from "@/paper/idempotency";
-import { createManagementIntent, createTradeIntent, type AgentTradeIntent } from "@/paper/intent";
+import { createManagementIntent, type AgentTradeIntent } from "@/paper/intent";
 import { DEFAULT_PAPER_POLICY, type PaperExecutionPolicy } from "@/paper/policy";
 import { commitPaperExecution, monitorPositions, type PositionMeta, type PositionOrigin } from "@/paper/positions";
 import type { ExecutionRecord } from "@/paper/records";
 import type { PaperCycleStep } from "@/domain/paper-cycle-view";
+import { planAssetIntent } from "@/execution/plan";
 import { assessTradeIntent } from "@/paper/risk-gate";
 import { previewPaperExecution, type PaperMarketSnapshot } from "@/paper/simulate";
 import { sizePaperOrder } from "@/paper/sizing";
@@ -182,27 +183,37 @@ function evaluateRow(
       book: managedBook,
     });
   }
-  const decision = row.arbitration;
-  const action = decision?.selectedAction;
-  const executable =
-    decision !== null &&
-    (decision.decision === "SELECT_STRATEGY" || decision.decision === "MULTI_STRATEGY_CONFIRMATION") &&
-    (action === "BUY" || action === "SELL") &&
-    decision.selectedStrategy !== null;
-  if (!decision || !executable || !decision.selectedStrategy || (action !== "BUY" && action !== "SELL")) {
+  const book = readPaperBook(input.userId, input.agentId);
+  if (!book) {
+    return skip(row, `${row.ticker} — no paper book`, "The paper book is missing.");
+  }
+  const plan = planAssetIntent({
+    userId: input.userId,
+    agentId: input.agentId,
+    row,
+    account: book.account,
+    riskPolicy: input.riskPolicy,
+    paperPolicy,
+    nowMs: input.nowMs,
+    safetyMode: input.safetyMode,
+    venue: "paper",
+    candles: input.candles,
+  });
+  if (plan.kind === "NO_TRADE") {
+    const decision = plan.arbitration;
+    const action = decision?.selectedAction;
+    const noSelection = !decision || action === "HOLD" || action === "NO_SIGNAL";
     return {
-      assetId: row.representationId,
-      ticker: row.ticker,
-      headline: `${row.ticker} — no executable selection`,
+      assetId: plan.assetId,
+      ticker: plan.ticker,
+      headline: noSelection ? `${row.ticker} — no executable selection` : `${row.ticker} — ${plan.reason}`,
       steps: [
         { label: "Arbitration", state: "skipped", detail: decision ? decision.decision : "No decision" },
-        { label: "Trade intent", state: "skipped", detail: action === "HOLD" ? "HOLD is not a trade intent" : "Not created" },
+        { label: "Trade intent", state: "skipped", detail: action === "HOLD" ? "HOLD is not a trade intent" : plan.reason },
       ],
     };
   }
-
-  const strategyId = decision.selectedStrategy;
-  const dedupKey = `${row.representationId}|${strategyId}|${action}`;
+  const { arbitration: decision, action, strategyId, dedupKey } = plan;
   const previous = readLastIntentAt(input.userId, input.agentId, dedupKey);
   if (previous !== null && input.nowMs - previous < paperPolicy.minimumActionIntervalMs) {
     return recall(input, row, "No new intent. The last intent for this strategy is still inside the minimum action interval.");
@@ -210,75 +221,6 @@ function evaluateRow(
   if (openIntent(input.userId, input.agentId, row.representationId, input.nowMs)) {
     return recall(input, row, "An unexpired intent already exists for this asset.");
   }
-
-  const book = readPaperBook(input.userId, input.agentId);
-  if (!book) {
-    return skip(row, `${row.ticker} — no paper book`, "The paper book is missing.");
-  }
-  const held = book.account.positions.find((position) => position.assetSymbol === row.ticker);
-  if (input.safetyMode === "RISK_REDUCTION_ONLY" && action === "BUY") {
-    return skip(row, `${row.ticker} — risk reduction only`, "RISK_REDUCTION_ONLY blocks a new long.");
-  }
-  if (action === "BUY" && held) {
-    return recall(input, row, "Re-entry is blocked while this asset is open. One position per asset.");
-  }
-  if (action === "SELL" && !held) {
-    return skip(row, `${row.ticker} — no position`, "A sell requires an open paper position.");
-  }
-
-  const observed = row.price === null ? null : scaleDecimal(row.price);
-  if (observed === null || observed <= 0n) {
-    return skip(row, `${row.ticker} — no price`, "The observation has no usable price.");
-  }
-  const summary = summarizePortfolio(book.account);
-  const sized = sizePaperOrder({
-    action,
-    observedPrice: observed,
-    cash: book.account.cash,
-    equity: summary.equity,
-    invested: summary.invested,
-    heldQuantity: held?.quantity ?? 0n,
-    existingMarketValue: held ? mul(held.currentPrice, held.quantity) : 0n,
-    riskPolicy: input.riskPolicy,
-    paperPolicy,
-  });
-  if (!sized.ok) {
-    const detail =
-      sized.reason === "ALLOCATION_EXCEEDED"
-        ? "Allocation limit leaves no room for another buy."
-        : sized.reason === "NO_POSITION"
-          ? "A sell requires an open paper position."
-          : "The sized order is below the paper minimum.";
-    return skip(row, `${row.ticker} — ${sized.reason}`, detail);
-  }
-
-  const correlationId = `corr_${input.userId}_${row.representationId}_${decision.timestamp}_${action}`;
-  const created = createTradeIntent({
-    userId: input.userId,
-    agentId: input.agentId,
-    accountId: paperAccountId(input.userId),
-    decision,
-    observation: {
-      assetId: row.representationId,
-      ticker: row.ticker,
-      userId: input.userId,
-      observedPrice: observed,
-      referencePrice: row.referencePrice === null ? null : scaleDecimal(row.referencePrice),
-      priceTimestamp: row.sourceTimestamp ?? row.receivedAt,
-    },
-    riskPolicy: input.riskPolicy,
-    quantity: sized.quantity,
-    notional: sized.notional,
-    paperPolicy,
-    nowMs: input.nowMs,
-    correlationId,
-    cycleId: row.kairos?.cycleId,
-    strategyVersion: row.kairos?.strategySignals.value?.signals.find((item) => item.strategyId === strategyId)?.version ?? "1",
-  });
-  if (!created.ok) {
-    return skip(row, `${row.ticker} — intent refused`, created.reason);
-  }
-
   return completePaperIntent({
     row,
     input,
@@ -288,16 +230,16 @@ function evaluateRow(
     events,
     createdIntentIds,
     step,
-    intent: created.intent,
+    intent: plan.intent,
     arbitration: decision,
     action,
     strategyId,
-    heldQuantity: held?.quantity ?? 0n,
+    heldQuantity: plan.heldQuantity,
     dedupKey,
     book,
-    observed,
-    riskEffect: action === "BUY" ? "INCREASE_RISK" : "CLOSE_RISK",
-    positionDecision: null,
+    observed: plan.observed,
+    riskEffect: plan.riskEffect,
+    positionDecision: plan.positionDecision,
     headline: `${row.ticker} — ${decision.selectedStrategyName ?? strategyId} selected`,
   });
 }

@@ -11,12 +11,13 @@
     "test": "vitest run",
     "agent-studio:precheck": "node studio/precheck-cli.mjs",
     "kairos:preflight": "node scripts/kairos-preflight.mjs",
-    "kairos:runner": "vite-node --config vitest.config.ts runtime/cli-runner.ts"
+    "kairos:runner": "tsx runtime/cli-runner.ts"
   },
   "dependencies": {
     "next": "16.3.8",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "tsx": "^4.19.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

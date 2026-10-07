@@ -1,6 +1,7 @@
 import { deterministicPositionManager } from "@/context/position-manager";
 import type { ArbitrationDecision } from "@/domain/arbitration";
 import { scaleDecimal, type Candle } from "@/domain/candle";
+import { classifySeries } from "@/domain/candle-quality";
 import type { AgentId, UserId } from "@/domain/ids";
 import type { PaperAccountState, RiskPolicy, TradeVenue } from "@/domain/models";
 import { mul, parseDecimal, type Scaled } from "@/domain/money";
@@ -53,6 +54,8 @@ export type IntentPlan =
       dedupKey: string;
     };
 
+export const MARKET_DATA_SUSPICIOUS = "MARKET_DATA_SUSPICIOUS";
+
 /** Shared arbitration → position/sizing → intent → risk. Paper and live consume this plan. */
 export function planAssetIntent(input: IntentPlanInput): IntentPlan {
   const row = input.row;
@@ -63,6 +66,15 @@ export function planAssetIntent(input: IntentPlanInput): IntentPlan {
   }
   if (row.arbitration?.decision === "DATA_BLOCKED") {
     return skip(row, "Arbitration blocked on data quality.");
+  }
+  const candles = input.candles?.get(row.representationId) ?? [];
+  const barClass = classifySeries(candles);
+  const liveGate = input.venue === "live" || row.fidelity === "live";
+  if (liveGate && barClass === "SUSPICIOUS") {
+    return skip(row, MARKET_DATA_SUSPICIOUS);
+  }
+  if (liveGate && barClass === "INVALID") {
+    return skip(row, "Market data quality blocks execution.");
   }
   const held = input.account.positions.find((position) => position.assetSymbol === row.ticker && position.quantity > 0n) ?? null;
   if (held && row.kairos) {
@@ -94,7 +106,7 @@ function planEntry(
     return skip(row, "Re-entry is blocked while this asset is open. One position per asset.");
   }
   if (action === "SELL" && !held) {
-    return skip(row, "A sell requires an open position.");
+    return skip(row, "no position");
   }
   const observed = row.price === null ? null : scaleDecimal(row.price);
   if (observed === null || observed <= 0n) {

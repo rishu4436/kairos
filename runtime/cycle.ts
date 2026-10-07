@@ -103,6 +103,15 @@ export async function runKairosAutonomousCycle(input: AutonomousCycleInput): Pro
     return finish(input, store, cycleId, startedAt, "FAILED", [], [], errors, warnings, [], false, false, null, transitions, [], null);
   }
 
+  const keepLease = (): boolean => {
+    const renewed = store.renewLease(input.userId, input.agentId, input.ownerId, LEASE_TTL_MS, input.startedAtMs);
+    if (renewed.ok) {
+      return true;
+    }
+    errors.push(failure("LEASE_UNAVAILABLE", "Lease renewal failed. No new execution work was started."));
+    return false;
+  };
+
   try {
     if (input.marketAvailable === false) {
       errors.push(failure("MARKET_DATA_ERROR", "Market data is unavailable. Trading decisions are blocked."));
@@ -143,6 +152,9 @@ export async function runKairosAutonomousCycle(input: AutonomousCycleInput): Pro
     if (!snapshot.board.ok) {
       errors.push(failure("MARKET_DATA_ERROR", snapshot.board.error?.message ?? "Observation board is not usable."));
       return finish(input, store, cycleId, startedAt, "DEGRADED", [], [], errors, warnings, [], true, input.executionMode !== "PAPER", null, transitions, [], null);
+    }
+    if (!keepLease()) {
+      return finish(input, store, cycleId, startedAt, "FAILED", [], [], errors, warnings, [], false, input.executionMode !== "PAPER", null, transitions, [], "WALLET_DISABLED");
     }
 
     push("BUILDING_CONTEXT");
@@ -216,9 +228,9 @@ export async function runKairosAutonomousCycle(input: AutonomousCycleInput): Pro
           strategyDecision: null,
           arbitrationDecision: plan.arbitration?.decision ?? null,
           positionDecision: plan.positionDecision?.action ?? null,
-          riskDecision: null,
-          executionState: "ABSTAINED",
-          status: "OK",
+          riskDecision: plan.reason === "MARKET_DATA_SUSPICIOUS" ? "MARKET_DATA_SUSPICIOUS" : null,
+          executionState: plan.reason === "MARKET_DATA_SUSPICIOUS" ? "MARKET_DATA_SUSPICIOUS" : "ABSTAINED",
+          status: plan.reason === "MARKET_DATA_SUSPICIOUS" ? "BLOCKED" : "OK",
         });
         continue;
       }
@@ -237,6 +249,21 @@ export async function runKairosAutonomousCycle(input: AutonomousCycleInput): Pro
           status: "BLOCKED",
         });
         continue;
+      }
+      if (!keepLease()) {
+        assets.push({
+          assetId: plan.assetId,
+          ticker: plan.ticker,
+          contextId: row.kairos?.contextId ?? null,
+          positionState: null,
+          strategyDecision: plan.strategyId,
+          arbitrationDecision: plan.arbitration.decision,
+          positionDecision: plan.positionDecision?.action ?? null,
+          riskDecision: "PASSED",
+          executionState: "LEASE_UNAVAILABLE",
+          status: "BLOCKED",
+        });
+        break;
       }
       if (!input.livePreparation) {
         assets.push({

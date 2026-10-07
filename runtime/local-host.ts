@@ -1,8 +1,11 @@
+import { randomUUID } from "node:crypto";
 import { CycleScheduler } from "@/runtime/scheduler";
 import { runKairosAutonomousCycle, type AutonomousCycleOutcome } from "@/runtime/cycle";
 import { runAgentCycle } from "@/paper/run-cycle";
 import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
-import { resolveProductExecutionMode } from "@/domain/execution-mode";
+import { readDataMode, type DataModeEnv } from "@/lib/mode";
+import type { ObserveMarket } from "@/runtime/observe";
+import type { KairosStateStore } from "@/runtime/store";
 import type { AgentControlState, AutonomousExecutionMode } from "@/runtime/types";
 
 const DEFAULT_INTERVAL_MS = 60_000;
@@ -15,6 +18,10 @@ export interface LocalHostOptions {
   nowMs?: () => number;
   sleep?: (ms: number) => Promise<void>;
   onCycle?: (outcome: AutonomousCycleOutcome) => void;
+  store?: KairosStateStore;
+  observeMarket?: ObserveMarket;
+  ownerId?: string;
+  env?: DataModeEnv;
 }
 
 /**
@@ -24,17 +31,17 @@ export interface LocalHostOptions {
 export class LocalKairosRunner {
   private readonly scheduler = new CycleScheduler();
   private readonly options: Required<Pick<LocalHostOptions, "userId" | "agentId">> & LocalHostOptions;
+  readonly ownerId: string;
   private started = false;
   private stopping = false;
   private inFlight = false;
   private stopWaiters: Array<() => void> = [];
 
   constructor(options: LocalHostOptions = {}) {
-    this.options = {
-      userId: options.userId ?? LOCAL_RUNTIME_USER_ID,
-      agentId: options.agentId ?? DEFAULT_AGENT_ID,
-      ...options,
-    };
+    const userId = options.userId ?? LOCAL_RUNTIME_USER_ID;
+    const agentId = options.agentId ?? DEFAULT_AGENT_ID;
+    this.options = { userId, agentId, ...options };
+    this.ownerId = options.ownerId ?? `local:${userId}:${agentId}:${randomUUID()}`;
   }
 
   start(nowMs = this.now()): void {
@@ -97,10 +104,7 @@ export class LocalKairosRunner {
   }
 
   async runOnce(nowMs = this.now()): Promise<AutonomousCycleOutcome> {
-    const executionMode = resolveProductExecutionMode({
-      serverMode: this.options.executionMode ?? "PAPER",
-      requested: "LIVE",
-    });
+    const executionMode = resolveRunnerExecutionMode(this.options.executionMode, this.options.env);
     return runKairosAutonomousCycle({
       userId: this.options.userId,
       agentId: this.options.agentId,
@@ -108,10 +112,12 @@ export class LocalKairosRunner {
       executionMode,
       cycleTrigger: "SCHEDULER",
       startedAtMs: nowMs,
-      ownerId: `local:${this.options.userId}:${this.options.agentId}`,
+      ownerId: this.ownerId,
       marketAvailable: true,
       researchAvailable: false,
       runPaper: executionMode === "PAPER" ? (userId, now) => runAgentCycle(userId, now) : undefined,
+      observeMarket: this.options.observeMarket,
+      store: this.options.store,
       control: "RUNNING" satisfies AgentControlState,
     });
   }
@@ -145,6 +151,21 @@ export class LocalKairosRunner {
       waiter();
     }
   }
+}
+
+export function resolveRunnerExecutionMode(
+  explicit: AutonomousExecutionMode | undefined,
+  env?: DataModeEnv,
+): AutonomousExecutionMode {
+  const data = readDataMode(env);
+  const mode = explicit ?? (data === "live" ? "LIVE_PREVIEW" : "PAPER");
+  if (data === "paper" && mode !== "PAPER") {
+    throw new Error("Invalid combination: paper data mode cannot run LIVE execution.");
+  }
+  if (data === "live" && mode === "PAPER") {
+    throw new Error("Invalid combination: live data mode cannot run paper execution.");
+  }
+  return mode;
 }
 
 function positiveInterval(raw: string | undefined): number {

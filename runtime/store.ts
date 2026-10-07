@@ -45,7 +45,7 @@ export interface KairosStateStore {
   readHeartbeat(userId: string, agentId: string): AgentHeartbeatRecord;
   writeHeartbeat(userId: string, agentId: string, heartbeat: AgentHeartbeatRecord): void;
   acquireLease(input: { userId: string; agentId: string; ownerId: string; nowMs: number; ttlMs: number }): { ok: true; lease: RuntimeLease } | { ok: false; reason: "LEASE_UNAVAILABLE" };
-  renewLease(userId: string, agentId: string, ownerId: string, ttlMs: number): { ok: true } | { ok: false; reason: "LEASE_NOT_OWNER" };
+  renewLease(userId: string, agentId: string, ownerId: string, ttlMs: number, nowMs?: number): { ok: true } | { ok: false; reason: "LEASE_NOT_OWNER" };
   releaseLease(userId: string, agentId: string, ownerId: string): { ok: boolean; reason?: "LEASE_NOT_OWNER" };
 }
 
@@ -173,13 +173,13 @@ export class InMemoryKairosStateStore implements KairosStateStore {
     return { ok: true as const, lease };
   }
 
-  renewLease(userId: string, agentId: string, ownerId: string, ttlMs: number): { ok: true } | { ok: false; reason: "LEASE_NOT_OWNER" } {
+  renewLease(userId: string, agentId: string, ownerId: string, ttlMs: number, nowMs = Date.now()): { ok: true } | { ok: false; reason: "LEASE_NOT_OWNER" } {
     const key = `${userId}\n${agentId}`;
     const current = this.leases.get(key);
-    if (!current || current.ownerId !== ownerId || Date.parse(current.expiresAt) <= Date.now()) {
+    if (!current || current.ownerId !== ownerId || Date.parse(current.expiresAt) <= nowMs) {
       return { ok: false, reason: "LEASE_NOT_OWNER" };
     }
-    this.leases.set(key, { ...current, expiresAt: new Date(Date.now() + ttlMs).toISOString(), revision: current.revision + 1 });
+    this.leases.set(key, { ...current, expiresAt: new Date(nowMs + ttlMs).toISOString(), revision: current.revision + 1 });
     return { ok: true };
   }
 
@@ -323,7 +323,8 @@ export class RedisKairosStateStore implements KairosStateStore {
     };
   }
 
-  renewLease(userId: string, agentId: string, ownerId: string, ttlMs: number): { ok: true } | { ok: false; reason: "LEASE_NOT_OWNER" } {
+  renewLease(userId: string, agentId: string, ownerId: string, ttlMs: number, _nowMs?: number): { ok: true } | { ok: false; reason: "LEASE_NOT_OWNER" } {
+    void _nowMs;
     const ok = this.transport.command(["EVAL", "lease-renew", "1", stateKey(["lease", userId, agentId]), ownerId, String(ttlMs)]);
     return ok === "OK" ? { ok: true } : { ok: false, reason: "LEASE_NOT_OWNER" };
   }
