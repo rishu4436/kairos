@@ -23,11 +23,14 @@ describe("agentic wallet boundary", () => {
   it("blocks a trade that exceeds the wallet quota and does not call the wallet", async () => {
     const decision = assessWalletPolicy({
       notionalUsd: 100,
-      policy: policy({ quotaLeft: 50, tradeAllTokens: true, highRiskHandling: "AutoReject" }),
+      policy: policy({ quotaLeft: 50, tradeAllTokens: false, highRiskHandling: "AutoReject" }),
+      chainId: "56",
+      tokens: [USDT, STOCK],
+      operatorScope: scope(),
     });
     expect(decision.reason).toBe("BLOCKED BY WALLET LIMIT");
     const swap = vi.fn();
-    const blocked = await executeThroughAgenticWallet(base({ notionalUsd: 100, policy: policy({ quotaLeft: 50, tradeAllTokens: true, highRiskHandling: "AutoReject" }) }), gateway(swap), true);
+    const blocked = await executeThroughAgenticWallet(base({ notionalUsd: 100, policy: policy({ quotaLeft: 50, tradeAllTokens: false, highRiskHandling: "AutoReject" }) }), gateway(swap), true);
     expect(blocked.phase).toBe("WALLET_POLICY_BLOCKED");
     expect(blocked.paperFill).toBe(false);
     expect(swap).not.toHaveBeenCalled();
@@ -102,6 +105,14 @@ describe("agentic wallet boundary", () => {
   });
 });
 
+function scope() {
+  return {
+    chainId: "56" as const,
+    contracts: [USDT.toLowerCase(), STOCK.toLowerCase()],
+    provenance: "OPERATOR_ATTESTED" as const,
+  };
+}
+
 function policy(input: { quotaLeft: number; tradeAllTokens: boolean; highRiskHandling: "AutoReject" | "NeedConfirmation" }) {
   return {
     dailyLimit: 100,
@@ -154,7 +165,8 @@ function base(overrides: Partial<AgenticExecutionRequest>): AgenticExecutionRequ
     buildPassed: true,
     simulationPassed: true,
     tradable: true,
-    policy: policy({ quotaLeft: 50, tradeAllTokens: true, highRiskHandling: "AutoReject" }),
+    policy: policy({ quotaLeft: 50, tradeAllTokens: false, highRiskHandling: "AutoReject" }),
+    operatorScope: scope(),
     walletConnected: true,
     walletAddress: WALLET,
     expectedWalletAddress: WALLET,

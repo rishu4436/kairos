@@ -73,6 +73,12 @@ export interface AgenticWalletExecutionResult {
 
 export interface WalletPolicyDecision {
   allowed: boolean;
-  reason: "PASS" | "BLOCKED BY WALLET LIMIT" | "TOKEN_SCOPE_UNVERIFIED" | "REQUIRES APP CONFIRMATION" | "WALLET_UNAVAILABLE";
+  reason:
+    | "PASS"
+    | "BLOCKED BY WALLET LIMIT"
+    | "TOKEN_SCOPE_UNVERIFIED"
+    | "TOKEN_NOT_ALLOWED"
+    | "REQUIRES APP CONFIRMATION"
+    | "WALLET_UNAVAILABLE";
   remainingUsd: number | null;
 }

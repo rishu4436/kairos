@@ -5,6 +5,7 @@ import { acceptHumanConfirmation } from "@/wallet/agentic/live-test";
 import { assessWalletPolicy } from "@/wallet/agentic/policy";
 import type { AgenticWalletGateway } from "@/wallet/agentic/gateway";
 import type { AgenticWalletSecurityPolicy } from "@/domain/agentic-wallet";
+import type { OperatorTokenScope } from "@/wallet/agentic/token-scope";
 
 export interface AgenticExecutionRequest {
   capability: LiveExecutionCapability | PaperExecutionCapability;
@@ -34,6 +35,7 @@ export interface AgenticExecutionRequest {
   expectedWalletAddress: string | null;
   humanConfirmation: string | null;
   expectedConfirmation: string | null;
+  operatorScope?: OperatorTokenScope | null;
 }
 
 export interface AgenticExecutionOutcome {
@@ -74,7 +76,13 @@ export async function executeThroughAgenticWallet(
     push("WALLET_CONNECTED", "Wallet status is connected.");
   }
   push("WALLET_POLICY_READ", "Wallet policy was read.");
-  const policy = assessWalletPolicy({ notionalUsd: request.notionalUsd, policy: request.policy });
+  const policy = assessWalletPolicy({
+    notionalUsd: request.notionalUsd,
+    policy: request.policy,
+    chainId: request.chainId,
+    tokens: [request.fromToken, request.toToken],
+    operatorScope: request.operatorScope,
+  });
   if (!policy.allowed) {
     push("WALLET_POLICY_BLOCKED", policy.reason);
     return done("WALLET_POLICY_BLOCKED", policy.reason, null, events);

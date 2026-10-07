@@ -16,7 +16,7 @@ The argument list is fixed. KAIROS does not build a shell string.
 
 Sign-in, when a person starts it, is `baw auth signin --json`, then the returned `urlForWeb` unchanged, then `baw auth verify --qrCodeId <qrCodeId> --json`. Connection is true only after `wallet status` says `CONNECTED`. The App screen is not enough.
 
-`wallet settings` is read-only. High-risk handling is `AutoReject` or `NeedConfirmation`. `quotaLeft` is the remaining daily amount. `tradeAllTokens` false does not include the allow list in the response, so KAIROS blocks with `TOKEN_SCOPE_UNVERIFIED` instead of guessing.
+`wallet settings` is read-only. High-risk handling is `AutoReject` or `NeedConfirmation`. `quotaLeft` is the remaining daily amount. `tradeAllTokens` false does not include the allow list in the CLI response. KAIROS does not guess that list. Live admission requires `tradeAllTokens` false plus an operator-attested `KAIROS_AGENTIC_ALLOWED_TOKENS` set of `chain:contract` pairs. Provenance is `OPERATOR_ATTESTED`. A missing or malformed list is `TOKEN_SCOPE_UNVERIFIED`. A contract outside the list is `TOKEN_NOT_ALLOWED`. Tickers are never authorization.
 
 A swap response with an `orderId` is `SUBMITTED`. It is `CONFIRMED` only after `market-order list` reports `FINISHED`. `FAILED` stays rejected. `PENDING` is not confirmation.
 

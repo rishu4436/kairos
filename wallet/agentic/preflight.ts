@@ -1,4 +1,5 @@
 import type { AgenticWalletSecurityPolicy, WalletConnectionStatus } from "@/domain/agentic-wallet";
+import { admitOperatorTokenPair, type OperatorTokenScope } from "@/wallet/agentic/token-scope";
 
 export interface ToolingMetadata {
   nodeVersion: string;
@@ -21,6 +22,8 @@ export interface PreflightInput {
   tokenAllowed: boolean;
   tokenTradable: boolean | null;
   tooling: ToolingMetadata;
+  swapTokens?: { chainId: string; from: string; to: string };
+  operatorScope?: OperatorTokenScope | null;
 }
 
 export interface PreflightResult {
@@ -52,7 +55,18 @@ export function runAgenticWalletPreflight(input: PreflightInput): PreflightResul
   if (input.policy === null || input.policy.quotaLeft === null) {
     reasons.push("WALLET_POLICY_UNAVAILABLE");
   }
-  if (!input.tokenAllowed) {
+  if (input.swapTokens) {
+    const admission = admitOperatorTokenPair({
+      chainId: input.swapTokens.chainId,
+      tokens: [input.swapTokens.from, input.swapTokens.to],
+      scope: input.operatorScope ?? null,
+    });
+    if (admission === "TOKEN_SCOPE_UNVERIFIED") {
+      reasons.push("TOKEN_SCOPE_UNVERIFIED");
+    } else if (admission === "TOKEN_NOT_ALLOWED") {
+      reasons.push("TOKEN_NOT_ALLOWED");
+    }
+  } else if (!input.tokenAllowed) {
     reasons.push("TOKEN_NOT_ALLOWED");
   }
   if (input.tokenTradable === null) {
