@@ -49,7 +49,7 @@ export interface KairosStateStore {
   releaseLease(userId: string, agentId: string, ownerId: string): { ok: boolean; reason?: "LEASE_NOT_OWNER" };
 }
 
-const SECRET = /api[_-]?key|private[_-]?key|authorization|secret|seed phrase/i;
+const SECRET = /api[_-]?key|private[_-]?key|authorization|secret|seed phrase|password|redis[_-]?url|rediss?:\/\//i;
 
 export function assertPersistable(value: unknown): void {
   const text = JSON.stringify(value);

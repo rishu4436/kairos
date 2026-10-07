@@ -225,5 +225,6 @@ export const REDIS_LUA = {
     "local cur = redis.call('GET', KEYS[1]) if not cur or cur ~= ARGV[1] then return nil end redis.call('SET', KEYS[1], ARGV[1], 'PX', ARGV[2]) return 'OK'",
   "lease-release":
     "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) end return 0",
-  cas: "local cur = redis.call('GET', KEYS[1]) local expected = tonumber(ARGV[1]) local parsed = nil if cur then parsed = cjson.decode(cur) end if expected == 0 and parsed then return nil end if expected ~= 0 and (not parsed or tonumber(parsed.revision) ~= expected) then return nil end local nextRev = (parsed and tonumber(parsed.revision) or 0) + 1 local record = { schemaVersion = 1, revision = nextRev, updatedAt = ARGV[3], value = cjson.decode(ARGV[2]) } local encoded = cjson.encode(record) redis.call('SET', KEYS[1], encoded) return encoded",
+  // Preserve the original value JSON: Lua JSON re-encoding can alter nulls/arrays/numbers.
+  cas: `local cur = redis.call('GET', KEYS[1]) local expected = tonumber(ARGV[1]) local parsed = nil if cur then parsed = cjson.decode(cur) end if expected == 0 and parsed then return nil end if expected ~= 0 and (not parsed or tonumber(parsed.revision) ~= expected) then return nil end local nextRev = (parsed and tonumber(parsed.revision) or 0) + 1 local encoded = '{"schemaVersion":1,"revision":' .. tostring(nextRev) .. ',"updatedAt":' .. cjson.encode(ARGV[3]) .. ',"value":' .. ARGV[2] .. '}' redis.call('SET', KEYS[1], encoded) return encoded`,
 } as const;

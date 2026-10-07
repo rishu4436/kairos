@@ -2,6 +2,13 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { probeRedis } from "../runtime/redis-health.mjs";
+
+const localEnv = new URL("../.env.local", import.meta.url);
+if (existsSync(localEnv)) {
+  try { process.loadEnvFile(fileURLToPath(localEnv)); }
+  catch { throw new Error("LOCAL_ENV_INVALID (values suppressed)"); }
+}
 
 const COMPATIBLE_AT = [0, 0, 14];
 
@@ -14,7 +21,7 @@ function stateBackend() {
   if (process.env.KAIROS_STATE_BACKEND !== "redis") {
     return "MEMORY_EPHEMERAL";
   }
-  return present("REDIS_URL") ? "READY" : "NOT_CONFIGURED";
+  return present("REDIS_URL") ? probeRedis(process.env.REDIS_URL) : "NOT_CONFIGURED";
 }
 
 function binance() {
@@ -109,9 +116,11 @@ function studioCli() {
 }
 
 const studio = studioCli();
+const state = stateBackend();
 console.log("KAIROS preflight");
 console.log("Values are not printed.");
-console.log(`STATE BACKEND\t${stateBackend()}`);
+console.log(`STATE BACKEND\t${state === "READY" ? "REDIS" : state}`);
+console.log(`PERSISTENCE\t${state === "READY" ? "DURABLE" : state === "MEMORY_EPHEMERAL" ? "EPHEMERAL" : "UNVERIFIED"}`);
 console.log(`BINANCE WEB3\t${binance()}`);
 console.log(`QWEN\t${qwen()}`);
 console.log(`FMP\t${fmp()}`);
@@ -128,4 +137,4 @@ console.log("DEPLOYMENT\tNOT_DEPLOYED");
 console.log(`STUDIO CLI\t${studio.compatibility}`);
 console.log(`STUDIO CLI SOURCE\t${studio.bin}`);
 console.log(`STUDIO CLI VERSION\t${studio.version ?? "UNAVAILABLE"}`);
-console.log(`PRODUCTION DURABLE\t${stateBackend() === "READY" ? "YES" : "NO"}`);
+console.log(`PRODUCTION DURABLE\t${state === "READY" ? "YES" : "NO"}`);

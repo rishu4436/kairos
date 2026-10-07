@@ -1,5 +1,23 @@
 # Deployment runbook
 
+## Phase 17H Redis configuration
+
+Set `KAIROS_STATE_BACKEND=redis` and `REDIS_URL` privately in Git-ignored
+`D:\kairos\.env.local`. For Upstash use Connect → TCP, the read/write `rediss://`
+connection URL; the HTTPS REST endpoint is unsupported by the RESP adapter.
+The URL includes authentication, so no separate Redis token variable is used.
+Do not copy credentials into `.env.example`, TOML, documentation, or chat.
+
+Run the gated real suite described in STATE_PERSISTENCE.md, then
+`npm run kairos:preflight` with the existing local modern KAIROS_BAG_BIN override.
+The preflight reads `.env.local` without printing values and reports REDIS /
+DURABLE only after PING succeeds. Unreachable Redis reports unverified and does
+not fall back to memory. The normal test suite skips remote Redis.
+
+Real remote persistence was verified on 2026-10-07. Studio deployment remains
+NOT_DEPLOYED and the operating wallet UNFUNDED. No funding, registration, commerce
+publication, provider-credential setup, signing, broadcasting, or x402 is authorized.
+
 ## Phase 17G completed readiness scope
 
 The throwaway BSC-testnet operating wallet is configured. The free ERC-8183

@@ -1,4 +1,6 @@
-export type ReadinessStatus = "READY" | "NOT_CONFIGURED" | "INCOMPATIBLE" | "BLOCKED" | "OPTIONAL" | "MEMORY_EPHEMERAL";
+import { probeRedis } from "@/runtime/redis-health.mjs";
+
+export type ReadinessStatus = "READY" | "NOT_CONFIGURED" | "INCOMPATIBLE" | "BLOCKED" | "OPTIONAL" | "MEMORY_EPHEMERAL" | "STATE_BACKEND_ERROR";
 
 export interface RuntimeReadiness {
   stateBackend: ReadinessStatus;
@@ -20,11 +22,11 @@ function present(value: string | undefined): boolean {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-/** Presence only. Values are never returned. */
+/** Provider presence plus a read-only Redis probe. Values are never returned. */
 export function collectReadiness(env: NodeJS.ProcessEnv = process.env): RuntimeReadiness {
   const redisSelected = env.KAIROS_STATE_BACKEND === "redis";
   const redisUrl = present(env.REDIS_URL);
-  const stateBackend: ReadinessStatus = !redisSelected ? "MEMORY_EPHEMERAL" : redisUrl ? "READY" : "NOT_CONFIGURED";
+  const stateBackend: ReadinessStatus = !redisSelected ? "MEMORY_EPHEMERAL" : redisUrl ? probeRedis(env.REDIS_URL) : "NOT_CONFIGURED";
   return {
     stateBackend,
     binanceWeb3: present(env.BINANCE_WEB3_API_KEY) && present(env.BINANCE_WEB3_SECRET_KEY) ? "READY" : "NOT_CONFIGURED",
@@ -61,7 +63,7 @@ export function readinessLabels(env: NodeJS.ProcessEnv = process.env): Readiness
   const ready = collectReadiness(env);
   return {
     autonomousRuntime: "LOCAL",
-    stateBackend: ready.stateBackend === "READY" ? "REDIS · DURABLE" : ready.stateBackend === "NOT_CONFIGURED" ? "REDIS · NOT CONFIGURED" : "MEMORY · EPHEMERAL",
+    stateBackend: ready.stateBackend === "READY" ? "REDIS · DURABLE" : ready.stateBackend === "STATE_BACKEND_ERROR" ? "REDIS · UNAVAILABLE" : ready.stateBackend === "NOT_CONFIGURED" ? "REDIS · NOT CONFIGURED" : "MEMORY · EPHEMERAL",
     identity: "NOT REGISTERED",
     operatingWallet: "NOT CONFIGURED",
     binanceData: ready.binanceWeb3 === "READY" ? "CONNECTED" : "NOT CONFIGURED",

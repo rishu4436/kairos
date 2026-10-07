@@ -1,5 +1,20 @@
 # Recovery
 
+## Phase 17H real-server evidence (2026-10-07)
+
+The gated `runtime/redis-live.integration.test.ts` recreates KAIROS domain services,
+stores, and TCP connections against privately configured Upstash. A controlled
+paper fixture is persisted and then reloaded: position quantity and metadata,
+research thesis/proposal/experiment, PAPER_ACTIVE lifecycle, performance sample
+size/version, and arbitration selection/cooldown survive. Completed-intent replay
+performs no second ledger mutation. An unfinished cycle becomes INTERRUPTED and
+its already-completed execution is recognized. Heartbeat and control records also
+round-trip. Connection failure returns STATE_BACKEND_ERROR.
+
+The verification uses only random test namespaces and removes their keys. No
+application namespace, provider configuration, wallet, or on-chain state is changed.
+Real remote verification supplements the original memory/fake protocol checks below.
+
 On the next cycle the store looks at the previous record. A non-terminal status (`EXECUTING_PAPER` and the other in-progress states) is copied as `INTERRUPTED`. The runtime does not replay that execution.
 
 Paper recovery reloads the account, position meta, intent stamps, and completed intent ids. The next cycle sees the open position and calls the Position Manager. It does not open a second independent position.

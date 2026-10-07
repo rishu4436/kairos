@@ -1,5 +1,18 @@
 # KAIROS
 
+## Phase 17H: local Redis durability (2026-10-07)
+
+The existing Redis state backend was verified against a real privately configured
+Upstash TCP/TLS instance. Git-ignored `.env.local` selects `KAIROS_STATE_BACKEND=redis`
+and stores `REDIS_URL`; no credential belongs in `.env.example` or source.
+Verification covers connectivity, atomic leases/CAS, serialization, restart
+recovery, idempotency, interrupted cycles, and bounded context retention.
+Preflight and runtime labels report REDIS / DURABLE after a successful probe;
+memory mode remains EPHEMERAL and Redis failures do not fall back to memory.
+See [State persistence](docs/STATE_PERSISTENCE.md) for the explicitly gated real
+integration suite. Agent Studio remains undeployed, its wallet unfunded, and
+live execution blocked. This phase does not execute a real trade.
+
 ## Phase 17G: external intelligence service (2026-10-07)
 
 The free ERC-8183 rail is configured for **KAIROS Market Intelligence Brief**.

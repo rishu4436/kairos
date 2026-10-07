@@ -1,5 +1,22 @@
 # Developer experience notes
 
+## Phase 17H real Redis validation
+
+Upstash Connect → TCP supplies the Redis TLS URL; REST credentials alone cannot
+connect the KAIROS RESP worker. Secret configuration lives only in `.env.local`.
+The remote suite is explicitly gated with KAIROS_REDIS_LIVE_TEST=1 and namespaces
+every key under a random `kairos:v1:test:` prefix. It cleans up only those keys.
+
+Network latency required normal lease assertions to use a 30-second TTL, while
+a separate short lease proves real expiration. Remote fixture recovery has a
+60-second test limit; local test timings remain unchanged. Remote CAS revealed
+null-field corruption from Lua JSON re-encoding, fixed by preserving original
+payload JSON inside the atomic versioned envelope. No Redis dependency was added.
+
+Preflight and runtime labels probe connectivity instead of treating URL presence
+as durability. Normal tests explicitly keep CLI-preflight fixtures on memory,
+and the gated remote suite is skipped by default. No real trade was executed.
+
 ## Phase 17G Studio schema verification
 
 Use the explicit modern bag.cmd path and run `corepack pnpm` from `studio/bnb`

@@ -32,14 +32,14 @@ describe("studio cli selection", () => {
       const missingRun = execFileSync(process.execPath, ["scripts/kairos-preflight.mjs"], {
         cwd: process.cwd(),
         encoding: "utf8",
-        env: { ...process.env, KAIROS_BAG_BIN: missing },
+        env: { ...process.env, KAIROS_STATE_BACKEND: "memory", REDIS_URL: "", KAIROS_BAG_BIN: missing },
       });
       expect(missingRun).toMatch(/STUDIO CLI\tINCOMPATIBLE/);
       expect(missingRun).toMatch(/STUDIO CLI SOURCE\tEXPLICIT/);
       const explicit = execFileSync(process.execPath, ["scripts/kairos-preflight.mjs"], {
         cwd: process.cwd(),
         encoding: "utf8",
-        env: { ...process.env, KAIROS_BAG_BIN: fake },
+        env: { ...process.env, KAIROS_STATE_BACKEND: "memory", REDIS_URL: "", KAIROS_BAG_BIN: fake },
       });
       expect(explicit).toMatch(/STUDIO CLI\tCOMPATIBLE/);
       expect(explicit).toMatch(/STUDIO CLI VERSION\t0\.0\.14/);

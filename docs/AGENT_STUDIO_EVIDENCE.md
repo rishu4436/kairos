@@ -1,5 +1,26 @@
 # Agent Studio evidence
 
+## Phase 17H Redis evidence (2026-10-07)
+
+Verification at 12:57 IST: all 7 real Redis integration tests passed. Default
+suite: 298 passed, 14 explicitly gated tests skipped. Preflight: STATE BACKEND
+REDIS, PERSISTENCE DURABLE, PRODUCTION DURABLE YES after successful probe.
+
+KAIROS real remote Upstash state was verified using the existing RESP adapter and
+private local configuration. Random temporary namespaces covered PING, write/read/
+delete, owner-only lease acquire/renew/release, TTL, CAS, JSON serialization,
+recovery of paper/research/performance/candidate/arbitration/position/context state,
+duplicate-intent replay, interrupted-cycle recovery, heartbeat, and control state.
+Tests removed their keys. No hostname, username, password, or URL is recorded.
+
+The null-preservation defect found on the real server was fixed in the atomic Lua
+CAS envelope. Preflight now loads private local configuration and probes Redis;
+production durability is never inferred solely from URL presence.
+
+This does not deploy Studio or authorize commerce. Studio remains CONFIGURED /
+NOT_DEPLOYED, operating wallet CONFIGURED / UNFUNDED, ERC-8004 NOT_REGISTERED,
+ERC-8183 NOT_PUBLISHED, trading wallet NOT_CONNECTED, and live execution BLOCKED.
+
 ## Phase 17G (2026-10-07; supersedes earlier observations)
 
 - Canonical starting HEAD: `cefa391e7de7305da1092b95e41cdffe21160fde`, clean main, pull unchanged.

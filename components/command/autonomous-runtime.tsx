@@ -11,7 +11,7 @@ export function AutonomousRuntimePanel({ snapshot }: { snapshot: Snapshot }) {
       <h2 id="autonomous-runtime-title" className="mt-1 text-lg">Paper cycle</h2>
       <dl className="mt-3 grid grid-cols-2 gap-3 text-sm lg:grid-cols-4">
         <Fact label="Autonomous runtime" value={snapshot.labels.autonomousRuntime} />
-        <Fact label="State backend" value={snapshot.durable ? "REDIS · DURABLE" : snapshot.labels.stateBackend} />
+        <Fact label="State backend" value={snapshot.labels.stateBackend} />
         <Fact label="Studio project" value={snapshot.labels.studioProject} />
         <Fact label="Deployment" value={snapshot.labels.deployment} />
         <Fact label="Agent identity" value={snapshot.labels.identity} />
