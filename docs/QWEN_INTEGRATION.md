@@ -1,5 +1,23 @@
 # Qwen integration
 
+## User-authorized retry — 2026-10-07
+
+At `2026-10-07T09:06:17.388Z` (14:36:17 IST), one additional request used the
+current private configuration, the same Redis context, model `qwen3.8-max`, and
+prompt 1.1. It returned no HTTP response within the 60-second client limit
+(60,022 ms). No output, thesis, proposal, experiment, or promotion was produced.
+Authentication success cannot be inferred from a request that did not respond.
+
+The first HTTP 401 record is preserved as
+[attempt 1](evidence/phase-17i-qwen-attempt-1.json); the
+[latest record](evidence/phase-17i-qwen.json) retains the provider's actual
+UPSTREAM_ERROR result. That category arose when the existing internal retry was
+blocked by the one-request wrapper. The adapter now supports an explicit
+single-attempt mode, used by this evidence harness, so future timeouts keep
+their TIMEOUT category without initiating another fetch. Normal callers retain
+the original two-attempt policy. A local regression test verifies this change;
+no third real request was made. The UI shows NO RESPONSE, not HTTP null.
+
 ## Phase 17I actual provider attempt
 
 Configured locally with private credentials; this alone does not mean connected.

@@ -4,7 +4,7 @@
 
 This is **RECORDED REAL PROVIDER EVIDENCE**, not a live response when replayed.
 Binance authenticated market data and Redis context replay succeeded. Qwen's
-single authorized request failed authentication; the complete intelligence
+first request failed authentication and the authorized retry produced no response; the complete intelligence
 chain is therefore **NOT VERIFIED**.
 
 | Proof | Result | Record |
@@ -15,7 +15,8 @@ chain is therefore **NOT VERIFIED**.
 | Public tokenized-securities information | HTTP 200; TSLAon on BSC; 591 ms | [Skills](evidence/phase-17i-skills.json) |
 | Token audit on that exact chain and contract | HTTP 200; provider returned UNSUPPORTED; 726 ms; risk fields null | Same skills record |
 | Real Redis context persistence / reconnect replay | PASS; complete context and research projection match | Same market record |
-| Qwen research | HTTP 401; AUTHENTICATION_ERROR; 840 ms; no thesis | [Qwen](evidence/phase-17i-qwen.json) |
+| Qwen research, first attempt | HTTP 401; AUTHENTICATION_ERROR; 840 ms; no thesis | [First attempt](evidence/phase-17i-qwen-attempt-1.json) |
+| Qwen research, user-authorized retry | No HTTP response within 60 seconds; 60,022 ms; no thesis | [Latest attempt](evidence/phase-17i-qwen.json) |
 
 Asset: underlying **TSLA**, representation **TSLAon**, Ondo Finance, BSC **56**,
 contract `0x2494b603319d4d9f9715c9f4496d9e0364b59d93`. It was resolved from the
@@ -39,8 +40,13 @@ is unavailable after the unsupported audit, and opportunity state is BLOCKED.
 FMP news and earnings are UNAVAILABLE / NOT_CONFIGURED, not absent events.
 
 Qwen requested `qwen3.8-max`, prompt 1.1, at `2026-10-07T07:54:13.483Z`.
+The retry started at `2026-10-07T09:06:17.388Z` (14:36:17 IST) and ended at
+`2026-10-07T09:07:17.410Z`. The existing provider retried internally after the
+60-second client limit; the harness blocked that second outbound send, leaving
+the original recorded category UPSTREAM_ERROR. Single-attempt mode now preserves
+TIMEOUT for future calls. No additional real call was made to test the fix.
 No response model or output was returned. Schema validity is false and semantic
-validation did not pass because authentication failed. No proposal, experiment,
+validation did not pass because no model output was returned. No proposal, experiment,
 or promotion occurred. Another request requires explicit authorization.
 
 The evidence user is separate from demo/paper trading state. Only the sanitized

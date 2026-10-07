@@ -190,6 +190,21 @@ describe("qwen provider", () => {
     expect(extractChatContent({ choices: [] })).toBeNull();
   });
 
+  it("preserves timeout classification when only one request is authorized", async () => {
+    let calls = 0;
+    const provider = new QwenReasoningProvider(qwenConfig(), async () => {
+      calls += 1;
+      const error = new Error("local timeout fixture");
+      error.name = "TimeoutError";
+      throw error;
+    }, 1);
+    const result = await provider.generateThesis(contextFor());
+    expect(calls).toBe(1);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errorCategory).toBe("TIMEOUT");
+    expect(readLlmAttempt()?.status).toBe("TIMEOUT");
+  });
+
   it("rejects an unknown provider and a missing Qwen base URL without using mock output", async () => {
     const providers: ReasoningProvider[] = [
       new MockReasoningProvider(),

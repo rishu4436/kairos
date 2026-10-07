@@ -1,5 +1,15 @@
 # Developer experience notes
 
+## Qwen retry outcome
+
+The user-authorized retry on 2026-10-07 produced no response within the 60-second
+limit. Preserve the original 401 attempt alongside the latest evidence. A
+transport wrapper alone bounded outbound calls but let the provider's internal
+retry mask the first timeout as UPSTREAM_ERROR. QwenReasoningProvider now accepts
+an explicit one-attempt limit; default callers still use two. The evidence
+harness selects one, and a local regression test proves exactly one fetch and
+TIMEOUT classification. No additional live request was sent after the retry.
+
 ## Phase 17I provider proof
 
 Use Node's `--env-file=.env.local` only for the explicitly gated evidence suites.

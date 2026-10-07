@@ -6,7 +6,6 @@ import { RESEARCH_THESIS_SCHEMA, STRATEGY_PROPOSAL_SCHEMA } from "@/research/sch
 import type { ResearchContext, ResearchThesis } from "@/research/types";
 
 const MAX_RESPONSE_CHARS = 64_000;
-const MAX_ATTEMPTS = 2;
 
 export interface QwenFetch {
   (input: string, init: RequestInit): Promise<Response>;
@@ -37,6 +36,7 @@ export class QwenReasoningProvider implements ReasoningProvider {
   constructor(
     private readonly config: LlmConfig,
     private readonly fetchImpl: QwenFetch = fetch,
+    private readonly maxAttempts: 1 | 2 = 2,
   ) {
     this.model = config.model;
   }
@@ -57,7 +57,7 @@ export class QwenReasoningProvider implements ReasoningProvider {
     const requestId = `qwen_${startedMs}`;
     const url = qwenChatUrl(this.config.qwenBaseUrl);
     let attempt = 0;
-    while (attempt < MAX_ATTEMPTS) {
+    while (attempt < this.maxAttempts) {
       try {
         const response = await this.fetchImpl(url, {
           method: "POST",
@@ -74,7 +74,7 @@ export class QwenReasoningProvider implements ReasoningProvider {
         }
         const statusCategory = httpCategory(response.status);
         if (statusCategory !== null) {
-          if (statusCategory === "UPSTREAM_ERROR" && attempt === 0) {
+          if (statusCategory === "UPSTREAM_ERROR" && attempt + 1 < this.maxAttempts) {
             attempt += 1;
             continue;
           }
@@ -102,7 +102,7 @@ export class QwenReasoningProvider implements ReasoningProvider {
         return this.succeed(promptVersion, responseId(body) ?? requestId, startedMs, value);
       } catch (error) {
         const timedOut = isTimeout(error);
-        if (attempt === 0) {
+        if (attempt + 1 < this.maxAttempts) {
           attempt += 1;
           continue;
         }

@@ -13,7 +13,7 @@ export function RecordedIntelligenceEvidence() {
         <Fact label="Token price at capture" value={`$${market.row.price}`} />
         <Fact label="Regime" value={market.row.regime} />
         <Fact label="Arbitration" value={market.row.arbitration?.decision ?? "CONTEXT BLOCKED"} />
-        <Fact label="Qwen" value={qwen.result.ok ? `RECORDED REAL RESPONSE · ${qwen.semanticValidation}` : `REQUEST FAILED · HTTP ${qwen.httpStatus}`} />
+        <Fact label="Qwen" value={qwen.result.ok ? `RECORDED REAL RESPONSE · ${qwen.semanticValidation}` : qwen.httpStatus === null ? "REQUEST FAILED · NO RESPONSE" : `REQUEST FAILED · HTTP ${qwen.httpStatus}`} />
         <Fact label="Requested model" value={qwen.requestedModel} />
         <Fact label="FMP" value="NOT CONFIGURED · NEWS / EARNINGS UNAVAILABLE" />
         <Fact label="Context replay" value={`REDIS · VERIFIED AT CAPTURE · ${market.replay}`} />

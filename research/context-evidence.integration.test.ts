@@ -50,7 +50,7 @@ describe.skipIf(!enabled)("one Qwen request on real persisted market context", (
         const body = await response.clone().json().catch(() => null);
         responseModel = typeof body?.model === "string" ? body.model : null;
         return response;
-      });
+      }, 1);
       const result = await provider.generateThesis(snapshot.research);
       const parsed = result.ok ? parseThesisDraft(result.value) : null;
       let thesis: ResearchThesis | null = null;

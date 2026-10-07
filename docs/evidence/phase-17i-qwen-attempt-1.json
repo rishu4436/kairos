@@ -3,24 +3,24 @@
   "contextId": "ctx:user_phase17i:56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93:cycle:user_phase17i:2026-10-07T07:52:48.058Z",
   "requestedModel": "qwen3.8-max",
   "responseModel": null,
-  "httpStatus": null,
+  "httpStatus": 401,
   "outboundRequests": 1,
   "result": {
     "ok": false,
-    "error": "The research provider failed.",
-    "errorCategory": "UPSTREAM_ERROR",
-    "latencyMs": 60022,
-    "requestId": "qwen_1791363977388",
+    "error": "The research provider rejected the credentials.",
+    "errorCategory": "AUTHENTICATION_ERROR",
+    "latencyMs": 840,
+    "requestId": "qwen_1791359653483",
     "provider": "qwen",
     "model": "qwen3.8-max",
     "promptVersion": "1.1",
-    "startedAt": "2026-10-07T09:06:17.388Z",
-    "completedAt": "2026-10-07T09:07:17.410Z"
+    "startedAt": "2026-10-07T07:54:13.483Z",
+    "completedAt": "2026-10-07T07:54:14.323Z"
   },
   "schemaValid": false,
   "semanticValidation": "FAIL",
   "reasons": [
-    "UPSTREAM_ERROR"
+    "AUTHENTICATION_ERROR"
   ],
   "thesis": null,
   "proposal": null,
