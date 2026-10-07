@@ -11,7 +11,7 @@ import {
 import { MEAN_REVERSION_PARAMS, MOMENTUM_PARAMS, WEEKEND_PARAMS } from "@/strategies/parameters";
 type AutonomousExecutionMode = "PAPER" | "LIVE_PREVIEW" | "LIVE";
 
-export const OPERATOR_SCHEMA_VERSION = 1 as const;
+export const OPERATOR_SCHEMA_VERSION = 2 as const;
 export const MIN_CYCLE_INTERVAL_MS = 5_000;
 export const MAX_CYCLE_INTERVAL_MS = 24 * 60 * 60 * 1000;
 export const IMPLEMENTED_STRATEGY_IDS = ["momentum", "mean-reversion", "weekend", "dca"] as const;
@@ -183,7 +183,7 @@ export function validateOperatorConfig(input: unknown): ConfigUpdateOk | ConfigU
   }
   const value = input as OperatorConfig;
   try {
-    assertInt(value.schemaVersion === OPERATOR_SCHEMA_VERSION, "unsupported schema");
+    assertInt(Number(value.schemaVersion) === 1 || Number(value.schemaVersion) === 2, "unsupported schema");
     assertInt(Number.isInteger(value.version) && value.version >= 1, "version");
     assertInt(value.source === "OPERATOR", "source");
     assertInt(value.identity?.userId === LOCAL_RUNTIME_USER_ID, "identity");

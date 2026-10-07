@@ -1,11 +1,19 @@
 import Link from "next/link";
+import { RunFlow } from "@/components/operator/run-flow";
+import { operatorMutationsAllowed } from "@/operator/guard";
+import { buttonAvailability, controlFace, percentLabel, AUTO_PROFILES } from "@/operator/mandate";
 import { detectPosture } from "@/operator/posture";
 import { readOperatorConfig } from "@/operator/store";
+import { autonomousStore } from "@/runtime/store";
+import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import { loadProductionDashboard } from "@/services/dashboard";
 
 export async function CommandCenter() {
   const dashboard = await loadProductionDashboard();
   const posture = detectPosture(readOperatorConfig());
+  const control = autonomousStore().readControl(LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID);
+  const buttons = buttonAvailability(controlFace(control, false), true);
+  const capital = AUTO_PROFILES.MEDIUM;
   const mode = dashboard.executionMode === "LIVE" ? "LIVE" : dashboard.executionMode === "LIVE_PREVIEW" ? "LIVE PREVIEW" : "PAPER";
   const decisions = dashboard.arbitration.filter((row) => row.decision !== "—");
   const headline = decisions[0];
@@ -24,10 +32,13 @@ export async function CommandCenter() {
         </div>
       </header>
 
+      {operatorMutationsAllowed() ? <div className="mb-3"><RunFlow buttons={buttons} /></div> : null}
       <section className="grid gap-3 sm:grid-cols-3">
         <Fact label="USDT" value={dashboard.wallet.usdt} />
         <Fact label="BNB" value={dashboard.wallet.bnb} />
         <Fact label="Next cycle" value={clock(dashboard.agent.nextCycle)} />
+        <Fact label="Deployable" value={percentLabel(capital.deployableCapitalBps)} />
+        <Fact label="Per trade" value={percentLabel(capital.perTradeBpsOfDeployable)} />
       </section>
 
       <section className="panel mt-3">

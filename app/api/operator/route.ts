@@ -1,6 +1,9 @@
 import { assertOperatorMutation } from "@/operator/guard";
 import { applyRiskPosture, applyRuntimeAction, patchOperatorConfig, requestOneCycle, type OperatorAction } from "@/operator/actions";
 import { POSTURES, type RiskPosture } from "@/operator/posture";
+import { admitOperatorAction, controlFace } from "@/operator/mandate";
+import { autonomousStore } from "@/runtime/store";
+import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import { readOperatorConfig } from "@/operator/store";
 import { operatorMutationsAllowed } from "@/operator/guard";
 
@@ -21,6 +24,13 @@ export async function POST(request: Request): Promise<Response> {
   }
   const body = (await request.json().catch(() => null)) as { action?: OperatorAction; patch?: Record<string, unknown> } | null;
   const action = body?.action;
+  if (action === "RUN" || action === "STOP" || action === "ONE_CYCLE") {
+    const face = controlFace(autonomousStore().readControl(LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID), false);
+    const allowed = admitOperatorAction(action, face, true);
+    if (!allowed.ok) {
+      return Response.json(allowed, { status: 409 });
+    }
+  }
   if (action === "ONE_CYCLE") {
     const outcome = await requestOneCycle();
     return Response.json({ ok: true, cycleId: outcome.cycleId, status: outcome.status, signed: false, broadcast: false });

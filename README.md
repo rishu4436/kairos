@@ -6,7 +6,7 @@ KAIROS is an autonomous multi-strategy tokenized-equity trading agent. Productio
 
 - Canonical underlying/representation discovery, prices, candles, freshness, sessions, regimes, and features.
 - Momentum, mean reversion, weekend/off-hours (observation/dislocation HOLD only), and deterministic DCA strategies, arbitration, and position management.
-- Local Operator Console (`/operator`) for a single self-hosted owner: RUN/PAUSE/STOP, config, risk, and strategy settings. The public dashboard is read-only.
+- Local operator desk for one owner: RUN, STOP, and RUN ONE CYCLE. AUTO and MANUAL are mandates over the same cycle, not separate engines. Paper simulation is only for thesis research.
 - User-scoped risk policies, trade intents, execution simulation, paper accounting, idempotency, and lifecycle history.
 - Research Brain with Qwen, Gemini, and xAI adapters, strict output schemas, evidence validation, and a declarative Strategy DSL. Mock reasoning is explicitly selected for development/tests.
 - Strategy Lab experiments, shadow candidates, measured performance, and guarded promotion analysis.
@@ -37,7 +37,7 @@ Use Node.js 22 or newer. Install the root dependencies with `npm ci`, copy `.env
 6. Set `KAIROS_OPERATOR_ENABLED=true` only on the self-hosted owner instance.
 7. Start `npm run kairos:runner` and `npm run dev`.
 8. Open `/operator` (control plane) and `/` (read-only dashboard).
-9. Choose PAPER, LIVE_PREVIEW, or LIVE (LIVE needs an explicit confirmation).
+9. On the desk, choose AUTO (Low, Medium, or High) or MANUAL. Normal operation is live preview until you explicitly arm live execution. Paper experiments stay in the thesis lab.
 10. Configure strategies and risk, then RUN.
 
 Public dashboard = sanitized persisted snapshots. Local operator console = owner control plane. LLM theses stay paper-first and never auto-promote into the live registry.

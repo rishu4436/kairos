@@ -98,7 +98,7 @@ export class LocalKairosRunner {
   }
 
   async tick(nowMs = this.now()): Promise<AutonomousCycleOutcome | null> {
-    if (!this.started || this.stopping || this.inFlight || !this.scheduler.due(nowMs)) {
+    if (!this.started || this.stopping || this.inFlight || !this.due(nowMs)) {
       return null;
     }
     this.inFlight = true;
