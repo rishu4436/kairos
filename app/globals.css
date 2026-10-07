@@ -1,0 +1,237 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-ink: #07080b;
+  --color-panel: #10141c;
+  --color-line: #2c3342;
+  --color-paper: #f3efe4;
+  --color-muted: #c9c2b4;
+  --color-faint: #a39c90;
+  --color-signal: #e4b15a;
+  --color-aqua: #8fd0c6;
+  --color-gain: #9ed4b4;
+  --color-loss: #e7a296;
+}
+
+@layer base {
+  html {
+    height: 100%;
+  }
+
+  body {
+    min-height: 100%;
+    background:
+      radial-gradient(880px 420px at 8% -12%, rgba(228, 177, 90, 0.09), transparent 55%),
+      var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans), sans-serif;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 3px;
+  }
+}
+
+.num {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.page-title {
+  margin-top: 0.35rem;
+  font-size: clamp(1.7rem, 2vw, 2.05rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+}
+
+.panel {
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-panel) 94%, black);
+  padding: 1rem 1rem 1.05rem;
+}
+
+.panel-risk {
+  border-color: color-mix(in srgb, var(--color-signal) 55%, var(--color-line));
+  background:
+    linear-gradient(180deg, rgba(228, 177, 90, 0.07), transparent 120px),
+    var(--color-panel);
+}
+
+.panel-lab {
+  border-style: dashed;
+}
+
+.decision-panel {
+  background:
+    radial-gradient(460px 200px at 100% 0%, rgba(228, 177, 90, 0.1), transparent 62%),
+    var(--color-panel);
+}
+
+.decision-action {
+  font-size: clamp(2.6rem, 5vw, 4.4rem);
+  line-height: 0.85;
+  letter-spacing: -0.045em;
+  font-weight: 500;
+}
+
+.nav-link {
+  display: block;
+  white-space: nowrap;
+  border-radius: 8px;
+  padding: 0.48rem 0.72rem;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+}
+
+.nav-link:hover {
+  color: var(--color-paper);
+  background: rgba(243, 239, 228, 0.04);
+}
+
+.nav-link-active {
+  color: #1a1408;
+  background: var(--color-signal);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pill-signal {
+  border-color: color-mix(in srgb, var(--color-signal) 55%, transparent);
+  color: var(--color-signal);
+}
+
+.pill-gain {
+  border-color: color-mix(in srgb, var(--color-gain) 50%, transparent);
+  color: var(--color-gain);
+}
+
+.pill-loss {
+  border-color: color-mix(in srgb, var(--color-loss) 55%, transparent);
+  color: var(--color-loss);
+}
+
+.pill-aqua {
+  border-color: color-mix(in srgb, var(--color-aqua) 50%, transparent);
+  color: var(--color-aqua);
+}
+
+.meter {
+  margin-top: 0.4rem;
+  height: 0.35rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(243, 239, 228, 0.08);
+}
+
+.meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-signal);
+}
+
+.meter-fill-aqua {
+  background: var(--color-aqua);
+}
+
+.phase-banner {
+  margin-bottom: 1.25rem;
+  border: 1px dashed var(--color-line);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.data-table thead th {
+  padding: 0 0.85rem 0.65rem 0;
+  color: var(--color-muted);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.data-table td,
+.data-table tbody th {
+  padding: 0.62rem 0.85rem 0.62rem 0;
+  border-top: 1px solid var(--color-line);
+  vertical-align: middle;
+  text-align: left;
+  font-weight: 400;
+}
+
+.data-table tbody th {
+  font-weight: 500;
+}
+
+.strategy-tile {
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  padding: 0.8rem 0.85rem 0.9rem;
+  background: rgba(243, 239, 228, 0.02);
+}
+
+.strategy-soon {
+  opacity: 0.72;
+}
+
+.state-card {
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+}
+
+.state-current {
+  border-color: color-mix(in srgb, var(--color-signal) 70%, var(--color-line));
+  background: rgba(228, 177, 90, 0.06);
+}
+
+.pulse {
+  animation: kairos-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes kairos-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    animation: none;
+  }
+}

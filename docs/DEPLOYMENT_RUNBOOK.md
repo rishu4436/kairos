@@ -1,0 +1,107 @@
+# Deployment runbook
+
+Paper and read-only only. This runbook does not connect the Agentic Wallet, sign, broadcast, or spend x402. Secret values are names, never literals.
+
+Phase 16 stopped before a real Agent Studio deploy. The installed `bag` is 0.0.5. Current docs and the published package `@bnbagent/studio-cli@0.0.14` do not match that binary. Do not invent `studio.toml` for the old CLI.
+
+## 1. Dependencies
+
+- Node.js 22 or newer. This machine had v24.18.0.
+- npm. This machine had 12.0.0.
+- Corepack. This machine had 0.35.0.
+- pnpm. Current Studio docs ask for pnpm 10. This machine had pnpm 11.10.0. Do not downgrade it silently.
+- Bun 1.3 or newer where the current deploy path requires it. This machine had 1.4.2.
+- Agent Studio CLI, only after an explicit global upgrade:
+
+```text
+npm install --global @bnbagent/studio-cli
+```
+
+Confirm `bag --help` and `bag <group> --help` before using any command from the website.
+
+## 2. Environment names
+
+Server only. Do not prefix secrets with `NEXT_PUBLIC`.
+
+| Name | Role |
+| --- | --- |
+| `KAIROS_DATA_MODE` | `paper` or `live`. Paper is the default. |
+| `KAIROS_STATE_BACKEND` | `memory` or `redis`. |
+| `REDIS_URL` | Required when the backend is `redis`. |
+| `KAIROS_CYCLE_INTERVAL_MS` | Suggested cycle gap. |
+| `KAIROS_RESEARCH_INTERVAL_MS` | Research cadence. |
+| `BINANCE_WEB3_API_KEY` | Signed market-data reads. |
+| `BINANCE_WEB3_SECRET_KEY` | HMAC secret for those reads. |
+| `KAIROS_LLM_PROVIDER` | `qwen` when research should call Qwen. |
+| `KAIROS_LLM_API_KEY` | Qwen key. |
+| `KAIROS_LLM_MODEL` | `qwen3.8-max` for that provider. |
+| `KAIROS_QWEN_BASE_URL` | Workspace Chat Completions base. |
+| `FMP_API_KEY` | Underlying earnings and news. |
+| `KAIROS_WALLET_ADDRESS` | Not used for trading in this phase. |
+
+Leave `KAIROS_AGENTIC_WALLET_EXECUTE`, `KAIROS_AGENTIC_WALLET_LIVE`, and `KAIROS_EXECUTION_LIVE_TEST` unset or `0`.
+
+## 3. State backend
+
+Use Redis before calling a deployment production-durable. Without `REDIS_URL`, preflight reports `MEMORY_EPHEMERAL` and production durable `NO`.
+
+The Redis path is lease acquire, owner renew, owner release, and revision CAS. A missing URL fails closed with `STATE_BACKEND_NOT_CONFIGURED`.
+
+## 4. Studio setup
+
+Do this only after the upgraded CLI's own help matches the current docs.
+
+- Generate a Studio project with the installed CLI. Do not move the Next.js app.
+- Keep KAIROS behavior behind `runKairosAutonomousCycle`.
+- `studio.toml` comes from that CLI's schema. The operating wallet is not the user's Agentic Wallet.
+- Execution mode is `PAPER` or `LIVE_PREVIEW`. Never `LIVE`.
+- Do not register ERC-8004 by hand. If Studio does not register, identity stays `NOT REGISTERED`.
+- Do not force ERC-8183 into the stock engine.
+- Do not spend x402 unless a later explicit approval names a tiny test.
+
+## 5. Preflight
+
+```text
+npm run kairos:preflight
+```
+
+The command prints statuses only.
+
+## 6. Paper test
+
+```text
+npm test
+```
+
+Confirm one paper fill is not repeated after a reload when the durable store is in use.
+
+## 7. Deploy
+
+Do not deploy while preflight says `DEPLOYMENT_BLOCKED`.
+
+When the current CLI and a valid project exist, use the deploy subcommands that `bag deploy --help` actually prints. Do not force NodeOps or an AWS-only path unless that help lists it. Successful `next build` is not a deployment.
+
+The deployed process must keep live broadcast false and the trading wallet disconnected.
+
+## 8. Verify
+
+Use the verify, status, and logs commands from the installed CLI. Check deployment status, runtime health, the agent endpoint, heartbeat, two paper cycles, the state backend, paper readiness, and live readiness.
+
+## 9. Identity and operating wallet
+
+If Studio returns a registration, record the agent id, network, public registration reference, endpoint, and operating address. Do not record a private key. If it does not, write `NOT REGISTERED`.
+
+Read a public balance only. Do not fund the operating wallet in this runbook. Do not use it as trading capital.
+
+## 10. Health
+
+The command center and `/agent` show autonomous runtime, state backend, identity, operating wallet, Binance data, Binance skills, Qwen, FMP, trading wallet, and live execution. Those labels must match preflight.
+
+## Phase 17
+
+After this paper path is actually deployed, or the user accepts the blocked local proof:
+
+1. Approve the `baw` upgrade from 1.9.0 to at least 1.10.0. The wallet skill on the hub is 1.12.0.
+2. Connect the Agentic Wallet as the trading identity. It stays distinct from the Studio operating wallet.
+3. Run a real quote, then simulation, against a tokenized stock KAIROS already resolved.
+4. A tiny execution is a separate explicit approval. It is not part of Phase 16.
