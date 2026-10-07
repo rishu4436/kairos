@@ -1,0 +1,39 @@
+{
+  "label": "RECORDED REAL PROVIDER EVIDENCE",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "contextSource": "RECORDED_BINANCE_REDIS",
+  "contextId": "ctx:user_phase17i:56:0x2494b603319d4d9f9715c9f4496d9e0364b59d93:cycle:user_phase17i:2026-10-07T07:52:48.058Z",
+  "dataTimestamp": "2026-10-07T07:52:48.058Z",
+  "requestTimestamp": "2026-10-07T09:43:38.646Z",
+  "httpStatus": null,
+  "outboundRequests": 1,
+  "latencyMs": 15018,
+  "result": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "promptVersion": "1.1",
+    "requestId": "gemini_1791366218646",
+    "startedAt": "2026-10-07T09:43:38.646Z",
+    "completedAt": "2026-10-07T09:43:53.664Z",
+    "latencyMs": 15018,
+    "ok": false,
+    "errorCategory": "TIMEOUT",
+    "error": "Gemini research request failed (TIMEOUT)."
+  },
+  "schemaValid": false,
+  "semanticValidation": "FAIL",
+  "reasons": [
+    "TIMEOUT"
+  ],
+  "thesis": null,
+  "proposal": null,
+  "proposalState": "NOT_REQUESTED; separate proposal needs a second request",
+  "experiment": null,
+  "experimentState": "NOT_RUN; no proposal requested",
+  "tools": false,
+  "wallet": false,
+  "execution": false,
+  "riskOverride": false,
+  "livePromotion": false
+}

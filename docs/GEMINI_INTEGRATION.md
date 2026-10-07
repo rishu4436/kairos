@@ -49,4 +49,8 @@ The strict thesis schema contains no strategy proposal. Proposal generation need
 
 ## Implementation status
 
-Gemini implemented; private credentials and a real Gemini request pending. Configuration checks and mocked successes do not establish real model connectivity.
+Gemini implemented and privately selected; the one user-authorized live request on October 7, 2026 timed out. Configuration presence and mocked successes do not establish real model connectivity.
+
+The request started at `2026-10-07T09:43:38.646Z` and ended at `2026-10-07T09:43:53.664Z`, latency 15,018 ms, category TIMEOUT. No HTTP response was received, so authentication and model availability remain unverified. Exactly one request used the exact recorded TSLAon context reloaded from Redis; no Binance market data was fetched again. See [recorded Gemini attempt](evidence/gemini.json).
+
+No model output was available for schema or semantic validation. The record therefore reports schemaValid false and semanticValidation FAIL due to TIMEOUT, rather than a rejected model thesis. No thesis, proposal, experiment, wallet operation, trade, or promotion occurred. No retry or other provider was called. Existing Qwen evidence is unchanged; the evidence index has no successful Gemini proof to add. A further live request requires separate user authorization.
