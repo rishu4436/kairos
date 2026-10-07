@@ -23,8 +23,10 @@ async function post(body: Record<string, unknown>) {
 export function StrategyControl({
   posture,
   manual,
+  choices,
 }: {
   posture: RiskPosture | "MANUAL";
+  choices: { strategies: string[]; assets: string[]; supportedAssets: string[] };
   manual: {
     momentumReturn: string;
     momentumVol: string;
@@ -53,6 +55,8 @@ export function StrategyControl({
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const dip = Number(data.get("dcaDip"));
+    const selectedStrategies = data.getAll("strategy").map(String);
+    const selectedAssets = data.getAll("asset").map(String);
     const result = await post({
       action: "CONFIG_PATCH",
       patch: {
@@ -81,8 +85,8 @@ export function StrategyControl({
           operatorMode: "MANUAL",
           autoProfile: null,
           autoProfileVersion: null,
-          selectedManualStrategies: ["momentum", "mean-reversion", "weekend", "dca"],
-          selectedManualAssets: [],
+          selectedManualStrategies: selectedStrategies,
+          selectedManualAssets: selectedAssets,
         },
       },
     });
@@ -123,6 +127,28 @@ export function StrategyControl({
         </div>
       ) : (
         <form className="panel space-y-4" onSubmit={(event) => void saveManual(event)}>
+          <fieldset>
+            <legend className="text-sm font-medium">Strategies</legend>
+            <div className="mt-2 flex flex-wrap gap-3 text-sm">
+              {["momentum", "mean-reversion", "weekend", "dca"].map((id) => (
+                <label key={id} className="flex items-center gap-2">
+                  <input type="checkbox" name="strategy" value={id} defaultChecked={choices.strategies.includes(id)} />
+                  {id}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend className="text-sm font-medium">Assets</legend>
+            <div className="mt-2 flex flex-wrap gap-3 text-sm">
+              {choices.supportedAssets.map((ticker) => (
+                <label key={ticker} className="flex items-center gap-2">
+                  <input type="checkbox" name="asset" value={ticker} defaultChecked={choices.assets.includes(ticker)} />
+                  {ticker}
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <fieldset>
             <legend className="text-sm font-medium">Momentum</legend>
             <div className="mt-2 grid gap-3 sm:grid-cols-3">

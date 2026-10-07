@@ -1,6 +1,9 @@
 import type { ObservationBoard } from "@/domain/observation";
 import type { MarketObservationSnapshot, ObserveMarket } from "@/runtime/observe";
-import { configuredWatchlist, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
+import { LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
+import { readOperatorConfig } from "@/operator/store";
+import { observationUniverse } from "@/operator/active-universe";
+import type { OperatorConfig } from "@/operator/config";
 import { observeWatchlist } from "@/observation/engine";
 import { emptyHealth, observationEvents, rowFromLive } from "@/observation/board";
 import { noteLiveSuccess, readLastSuccess } from "@/observation/health-memory";
@@ -16,14 +19,14 @@ import { CANDLE_REFRESH_MS, CANDLE_RETRY_MS } from "@/strategies/parameters";
 import type { Candle } from "@/domain/candle";
 import { publishPublicMarketSnapshot } from "@/studio/intelligence";
 
-export const observeLiveMarket: ObserveMarket = async ({ userId, now }) => {
-  const snapshot = await liveObservationSnapshot(userId);
+export const observeLiveMarket: ObserveMarket = async ({ userId, now, operator }) => {
+  const snapshot = await liveObservationSnapshot(userId, undefined, operator);
   void now;
   return snapshot;
 };
 
-export async function liveObservationSnapshot(userId: string, signal?: AbortSignal): Promise<MarketObservationSnapshot> {
-  const { board, candles } = await runLiveObservation(userId, signal);
+export async function liveObservationSnapshot(userId: string, signal?: AbortSignal, operator?: OperatorConfig): Promise<MarketObservationSnapshot> {
+  const { board, candles } = await runLiveObservation(userId, signal, operator);
   return { board, candles };
 }
 
@@ -32,7 +35,7 @@ export async function liveObservationBoard(userId: string, signal?: AbortSignal)
   return board;
 }
 
-async function runLiveObservation(userId: string, signal?: AbortSignal): Promise<{ board: ObservationBoard; candles: Map<string, Candle[]> }> {
+async function runLiveObservation(userId: string, signal?: AbortSignal, operator?: OperatorConfig): Promise<{ board: ObservationBoard; candles: Map<string, Candle[]> }> {
   if (userId !== LOCAL_RUNTIME_USER_ID) {
     throw new KairosApiError({
       category: "DATA_UNAVAILABLE",
@@ -41,7 +44,9 @@ async function runLiveObservation(userId: string, signal?: AbortSignal): Promise
     });
   }
   const config = readBinanceConfig();
-  const watchlist = configuredWatchlist(userId);
+  const mandate = operator ?? readOperatorConfig();
+  const universe = observationUniverse(mandate);
+  const watchlist = universe.ok ? universe.watchlist : { id: "empty", userId, name: "Empty", tickers: [], items: [] };
   const receivedAt = new Date();
   const gateway = createBinanceGateway(new BinanceWeb3Client({ config }));
   const run = await observeWatchlist({
@@ -122,6 +127,7 @@ async function runLiveObservation(userId: string, signal?: AbortSignal): Promise
     asOfMs: receivedAt.getTime(),
     historyHealth,
     record: (signal) => signalLog.record(signal),
+    operator: mandate,
   });
   return { board: enriched, candles };
 }

@@ -13,6 +13,7 @@ import { autonomousStore } from "@/runtime/store";
 import { readOperatorCommand, writeControl, writeOperatorCommand } from "@/operator/commands";
 import { readOperatorConfig } from "@/operator/store";
 import { operatorExecutionMode } from "@/operator/runtime-mode";
+import { beginOperatorCycle, endOperatorCycle } from "@/operator/cycle-lock";
 
 const DEFAULT_INTERVAL_MS = 60_000;
 
@@ -102,6 +103,10 @@ export class LocalKairosRunner {
     if (!this.started || this.stopping || this.inFlight || !this.due(nowMs)) {
       return null;
     }
+    const store = this.options.store ?? autonomousStore();
+    if (!beginOperatorCycle(store, this.ownerId)) {
+      return null;
+    }
     this.inFlight = true;
     try {
       const outcome = await this.runOnce(nowMs);
@@ -121,6 +126,7 @@ export class LocalKairosRunner {
       this.scheduler.recordFailure(nowMs);
       throw new Error("LOCAL_RUNNER_CYCLE_FAILED");
     } finally {
+      endOperatorCycle(store);
       this.inFlight = false;
       if (this.stopping) {
         this.flushStop();

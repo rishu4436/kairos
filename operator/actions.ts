@@ -120,11 +120,10 @@ export function saveMandate(
         version: current.version + 1,
         previousVersion: current.version,
         mandate: {
+          ...current.mandate,
           operatorMode: "MANUAL" as const,
           autoProfile: null,
           autoProfileVersion: null,
-          selectedManualStrategies: ["momentum", "mean-reversion", "weekend", "dca"],
-          selectedManualAssets: current.watchlist.entries.map((entry) => entry.ticker),
         },
         runtime: { ...current.runtime, executionMode: "LIVE_PREVIEW" as const },
         risk: { ...current.risk, liveTradingEnabled: false, paperTradingEnabled: false },

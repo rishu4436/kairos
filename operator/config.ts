@@ -1,6 +1,7 @@
 import { asAgentId, asPolicyId, asUserId } from "@/domain/ids";
 import type { RiskPolicy } from "@/domain/models";
 import { parseDecimal, type Scaled } from "@/domain/money";
+import { bpsOf } from "@/operator/mandate";
 import { PRODUCTION_CHAIN_ID } from "@/domain/network";
 import {
   CONFIGURED_WATCHLIST_TICKERS,
@@ -322,16 +323,31 @@ export function applyOperatorPatch(
   return validateOperatorConfig(next);
 }
 
-export function riskPolicyFromOperator(config: OperatorConfig): RiskPolicy {
+export function riskPolicyFromOperator(config: OperatorConfig, eligibleBalance?: Scaled): RiskPolicy {
+  const absoluteDaily = parseDecimal(config.risk.maxDailyLoss);
+  const absolutePosition = parseDecimal(config.risk.maxPositionNotional);
+  let maxDailyLoss = absoluteDaily;
+  let maxPositionNotional = absolutePosition;
+  if (eligibleBalance != null && eligibleBalance > 0n) {
+    const deployable = bpsOf(eligibleBalance, config.capital.deployableCapitalBps);
+    const percentDaily = bpsOf(deployable, config.capital.dailyLossBpsOfDeployable);
+    const percentPosition = bpsOf(deployable, config.capital.maxPositionBpsOfDeployable);
+    if (percentDaily > 0n && percentDaily < maxDailyLoss) {
+      maxDailyLoss = percentDaily;
+    }
+    if (percentPosition > 0n && percentPosition < maxPositionNotional) {
+      maxPositionNotional = percentPosition;
+    }
+  }
   return {
     id: asPolicyId(DEFAULT_POLICY_ID),
     userId: asUserId(config.identity.userId),
     agentId: asAgentId(config.identity.agentId),
     liveTradingEnabled: config.risk.liveTradingEnabled,
-    paperTradingEnabled: config.risk.paperTradingEnabled,
-    maxPositionNotional: parseDecimal(config.risk.maxPositionNotional),
+    paperTradingEnabled: false,
+    maxPositionNotional,
     maxAllocationBps: config.risk.maxAllocationBps,
-    maxDailyLoss: parseDecimal(config.risk.maxDailyLoss),
+    maxDailyLoss,
     maxSlippageBps: config.risk.maxSlippageBps,
     allowedAssets: [...config.risk.allowedAssets],
   };

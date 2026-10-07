@@ -1,7 +1,7 @@
 import type { IntelligenceStrategy } from "@/strategies/types";
 import { blocked, makeSignal } from "@/strategies/signal-base";
 import { parseDecimal } from "@/domain/money";
-import { budgetRemaining, dipTriggered, dcaEligibleKey, emptyDcaState } from "@/strategies/dca-math";
+import { dipTriggered, dcaEligibleKey, emptyDcaState } from "@/strategies/dca-math";
 
 
 export const DCA_VERSION = "1";
@@ -40,9 +40,6 @@ export const dcaStrategy: IntelligenceStrategy = {
     const book = context.operator?.dca ?? emptyDcaState(context.representationId, context.ticker, params.mode, params.reference);
     if (book.tranchesCompleted >= params.maxTranches) {
       return hold(context, params, "Maximum DCA tranches reached.");
-    }
-    if (budgetRemaining(book.budgetSpent, params.maxBudgetNotional) < parseDecimal(params.baseOrderNotional)) {
-      return hold(context, params, "DCA budget remaining is below the base order.");
     }
     if (params.mode === "TIME_BASED") {
       if (book.lastFillAtMs !== null && context.asOfMs - book.lastFillAtMs < params.intervalMs) {

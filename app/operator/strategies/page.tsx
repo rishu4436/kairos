@@ -1,5 +1,6 @@
 import { StrategyControl } from "@/components/operator/strategy-control";
 import { PageHeader } from "@/components/ui/page-header";
+import { CONFIGURED_WATCHLIST_TICKERS } from "@/domain/watchlist";
 import { detectPosture } from "@/operator/posture";
 import { readOperatorConfig } from "@/operator/store";
 
@@ -22,6 +23,11 @@ export default function OperatorStrategiesPage() {
       />
       <StrategyControl
         posture={posture}
+        choices={{
+          strategies: config.mandate.selectedManualStrategies,
+          assets: config.mandate.selectedManualAssets,
+          supportedAssets: [...CONFIGURED_WATCHLIST_TICKERS],
+        }}
         manual={{
           momentumReturn: (m.minReturnBps / 100).toFixed(2),
           momentumVol: (m.maxVolatilityBps / 100).toFixed(2),

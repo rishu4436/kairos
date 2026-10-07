@@ -4,6 +4,9 @@ import type { AgentTradeIntent } from "@/paper/intent";
 import type { PaperExecutionPolicy } from "@/paper/policy";
 import type { StructuredRiskDecision } from "@/paper/risk-gate";
 import { previewPaperExecution, type PaperMarketSnapshot, type PaperSimulation } from "@/paper/simulate";
+import { formatDecimal, parseDecimal } from "@/domain/money";
+import { emptyDcaState } from "@/strategies/dca-math";
+import { readDcaState, writeDcaState } from "@/strategies/dca-state";
 
 export const PAPER_EXECUTION_STATUSES = ["FILLED", "PARTIALLY_FILLED", "REJECTED", "EXPIRED"] as const;
 export type PaperExecutionStatus = (typeof PAPER_EXECUTION_STATUSES)[number];
@@ -112,6 +115,9 @@ export function executePaper(input: {
     return reject("REJECTED", simulation);
   }
 
+  if (input.intent.strategyId === "dca" && input.intent.action === "BUY") {
+    recordPaperDcaFill(input.intent, simulation.estimatedNotional, input.nowMs);
+  }
   return {
     simulation,
     execution: {
@@ -134,6 +140,20 @@ export function executePaper(input: {
       signature: null,
     },
   };
+}
+
+function recordPaperDcaFill(intent: AgentTradeIntent, notional: Scaled, nowMs: number): void {
+  const current = readDcaState(intent.userId, intent.agentId, intent.assetId) ?? emptyDcaState(intent.assetId, intent.ticker, "DIP_BASED", "LAST_DCA_FILL");
+  const spent = parseDecimal(current.budgetSpent) + notional;
+  writeDcaState(intent.userId, intent.agentId, {
+    ...current,
+    initialReference: current.initialReference ?? formatDecimal(intent.observedPrice, 6),
+    lastFillPrice: formatDecimal(intent.observedPrice, 6),
+    lastFillAtMs: nowMs,
+    tranchesCompleted: current.tranchesCompleted + 1,
+    budgetSpent: formatDecimal(spent, 6),
+    status: "ACTIVE",
+  });
 }
 
 function fail(simulation: PaperSimulation, reason: string): PaperSimulation {

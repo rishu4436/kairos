@@ -82,7 +82,7 @@ export async function runKairosAutonomousCycle(raw: AutonomousCycleInput): Promi
   const input: AutonomousCycleInput = {
     ...raw,
     operatorConfig: frozenConfig,
-    riskPolicy: raw.riskPolicy ?? riskPolicyFromOperator(frozenConfig),
+    riskPolicy: raw.riskPolicy ?? riskPolicyFromOperator(frozenConfig, raw.account?.cash),
   };
   const startedAt = new Date(input.startedAtMs).toISOString();
   const cycleId = `cycle_${input.userId}_${input.agentId}_${input.startedAtMs}`;
@@ -155,7 +155,7 @@ export async function runKairosAutonomousCycle(raw: AutonomousCycleInput): Promi
     push("OBSERVING");
     let snapshot;
     try {
-      snapshot = await input.observeMarket({ userId: input.userId, now: new Date(input.startedAtMs) });
+      snapshot = await input.observeMarket({ userId: input.userId, now: new Date(input.startedAtMs), operator: frozenConfig });
     } catch (error) {
       errors.push(failure("MARKET_DATA_ERROR", error instanceof Error ? error.message : "Observation failed."));
       return finish(input, store, cycleId, startedAt, "DEGRADED", [], [], errors, warnings, [], true, input.executionMode !== "PAPER", null, transitions, [], null);

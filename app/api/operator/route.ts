@@ -2,6 +2,7 @@ import { assertOperatorMutation } from "@/operator/guard";
 import { applyRiskPosture, applyRuntimeAction, patchOperatorConfig, requestOneCycle, saveMandate, type OperatorAction } from "@/operator/actions";
 import { POSTURES, type RiskPosture } from "@/operator/posture";
 import { admitOperatorAction, controlFace } from "@/operator/mandate";
+import { mandateReady } from "@/operator/active-universe";
 import { cycleInFlight } from "@/operator/cycle-lock";
 import { autonomousStore } from "@/runtime/store";
 import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
@@ -27,7 +28,7 @@ export async function POST(request: Request): Promise<Response> {
   const action = body?.action;
   if (action === "RUN" || action === "STOP" || action === "ONE_CYCLE") {
     const face = controlFace(autonomousStore().readControl(LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID), cycleInFlight(autonomousStore()));
-    const allowed = admitOperatorAction(action, face, true);
+    const allowed = admitOperatorAction(action, face, mandateReady(readOperatorConfig()));
     if (!allowed.ok) {
       return Response.json(allowed, { status: 409 });
     }

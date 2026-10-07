@@ -33,18 +33,9 @@ export function enrichBoard(
   },
 ): ObservationBoard {
   const operator = input.operator ?? defaultOperatorConfig();
-  const allowedAssets = mandateAssets(operator);
-  const strategies = (input.strategies ?? createStrategyRegistry().list()).filter((item) => {
-    const id = item.metadata.id;
-    if (id === "momentum") return operator.strategies.momentum.enabled;
-    if (id === "mean-reversion") return operator.strategies["mean-reversion"].enabled;
-    if (id === "weekend") return operator.strategies.weekend.enabled;
-    if (id === "dca") return operator.strategies.dca.enabled;
-    if (operator.mandate?.operatorMode === "MANUAL" && !operator.mandate.selectedManualStrategies.includes(id)) {
-      return false;
-    }
-    return true;
-  });
+  const researchExperiment = board.dataMode === "paper";
+  const allowedAssets = researchExperiment ? null : mandateAssets(operator);
+  const strategies = (input.strategies ?? createStrategyRegistry().list()).filter((item) => researchExperiment || strategyAllowed(item.metadata.id, operator));
   const events = [...board.events];
   const recent: SignalView[] = [];
   const watchlist = [...new Set(board.rows.map((row) => row.ticker))];
@@ -68,6 +59,26 @@ export function enrichBoard(
   };
 }
 
+function strategyAllowed(id: string, operator: OperatorConfig): boolean {
+  const enabled =
+    id === "momentum" ? operator.strategies.momentum.enabled
+    : id === "mean-reversion" ? operator.strategies["mean-reversion"].enabled
+    : id === "weekend" ? operator.strategies.weekend.enabled
+    : id === "dca" ? operator.strategies.dca.enabled
+    : true;
+  if (!enabled) {
+    return false;
+  }
+  const mode = operator.mandate?.operatorMode ?? "UNCONFIGURED";
+  if (mode === "UNCONFIGURED") {
+    return false;
+  }
+  if (mode === "MANUAL") {
+    return operator.mandate.selectedManualStrategies.includes(id);
+  }
+  return true;
+}
+
 function mandateAssets(operator: OperatorConfig): Set<string> | null {
   if (operator.mandate?.operatorMode === "MANUAL") {
     return new Set(operator.mandate.selectedManualAssets);
@@ -75,7 +86,7 @@ function mandateAssets(operator: OperatorConfig): Set<string> | null {
   if (operator.mandate?.operatorMode === "AUTO") {
     return new Set(operator.watchlist?.entries.map((entry) => entry.ticker) ?? []);
   }
-  return null;
+  return new Set();
 }
 
 function analyzeRow(

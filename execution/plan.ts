@@ -17,7 +17,7 @@ import type { PositionDecision } from "@/position/types";
 import type { RiskEffect } from "@/risk/validate";
 import type { OperatorConfig } from "@/operator/config";
 import { bpsOf, sizeByPercentage } from "@/operator/mandate";
-import { dcaEligibleKey, emptyDcaState, readDcaState, writeDcaState } from "@/strategies/dca-state";
+import { readDcaState } from "@/strategies/dca-state";
 
 export interface IntentPlanInput {
   userId: UserId;
@@ -150,7 +150,19 @@ function planEntry(
     if (!percent.ok) {
       return skip(row, percent.reason);
     }
-    const target = decision.selectedStrategy === "dca" ? bpsOf(percent.deployable, capital.dcaOrderBpsOfDeployable) : percent.notional;
+    let target = percent.notional;
+    let binding = percent.binding;
+    if (decision.selectedStrategy === "dca") {
+      const order = bpsOf(percent.deployable, capital.dcaOrderBpsOfDeployable);
+      const budget = bpsOf(percent.deployable, capital.dcaMaxBudgetBpsOfDeployable);
+      const spent = parseDecimal(readDcaState(input.userId, input.agentId, row.representationId)?.budgetSpent ?? "0");
+      const remaining = budget > spent ? budget - spent : 0n;
+      if (remaining <= 0n || order > remaining) {
+        return skip(row, "DCA_BUDGET");
+      }
+      target = order;
+      binding = "DCA_ORDER_PCT";
+    }
     const resized = sizePaperOrder({
       action,
       observedPrice: observed,
@@ -172,7 +184,7 @@ function planEntry(
       deployable: formatDecimal(percent.deployable, 2),
       raw: formatDecimal(percent.raw, 2),
       effective: formatDecimal(resized.notional, 2),
-      binding: decision.selectedStrategy === "dca" ? "DCA_ORDER_PCT" : percent.binding,
+      binding,
     };
   }
   const created = createTradeIntent({
@@ -201,9 +213,6 @@ function planEntry(
     return skip(row, created.reason);
   }
   const risk = assessTradeIntent(created.intent, input.riskPolicy, input.account, input.nowMs, action === "BUY" ? "INCREASE_RISK" : "CLOSE_RISK", input.venue);
-  if (risk.allowed && decision.selectedStrategy === "dca" && input.operatorConfig) {
-    admitDcaTranche(input, row.representationId, row.ticker, observed, sized.notional);
-  }
   return {
     kind: "READY",
     ticker: row.ticker,
@@ -329,31 +338,6 @@ function mandateAllows(config: NonNullable<IntentPlanInput["operatorConfig"]>, t
     return config.mandate.selectedManualAssets.includes(ticker) && config.mandate.selectedManualStrategies.includes(strategyId);
   }
   return config.watchlist.entries.some((entry) => entry.ticker === ticker);
-}
-
-function admitDcaTranche(input: IntentPlanInput, assetId: string, ticker: string, price: Scaled, notional: Scaled): void {
-  const params = input.operatorConfig!.strategies.dca;
-  const current = readDcaState(input.userId, input.agentId, assetId) ?? emptyDcaState(assetId, ticker, params.mode, params.reference);
-  const priceText = (Number(price) / 1_000_000).toFixed(6);
-  const spent = parseDecimal(current.budgetSpent) + notional;
-  const key = dcaEligibleKey({
-    mode: params.mode,
-    nowMs: input.nowMs,
-    intervalMs: params.intervalMs,
-    dipThresholdBps: params.dipThresholdBps,
-    referencePrice: price,
-    lastFillPrice: current.lastFillPrice,
-  });
-  writeDcaState(input.userId, input.agentId, {
-    ...current,
-    initialReference: current.initialReference ?? priceText,
-    lastFillPrice: priceText,
-    lastFillAtMs: input.nowMs,
-    lastEligibleKey: key,
-    tranchesCompleted: current.tranchesCompleted + 1,
-    budgetSpent: formatDecimal(spent, 6),
-    status: current.tranchesCompleted + 1 >= params.maxTranches ? "COMPLETE" : "ACTIVE",
-  });
 }
 
 function skip(row: ObservationRow, reason: string, positionDecision: PositionDecision | null = null): IntentPlan {

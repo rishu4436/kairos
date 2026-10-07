@@ -58,10 +58,16 @@ export function admitOperatorAction(
   face: ControlFace,
   mandateReady: boolean,
 ): { ok: true } | { ok: false; reason: string } {
-  const buttons = buttonAvailability(face, mandateReady);
-  if (action === "RUN" && !buttons.run) {
-    return { ok: false, reason: "RUN_WHILE_ACTIVE" };
+  if (action === "RUN") {
+    if (face !== "STOPPED") {
+      return { ok: false, reason: "RUN_WHILE_ACTIVE" };
+    }
+    if (!mandateReady) {
+      return { ok: false, reason: "MANDATE_REQUIRED" };
+    }
+    return { ok: true };
   }
+  const buttons = buttonAvailability(face, mandateReady);
   if (action === "STOP" && !buttons.stop) {
     return { ok: false, reason: "ALREADY_STOPPED" };
   }

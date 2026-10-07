@@ -3,6 +3,7 @@ import { autonomousStore } from "@/runtime/store";
 import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import { defaultOperatorConfig, validateOperatorConfig, type OperatorConfig } from "@/operator/config";
 import { AUTO_PROFILES, PROFILE_VERSION } from "@/operator/mandate";
+import { ensureAutoWatchlist } from "@/operator/active-universe";
 
 export function operatorConfigKey(userId = LOCAL_RUNTIME_USER_ID, agentId = DEFAULT_AGENT_ID): string {
   return stateKey(["operator", "config", userId, agentId]);
@@ -54,6 +55,7 @@ export function alignOperatingMode(config: OperatorConfig): OperatorConfig {
 
 export function applyAutoProfile(config: OperatorConfig, profile: "LOW" | "MEDIUM" | "HIGH", nowIso: string): OperatorConfig {
   const preset = AUTO_PROFILES[profile];
+  const ensured = ensureAutoWatchlist(config);
   return migrateOperatorConfig({
     ...config,
     updatedAt: nowIso,
@@ -78,9 +80,10 @@ export function applyAutoProfile(config: OperatorConfig, profile: "LOW" | "MEDIU
       operatorMode: "AUTO",
       autoProfile: profile,
       autoProfileVersion: PROFILE_VERSION,
-      selectedManualStrategies: [],
+      selectedManualStrategies: ["momentum", "mean-reversion", "weekend", "dca"].filter((id) => id !== "dca" || preset.dcaEnabled),
       selectedManualAssets: [],
     },
+    watchlist: ensured.ok ? { version: config.watchlist.version + 1, entries: ensured.entries } : config.watchlist,
     risk: { ...config.risk, liveTradingEnabled: false, paperTradingEnabled: false },
   });
 }

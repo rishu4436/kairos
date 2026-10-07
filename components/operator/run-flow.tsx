@@ -19,6 +19,7 @@ async function post(body: Record<string, unknown>) {
 export function RunFlow({ buttons }: { buttons: ButtonAvailability }) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [mandateSaved, setMandateSaved] = useState(false);
 
   async function act(action: string) {
     const result = await post({ action });
@@ -46,12 +47,15 @@ export function RunFlow({ buttons }: { buttons: ButtonAvailability }) {
           <p className="mt-1 text-sm text-muted">AUTO chooses inside your risk mandate. MANUAL uses the assets and settings you pick. Neither one is a paper trading mode.</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {(["LOW", "MEDIUM", "HIGH"] as const).map((profile) => (
-              <button key={profile} type="button" className="pill" onClick={() => void post({ action: "SET_MANDATE", mode: "AUTO", profile }).then((result) => setMessage(result.ok ? `AUTO ${profile} saved` : result.reason ?? "rejected"))}>
+              <button key={profile} type="button" className="pill" onClick={() => void post({ action: "SET_MANDATE", mode: "AUTO", profile }).then((result) => { setMandateSaved(result.ok); setMessage(result.ok ? `AUTO ${profile} saved. Press START KAIROS.` : result.reason ?? "rejected"); })}>
                 AUTO {profile}
               </button>
             ))}
-            <button type="button" className="pill" onClick={() => void post({ action: "SET_MANDATE", mode: "MANUAL" }).then((result) => setMessage(result.ok ? "MANUAL saved" : result.reason ?? "rejected"))}>
+            <button type="button" className="pill" onClick={() => void post({ action: "SET_MANDATE", mode: "MANUAL" }).then((result) => { setMandateSaved(result.ok); setMessage(result.ok ? "MANUAL saved. Choose strategies and assets, then START." : result.reason ?? "rejected"); })}>
               MANUAL
+            </button>
+            <button type="button" disabled={!mandateSaved} className="rounded-md border border-line px-3 py-2 text-sm disabled:opacity-40" onClick={() => void act("RUN")}>
+              START KAIROS
             </button>
           </div>
         </div>
