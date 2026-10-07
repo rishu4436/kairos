@@ -8,7 +8,7 @@ import {
 import type { ExecutionMode } from "@/domain/execution-mode";
 import { asUserId } from "@/domain/ids";
 import type { RiskPolicy } from "@/domain/models";
-import { DEMO_USER_ID } from "@/domain/watchlist";
+import { LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import { readDataMode } from "@/lib/mode";
 import { buildPaperObservation } from "@/observation/paper";
 import { runPreparedAgentCycle, type AgentCycleResult } from "@/paper/cycle";
@@ -62,7 +62,7 @@ export function sessionPaperCapability(nowMs = Date.now()): PaperExecutionCapabi
 }
 
 export function readStoredRiskPolicy(userId: string): RiskPolicy | null {
-  if (userId !== DEMO_USER_ID) {
+  if (userId !== LOCAL_RUNTIME_USER_ID) {
     return null;
   }
   return localPaperSession(userId)?.policy ?? null;
@@ -88,5 +88,5 @@ function stopped(
 }
 
 export function demoUserId() {
-  return asUserId(DEMO_USER_ID);
+  return asUserId(LOCAL_RUNTIME_USER_ID);
 }

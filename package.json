@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "agent-studio:precheck": "node studio/precheck-cli.mjs",
-    "kairos:preflight": "node scripts/kairos-preflight.mjs"
+    "kairos:preflight": "node scripts/kairos-preflight.mjs",
+    "kairos:runner": "vite-node --config vitest.config.ts runtime/cli-runner.ts"
   },
   "dependencies": {
     "next": "16.3.8",

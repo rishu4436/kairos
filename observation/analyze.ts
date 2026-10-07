@@ -16,6 +16,7 @@ import { readCachedUnderlyingEvents } from "@/events/service";
 import { paperResearchEvaluations, reviewShadowCandidates } from "@/lifecycle/universe";
 import { readAssetIntelligence } from "@/skills/store";
 import { buildBinanceIntelligenceView } from "@/skills/view";
+import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 
 const arbitrator = new StrategyArbitrator();
 
@@ -116,7 +117,7 @@ function analyzeRow(
   const versions = Object.fromEntries(strategies.map((strategy) => [strategy.metadata.id, strategy.metadata.version]));
   let kairos = buildObservationContext({
     userId,
-    agentId: userId === "user_demo" ? "agent_demo" : `agent_${userId}`,
+    agentId: userId === LOCAL_RUNTIME_USER_ID ? DEFAULT_AGENT_ID : `agent_${userId}`,
     cycleId,
     nowMs: asOfMs,
     watchlist,

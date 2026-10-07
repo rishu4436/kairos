@@ -8,7 +8,7 @@ The workspace is `studio/bnb`, with `app/agent/studio.toml`. It pins `pnpm@10.24
 
 Set `KAIROS_BAG_BIN` privately if PATH resolves an unrelated `bag` program. Inspect the selected CLI's help and schema before operating it. Do not commit machine-specific executable paths.
 
-The configured network is BSC testnet. The local operating wallet's public address lives in TOML; encrypted keystores and `WALLET_PASSWORD` stay under ignored workspace configuration. This is agent operating capital, separate from the user's Binance Agentic Wallet trading capital. Models hold neither signing authority.
+The Studio managed trial may run on the network the Studio provider configures (currently documented as BSC testnet in TOML). That is the Studio operating/runtime network. KAIROS production tokenized-stock trading remains BSC mainnet, chain ID 56. Studio must not redefine the KAIROS trading chain or duplicate the decision engine. The local operating wallet's public address lives in TOML; encrypted keystores and `WALLET_PASSWORD` stay under ignored workspace configuration. This is agent operating capital, separate from the user's Binance Agentic Wallet trading capital. Models hold neither signing authority.
 
 ## External intelligence work
 

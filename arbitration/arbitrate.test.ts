@@ -141,6 +141,7 @@ describe("strategy arbitration", () => {
   it("blocks selection when the observation is stale", () => {
     const decision = arbitrateAsset(context({ freshness: "STALE", dataQuality: quality("STALE") }), [side("momentum", "BUY", 0.9)]);
     expect(decision.decision).toBe("DATA_BLOCKED");
+    expect(arbitrateAsset(context({ dataQuality: quality("INSUFFICIENT") }), [side("momentum", "BUY", 0.9)]).decision).toBe("DATA_BLOCKED");
     expect(decision.selectedStrategy).toBeNull();
     expect(decision.candidates.every((candidate) => candidate.candidateStatus !== "SELECTED")).toBe(true);
   });

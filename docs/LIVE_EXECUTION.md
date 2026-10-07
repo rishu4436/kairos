@@ -10,7 +10,7 @@ KAIROS risk
             → market-order list
 ```
 
-Paper execution never enters this chain. A live failure does not create a paper fill.
+Paper execution never enters this chain. A live failure does not create a paper fill. Production chain is BSC mainnet (`56`). Token contracts come from representation metadata, never from ticker-only lookup.
 
 The live record phases are `READY_FOR_WALLET`, `WALLET_PRECHECK`, `WALLET_EXECUTION`, `SUBMITTED`, `VERIFYING`, and `CONFIRMED`. Failures stay on `WALLET_POLICY_BLOCKED`, `EXECUTION_REJECTED`, `EXECUTION_ERROR`, or `VERIFICATION_FAILED`.
 

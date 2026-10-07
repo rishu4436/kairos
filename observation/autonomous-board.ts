@@ -4,34 +4,34 @@ import { runKairosAutonomousCycle } from "@/runtime/cycle";
 import { readinessLabels } from "@/runtime/readiness";
 import { autonomousStore } from "@/runtime/store";
 import type { ObservationBoard } from "@/domain/observation";
-import { DEMO_USER_ID } from "@/domain/watchlist";
+import { DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import type { AgentCycleResult } from "@/paper/cycle";
 
 /** One manual paper cycle. Pages call this. Tests and builds do not start a background loop. */
 export function runManualPaperCycle(now = new Date()): ObservationBoard {
   let captured: ObservationBoard | null = null;
   runKairosAutonomousCycle({
-    userId: DEMO_USER_ID,
-    agentId: "agent_demo",
+    userId: LOCAL_RUNTIME_USER_ID,
+    agentId: DEFAULT_AGENT_ID,
     runtimeMode: "LOCAL",
     executionMode: "PAPER",
     cycleTrigger: "MANUAL",
     startedAtMs: now.getTime(),
-    ownerId: "local:user_demo:agent_demo",
+    ownerId: `local:${LOCAL_RUNTIME_USER_ID}:${DEFAULT_AGENT_ID}`,
     marketAvailable: true,
     researchAvailable: false,
-    runPaper: () => capturePaper(DEMO_USER_ID, now, (board) => {
+    runPaper: () => capturePaper(LOCAL_RUNTIME_USER_ID, now, (board) => {
       captured = board;
     }),
   });
-  return captured ?? buildPaperObservation(DEMO_USER_ID, now).board;
+  return captured ?? buildPaperObservation(LOCAL_RUNTIME_USER_ID, now).board;
 }
 
 export function autonomousSnapshot() {
   const store = autonomousStore();
   return {
-    heartbeat: store.readHeartbeat(DEMO_USER_ID, "agent_demo"),
-    cycles: store.listCycles(DEMO_USER_ID, "agent_demo").slice(-8).reverse(),
+    heartbeat: store.readHeartbeat(LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID),
+    cycles: store.listCycles(LOCAL_RUNTIME_USER_ID, DEFAULT_AGENT_ID).slice(-8).reverse(),
     backend: store.backend,
     durable: store.durable,
     labels: readinessLabels(),

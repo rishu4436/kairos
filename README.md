@@ -1,6 +1,6 @@
 # KAIROS
 
-KAIROS is a risk-gated research and execution system for tokenized equities. It combines Binance Web3 observations, deterministic strategies, bounded model research, and a paper Strategy Lab.
+KAIROS is an autonomous multi-strategy tokenized-equity trading agent. Production execution targets BNB Smart Chain mainnet (chain ID 56). One canonical cycle (`runKairosAutonomousCycle`) powers the local persistent runner and the Agent Studio adapter. The configured watchlist is the market universe. Built-in deterministic strategies are live decision authority. The Research Brain proposes and tests candidate strategies and has no execution authority. Paper mode is the Strategy Lab / simulation boundary. Current submission scope is a single local operating agent.
 
 ## Implemented capabilities
 
@@ -24,7 +24,7 @@ See [Architecture](docs/ARCHITECTURE.md), [Research Brain](docs/RESEARCH_BRAIN.m
 
 ## Local setup
 
-Use Node.js 22 or newer. Install the root dependencies with `npm ci`, copy `.env.example` to ignored `.env.local`, configure only the services you need, and run `npm run dev`.
+Use Node.js 22 or newer. Install the root dependencies with `npm ci`, copy `.env.example` to ignored `.env.local`, configure only the services you need, and run `npm run dev`. The always-on local host is `npm run kairos:runner`.
 
 The example lists variable names without credential values. Defaults are paper market mode and ephemeral memory state. Paper mode requires supplied market inputs; startup does not fabricate prices, positions, experiments, or research. Portfolio and mission views read the stored paper book or show empty state.
 
@@ -50,6 +50,6 @@ Ordinary tests use explicit fixtures and local/fake transports. Live tests requi
 
 Credentials remain server-side and Git-ignored. Execution requires server-issued authority, deterministic risk approval, simulation, ownership checks, and wallet policy. A selected research provider never silently fails over.
 
-Implementation does not establish live connectivity or a completed trade. Studio is not deployed, ERC-8004 identity is unregistered, commerce is not published, and automatic live candidate activation is disabled. Authentication and production multi-user wallet orchestration remain unfinished. The local account uses stable legacy IDs for state compatibility.
+Implementation does not establish live connectivity or a completed trade. Studio is not deployed, ERC-8004 identity is unregistered, commerce is not published, and automatic live candidate activation is disabled. Authentication and production multi-user wallet orchestration remain unfinished. The local account uses stable legacy IDs (`user_demo`, `agent_demo`) for state compatibility.
 
-Next work is architecture review and completion of the canonical production core, followed by separately authorized live validation.
+Studio deployment, wallet funding, and live validation are separate later phases.

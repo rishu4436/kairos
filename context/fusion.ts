@@ -597,7 +597,7 @@ function classifyQuality(input: {
   if (input.conflicts.some((conflict) => conflict.severity === "BLOCKING")) {
     return "BLOCKED";
   }
-  if (input.dataQualityStatus === "STALE") {
+  if (input.dataQualityStatus === "STALE" || input.dataQualityStatus === "INSUFFICIENT") {
     return "BLOCKED";
   }
   const optionalStale =

@@ -1,9 +1,25 @@
+import { isEvmAddress, PRODUCTION_CHAIN_ID, representationIdentity } from "@/domain/network";
+
+export interface WatchlistItem {
+  ticker: string;
+  tokenSymbol: string | null;
+  chainId: string;
+  contractAddress: string | null;
+  enabled: boolean;
+  representationId: string | null;
+}
+
 export interface UserWatchlist {
   id: string;
   userId: string;
   name: string;
   tickers: readonly string[];
+  items: readonly WatchlistItem[];
 }
+
+export type WatchlistAdmitResult =
+  | { ok: true; item: WatchlistItem }
+  | { ok: false; reason: "UNLISTED" | "DISABLED" | "WRONG_CHAIN" | "INVALID_CONTRACT" | "DUPLICATE" | "EMPTY" };
 
 export interface TickerNormalization {
   tickers: string[];
@@ -57,16 +73,88 @@ export function createUserWatchlist(
     userId: user,
     name,
     tickers: normalized.tickers,
+    items: normalized.tickers.map((ticker) => tickerItem(ticker)),
   };
 }
 
-/** First live watchlist. Resolved through the RWA search API. Symbols are not assumed. */
-export const DEMO_USER_ID = "user_demo";
+export function emptyWatchlist(userId: string, name = "Empty"): UserWatchlist {
+  const user = userId.trim();
+  if (user.length === 0) {
+    throw new Error("A watchlist requires a user id.");
+  }
+  return { id: `wl_${user}_empty`, userId: user, name, tickers: [], items: [] };
+}
 
-export const DEMO_WATCH_TICKERS = ["NVDA", "TSLA", "AAPL", "MSFT", "AMD", "SPY"] as const;
+function tickerItem(ticker: string): WatchlistItem {
+  return {
+    ticker,
+    tokenSymbol: null,
+    chainId: PRODUCTION_CHAIN_ID,
+    contractAddress: null,
+    enabled: true,
+    representationId: null,
+  };
+}
 
-export function demoWatchlist(userId: string = DEMO_USER_ID): UserWatchlist {
-  return createUserWatchlist(userId, DEMO_WATCH_TICKERS, "Tokenized equities");
+export function admitWatchlistItem(
+  universe: UserWatchlist,
+  candidate: Partial<WatchlistItem> & { ticker: string },
+): WatchlistAdmitResult {
+  const ticker = candidate.ticker.trim().toUpperCase();
+  if (universe.tickers.length === 0 && universe.items.length === 0) {
+    return { ok: false, reason: "EMPTY" };
+  }
+  const listed = universe.items.find((item) => item.ticker === ticker) ?? (universe.tickers.includes(ticker) ? tickerItem(ticker) : null);
+  if (!listed) {
+    return { ok: false, reason: "UNLISTED" };
+  }
+  if (listed.enabled === false || candidate.enabled === false) {
+    return { ok: false, reason: "DISABLED" };
+  }
+  const chainId = (candidate.chainId ?? listed.chainId).trim();
+  if (chainId !== PRODUCTION_CHAIN_ID) {
+    return { ok: false, reason: "WRONG_CHAIN" };
+  }
+  const contract = candidate.contractAddress ?? listed.contractAddress;
+  if (contract !== null && contract.trim().length > 0 && !isEvmAddress(contract)) {
+    return { ok: false, reason: "INVALID_CONTRACT" };
+  }
+  const representationId =
+    contract && isEvmAddress(contract) ? representationIdentity(chainId, contract) : listed.representationId;
+  return {
+    ok: true,
+    item: {
+      ticker,
+      tokenSymbol: candidate.tokenSymbol ?? listed.tokenSymbol,
+      chainId,
+      contractAddress: contract,
+      enabled: true,
+      representationId,
+    },
+  };
+}
+
+/**
+ * Persisted Redis/paper identity for the single local operating agent.
+ * Literal values stay stable so existing durable keys continue to load.
+ */
+export const LOCAL_RUNTIME_USER_ID = "user_demo";
+export const DEFAULT_AGENT_ID = "agent_demo";
+export const DEFAULT_POLICY_ID = "policy_demo";
+export const CONFIGURED_WATCHLIST_TICKERS = ["NVDA", "TSLA", "AAPL", "MSFT", "AMD", "SPY"] as const;
+
+/** @deprecated Use LOCAL_RUNTIME_USER_ID. Stored value is unchanged. */
+export const DEMO_USER_ID = LOCAL_RUNTIME_USER_ID;
+/** @deprecated Use CONFIGURED_WATCHLIST_TICKERS. */
+export const DEMO_WATCH_TICKERS = CONFIGURED_WATCHLIST_TICKERS;
+
+export function configuredWatchlist(userId: string = LOCAL_RUNTIME_USER_ID): UserWatchlist {
+  return createUserWatchlist(userId, CONFIGURED_WATCHLIST_TICKERS, "Tokenized equities");
+}
+
+/** @deprecated Use configuredWatchlist. */
+export function demoWatchlist(userId: string = LOCAL_RUNTIME_USER_ID): UserWatchlist {
+  return configuredWatchlist(userId);
 }
 
 const PLATFORM_LABELS: Record<string, string> = {

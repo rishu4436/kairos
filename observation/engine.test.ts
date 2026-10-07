@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { demoWatchlist } from "@/domain/watchlist";
+import { configuredWatchlist, emptyWatchlist } from "@/domain/watchlist";
 import { observeWatchlist } from "@/observation/engine";
 import type { RwaGateway } from "@/services/binance/gateway";
 import type { BinanceListedToken, BinanceRwaPrice, BinanceSearchHit } from "@/services/binance/types";
@@ -63,7 +63,7 @@ function gateway(): RwaGateway {
 
 describe("observation engine", () => {
   it("resolves only exact tickers and keeps each representation", async () => {
-    const watchlist = demoWatchlist("user_demo");
+    const watchlist = configuredWatchlist("user_demo");
     const run = await observeWatchlist({
       watchlist: { ...watchlist, tickers: ["NVDA", "TSLA"] },
       gateway: gateway(),
@@ -76,5 +76,39 @@ describe("observation engine", () => {
     expect(run.unresolved.some((item) => item.ticker === "TSLA")).toBe(true);
     expect(run.unresolved.some((item) => item.reason.includes("contract"))).toBe(true);
     expect(run.observations.every((item) => item.userId === "user_demo")).toBe(true);
+  });
+
+  it("is a no-op on an empty watchlist and rejects a non-mainnet representation", async () => {
+    const empty = await observeWatchlist({
+      watchlist: emptyWatchlist("user_demo"),
+      gateway: gateway(),
+      receivedAtMs: 1_700_000_004_000,
+      policy: { freshMaxMs: 30_000, agingMaxMs: 120_000 },
+    });
+    expect(empty.observations).toEqual([]);
+    expect(empty.unresolved).toEqual([]);
+
+    const hitsGateway = gateway();
+    const originalSearch = hitsGateway.search.bind(hitsGateway);
+    hitsGateway.search = async (keyword) => {
+      if (keyword === "NVDA") {
+        return [
+          {
+            ticker: "NVDA",
+            companyName: "NVIDIA Corporation",
+            assets: [{ platformId: "bstock", binanceChainId: "97", tokenContractAddress: "0xaaa", tokenSymbol: "NVDAB", assetType: 1 }],
+          },
+        ];
+      }
+      return originalSearch(keyword);
+    };
+    const rejected = await observeWatchlist({
+      watchlist: configuredWatchlist("user_demo"),
+      gateway: hitsGateway,
+      receivedAtMs: 1_700_000_004_000,
+      policy: { freshMaxMs: 30_000, agingMaxMs: 120_000 },
+    });
+    expect(rejected.observations).toEqual([]);
+    expect(rejected.unresolved.some((item) => item.reason.includes("chain 56"))).toBe(true);
   });
 });

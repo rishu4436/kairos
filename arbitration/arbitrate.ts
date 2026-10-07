@@ -38,7 +38,12 @@ export function arbitrateAsset(
   context: ArbitrationContext,
   evaluations: readonly StrategyEvaluation[],
 ): ArbitrationDecision {
-  const blocked = context.freshness === "STALE" || context.dataQuality.status === "STALE" || !context.pricePresent;
+  const blocked =
+    context.freshness === "STALE" ||
+    context.dataQuality.status === "STALE" ||
+    context.dataQuality.status === "INSUFFICIENT" ||
+    context.dataQuality.barClass === "INVALID" ||
+    !context.pricePresent;
   const scored = evaluations.map((evaluation) => scoreEvaluation(context, evaluation));
   const directional = scored.filter((candidate) => candidate.eligible && isDirectional(candidate.action));
   const conflicts = blocked ? [] : findConflicts(directional);

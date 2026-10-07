@@ -21,7 +21,7 @@ describe("market history", () => {
     const history = new InMemoryMarketHistory();
     const [first, second] = candlesFromCloses(["10", "11"]);
     history.append("a", [second, first]);
-    history.append("a", [{ ...first, close: scaleDecimal("12") ?? 0n }]);
+    history.append("a", [{ ...first, open: scaleDecimal("12") ?? 0n, high: scaleDecimal("13") ?? 0n, low: scaleDecimal("11") ?? 0n, close: scaleDecimal("12") ?? 0n }]);
     const rows = history.queryRecent("a", 10);
     expect(rows.map((candle) => candle.timestampMs)).toEqual([0, 900_000]);
     expect(rows[0].close).toBe(scaleDecimal("12"));

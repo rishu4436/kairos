@@ -1,5 +1,5 @@
 import type { ObservationBoard } from "@/domain/observation";
-import { demoWatchlist, DEMO_USER_ID } from "@/domain/watchlist";
+import { configuredWatchlist, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import { observeWatchlist } from "@/observation/engine";
 import { emptyHealth, observationEvents, rowFromLive } from "@/observation/board";
 import { noteLiveSuccess, readLastSuccess } from "@/observation/health-memory";
@@ -16,15 +16,15 @@ import type { Candle } from "@/domain/candle";
 import { publishPublicMarketSnapshot } from "@/studio/intelligence";
 
 export async function liveObservationBoard(userId: string, signal?: AbortSignal): Promise<ObservationBoard> {
-  if (userId !== DEMO_USER_ID) {
+  if (userId !== LOCAL_RUNTIME_USER_ID) {
     throw new KairosApiError({
       category: "DATA_UNAVAILABLE",
       safeMessage: "No watchlist is stored for this user.",
-      technicalMessage: "Only the demo user has a watchlist in this phase.",
+      technicalMessage: "Only the local operating user has a watchlist in this phase.",
     });
   }
   const config = readBinanceConfig();
-  const watchlist = demoWatchlist(userId);
+  const watchlist = configuredWatchlist(userId);
   const receivedAt = new Date();
   const gateway = createBinanceGateway(new BinanceWeb3Client({ config }));
   const run = await observeWatchlist({
@@ -111,7 +111,7 @@ export async function liveObservationBoard(userId: string, signal?: AbortSignal)
 export function failureBoard(
   error: KairosApiError,
   dataMode: "live" | "paper",
-  userId: string = DEMO_USER_ID,
+  userId: string = LOCAL_RUNTIME_USER_ID,
 ): ObservationBoard {
   const at = new Date().toISOString();
   const health = emptyHealth(readLastSuccess());

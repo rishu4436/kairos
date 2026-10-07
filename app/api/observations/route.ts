@@ -1,7 +1,7 @@
 import { localPaperSession } from "@/paper/session";
 import { resolveServerPaperCapability } from "@/domain/execution-authority";
 import type { ObservationBoard } from "@/domain/observation";
-import { DEMO_USER_ID, DEMO_WATCH_TICKERS } from "@/domain/watchlist";
+import { CONFIGURED_WATCHLIST_TICKERS, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import { asAgentId, asUserId } from "@/domain/ids";
 import { warmUnderlyingEvents } from "@/events/service";
 import { readPaperBook } from "@/paper/store";
@@ -16,7 +16,7 @@ export const runtime = "nodejs";
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
-  const requested = url.searchParams.get("userId")?.trim() || DEMO_USER_ID;
+  const requested = url.searchParams.get("userId")?.trim() || LOCAL_RUNTIME_USER_ID;
 
   try {
     const mode = readDataMode();
@@ -24,7 +24,7 @@ export async function GET(request: Request): Promise<Response> {
       return json(invalidUser(requested, mode), 400);
     }
     if (mode === "paper") {
-      if (requested !== DEMO_USER_ID) {
+      if (requested !== LOCAL_RUNTIME_USER_ID) {
         return json(buildPaperObservation(requested).board);
       }
       const session = localPaperSession()!;
@@ -41,7 +41,7 @@ export async function GET(request: Request): Promise<Response> {
         return json(buildPaperObservation(requested).board);
       }
       const open = readPaperBook(asUserId(requested), asAgentId(session.agent.id))?.account.positions.map((position) => position.assetSymbol) ?? [];
-      await warmUnderlyingEvents({ tickers: [...DEMO_WATCH_TICKERS, ...open], nowMs: Date.now(), fidelity: "paper" });
+      await warmUnderlyingEvents({ tickers: [...CONFIGURED_WATCHLIST_TICKERS, ...open], nowMs: Date.now(), fidelity: "paper" });
       return json(runManualPaperCycle());
     }
     return json(await liveObservationBoard(requested, request.signal));

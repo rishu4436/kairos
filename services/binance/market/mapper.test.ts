@@ -7,6 +7,7 @@ describe("candle mapping", () => {
   it("maps the documented positional row", () => {
     const mapped = mapCandles([[1.0001, 1.0023, 0.9987, 1.001, 125000.5, 1748600000000, 42]]);
     expect(mapped.rejected).toBe(0);
+    expect(mapped.suspicious).toBe(0);
     expect(mapped.candles).toHaveLength(1);
     expect(formatDecimal(mapped.candles[0].open, 4)).toBe("1.0001");
     expect(formatDecimal(mapped.candles[0].close, 4)).toBe("1.0010");

@@ -1,10 +1,13 @@
+import { PRODUCTION_CHAIN_ID } from "@/domain/network";
+
 /** Official quote TTL. The quote response does not return an expiry field. */
 export const DOCUMENTED_QUOTE_TTL_MS = 30_000;
 
 /** BSC USDT contract cited in the Trading API examples. */
+
 export const BSC_USDT_CONTRACT = "0x55d398326f99059fF775485246999027B3197955";
 
-export const BSC_CHAIN_ID = "56";
+export const BSC_CHAIN_ID = PRODUCTION_CHAIN_ID;
 
 export type QuoteStatus = "VALID" | "EXPIRED" | "INVALID" | "ERROR";
 

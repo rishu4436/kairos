@@ -17,7 +17,7 @@ Base URL: `https://web3.binance.com/build`. The signed path includes `/build`.
 
 Query fields KAIROS sends, all named by the catalog:
 
-- `binanceChainId` (`56` for BSC)
+- `binanceChainId` (`56` for BNB Smart Chain mainnet; wrong chain fails closed)
 - `fromTokenAddress`
 - `toTokenAddress`
 - `amount` (positive integer string in the token's smallest unit)

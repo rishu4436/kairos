@@ -9,7 +9,7 @@ API references:
 - https://web3.binance.com/en/dev-docs/products/market-api/error-codes
 - https://web3.binance.com/en/dev-docs/authentication
 
-No candle call was made from this workspace. Field notes below are from those pages, not from a live payload.
+Mapped candles must satisfy OHLC invariants (`high` ≥ open/close/low, `low` ≤ open/close/high, positive prices, valid timestamps). Invalid bars are rejected. Economically extreme wicks (for example close ≈ 380 with high ≈ 16044) are classified `SUSPICIOUS`, downgrade data quality below `GOOD`, and cannot remain executable live intent.
 
 ## Endpoint in use
 

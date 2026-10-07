@@ -1,5 +1,6 @@
 import type { Candle } from "@/domain/candle";
 import { scaleDecimal } from "@/domain/candle";
+import { classifySeries } from "@/domain/candle-quality";
 import type { FreshnessStatus } from "@/domain/freshness";
 import { computeFeatures, simpleReturnBps, type FeatureSet } from "@/domain/features";
 import type { DataQuality } from "@/domain/quality";
@@ -77,6 +78,7 @@ export function buildStrategyContext(input: {
     referenceAgeMs: referencePrice === null ? null : input.latestAgeMs,
     missingFields: missing,
     fidelity: input.fidelity,
+    barClass: classifySeries(input.candles),
   });
   return {
     ticker: input.ticker,

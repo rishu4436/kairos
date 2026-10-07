@@ -1,4 +1,5 @@
 import { HISTORY_CAP, type Candle } from "@/domain/candle";
+import { classifyCandleBar } from "@/domain/candle-quality";
 
 export interface MarketHistory {
   append(seriesKey: string, candles: readonly Candle[]): void;
@@ -31,7 +32,7 @@ export class InMemoryMarketHistory implements MarketHistory {
       byTime.set(candle.timestampMs, candle);
     }
     for (const candle of candles) {
-      if (!Number.isFinite(candle.timestampMs)) {
+      if (!Number.isFinite(candle.timestampMs) || classifyCandleBar(candle).classification === "INVALID") {
         continue;
       }
       byTime.set(candle.timestampMs, candle);

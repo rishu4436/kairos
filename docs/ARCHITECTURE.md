@@ -147,7 +147,11 @@ Implemented strategies evaluate an observation context and return an `Analytical
 
 ## Autonomous runtime
 
-`runKairosAutonomousCycle` is the single orchestration entry. It acquires a user/agent lease, recovers an interrupted cycle, runs the existing paper path for `PAPER`, and refuses paper when the mode is `LIVE` or `LIVE_PREVIEW`. See [AUTONOMOUS_RUNTIME.md](AUTONOMOUS_RUNTIME.md), [STATE_PERSISTENCE.md](STATE_PERSISTENCE.md), [IDEMPOTENCY.md](IDEMPOTENCY.md), and [RECOVERY.md](RECOVERY.md).
+`runKairosAutonomousCycle` is the single orchestration entry. Local persistent runner (`npm run kairos:runner`) and Agent Studio adapters invoke it. They do not own strategies, risk, or position logic.
+
+Cycle shape: watchlist → observe → validate market data → build KAIROS context → run built-in strategies → arbitrate → deterministic risk → prepare execution → execution adapter → reconcile → persist/audit.
+
+The production trading network is BNB Smart Chain mainnet, chain ID 56. Agent Studio's managed trial/operating network is a separate runtime-host concern and does not redefine KAIROS execution. See [AUTONOMOUS_RUNTIME.md](AUTONOMOUS_RUNTIME.md), [STATE_PERSISTENCE.md](STATE_PERSISTENCE.md), [IDEMPOTENCY.md](IDEMPOTENCY.md), and [RECOVERY.md](RECOVERY.md).
 
 ## Event boundary
 

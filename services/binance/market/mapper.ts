@@ -1,9 +1,11 @@
 import { countUnknown, epochUnknown, scaleUnknown, type Candle } from "@/domain/candle";
+import { classifyCandleBar } from "@/domain/candle-quality";
 import { KairosApiError } from "@/services/binance/errors";
 
 export interface CandleMapResult {
   candles: Candle[];
   rejected: number;
+  suspicious: number;
 }
 
 /** Map a Market API candle payload into domain candles. Invalid rows are counted and dropped. */
@@ -17,15 +19,24 @@ export function mapCandles(payload: unknown): CandleMapResult {
   }
   const candles: Candle[] = [];
   let rejected = 0;
+  let suspicious = 0;
   for (const row of payload) {
     const mapped = mapRow(row);
     if (mapped === null) {
       rejected += 1;
       continue;
     }
+    const classified = classifyCandleBar(mapped);
+    if (classified.classification === "INVALID") {
+      rejected += 1;
+      continue;
+    }
+    if (classified.classification === "SUSPICIOUS") {
+      suspicious += 1;
+    }
     candles.push(mapped);
   }
-  return { candles, rejected };
+  return { candles, rejected, suspicious };
 }
 
 function mapRow(row: unknown): Candle | null {
@@ -40,7 +51,10 @@ function mapRow(row: unknown): Candle | null {
   if (open === null || high === null || low === null || close === null || timestampMs === null) {
     return null;
   }
-  if (high < low) {
+  if (open <= 0n || high <= 0n || low <= 0n || close <= 0n) {
+    return null;
+  }
+  if (high < low || high < open || high < close || low > open || low > close) {
     return null;
   }
   const volume = row[4] === null || row[4] === undefined || row[4] === "" ? null : scaleUnknown(row[4]);

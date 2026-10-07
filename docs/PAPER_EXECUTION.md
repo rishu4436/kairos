@@ -1,6 +1,6 @@
 # Paper execution
 
-This is simulated execution and does not broadcast blockchain transactions.
+This is simulated execution and does not broadcast blockchain transactions. Paper shares observation, strategies, arbitration, risk, and intent shape with live. It is the Strategy Lab / shadow-execution boundary, not a second risk engine.
 
 The paper loop proves the path from a decision to a position. It does not sign, broadcast, move real funds, call Agentic Wallet, call Agent Studio, call an LLM, or call a news provider.
 

@@ -1,5 +1,6 @@
 import type { FreshnessPolicy } from "@/domain/freshness";
 import type { MarketObservationRecord } from "@/domain/observation";
+import { PRODUCTION_CHAIN_ID } from "@/domain/network";
 import type { UserWatchlist } from "@/domain/watchlist";
 import { addressKey, mapRepresentation } from "@/services/binance/mapper";
 import type { RwaGateway } from "@/services/binance/gateway";
@@ -28,7 +29,16 @@ export async function observeWatchlist(input: {
   const drafts: { ticker: string; companyName: string; asset: BinanceSearchAsset }[] = [];
   const unresolved: { ticker: string; reason: string }[] = [];
 
+  if (input.watchlist.tickers.length === 0) {
+    return { observations: [], unresolved: [] };
+  }
+
   for (const ticker of input.watchlist.tickers) {
+    const item = input.watchlist.items?.find((row) => row.ticker === ticker);
+    if (item && item.enabled === false) {
+      unresolved.push({ ticker, reason: "Watchlist item is disabled." });
+      continue;
+    }
     const hits = await input.gateway.search(ticker, input.signal);
     const match = exactHit(hits, ticker);
     if (!match || !match.assets || match.assets.length === 0) {
@@ -41,6 +51,10 @@ export async function observeWatchlist(input: {
       const contract = asset.tokenContractAddress?.trim();
       if (!chainId || !contract) {
         unresolved.push({ ticker, reason: "A search row omitted the chain or contract address." });
+        continue;
+      }
+      if (chainId !== PRODUCTION_CHAIN_ID) {
+        unresolved.push({ ticker, reason: "Representation is not on BSC mainnet (chain 56)." });
         continue;
       }
       const key = addressKey(chainId, contract);

@@ -1,5 +1,5 @@
 import type { ObservationBoard } from "@/domain/observation";
-import { DEMO_USER_ID, DEMO_WATCH_TICKERS } from "@/domain/watchlist";
+import { CONFIGURED_WATCHLIST_TICKERS, DEFAULT_AGENT_ID, LOCAL_RUNTIME_USER_ID } from "@/domain/watchlist";
 import { warmUnderlyingEvents } from "@/events/service";
 import { asAgentId, asUserId } from "@/domain/ids";
 import { readPaperBook } from "@/paper/store";
@@ -10,9 +10,9 @@ import { buildPaperObservation } from "@/observation/paper";
 import { sessionPaperCapability } from "@/paper/run-cycle";
 import { KairosApiError, safeMessage } from "@/services/binance/errors";
 
-/** Same board the observation route returns for the demo user. Pages render it on the first response. */
+/** Same board the observation route returns for the local operating user. Pages render it on the first response. */
 export async function loadDemoObservationBoard(): Promise<ObservationBoard> {
-  const userId = DEMO_USER_ID;
+  const userId = LOCAL_RUNTIME_USER_ID;
   try {
     const mode = readDataMode();
     if (mode === "paper") {
@@ -46,6 +46,6 @@ export async function loadDemoObservationBoard(): Promise<ObservationBoard> {
 }
 
 function eventTickers(userId: string): string[] {
-  const open = readPaperBook(asUserId(userId), asAgentId("agent_demo"))?.account.positions.map((position) => position.assetSymbol) ?? [];
-  return [...DEMO_WATCH_TICKERS, ...open];
+  const open = readPaperBook(asUserId(userId), asAgentId(DEFAULT_AGENT_ID))?.account.positions.map((position) => position.assetSymbol) ?? [];
+  return [...CONFIGURED_WATCHLIST_TICKERS, ...open];
 }
