@@ -1,5 +1,7 @@
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const COMPATIBLE_AT = [0, 0, 14];
 
@@ -25,6 +27,25 @@ function qwen() {
 
 function fmp() {
   return present("FMP_API_KEY") ? "READY" : "NOT_CONFIGURED";
+}
+
+function operatingWallet() {
+  const workspaceRoot = fileURLToPath(new URL("../studio/bnb/", import.meta.url));
+  const agentRoot = path.join(workspaceRoot, "app", "agent");
+  try {
+    // Only public configuration and file existence are inspected; no secret is read.
+    const config = readFileSync(path.join(agentRoot, "studio.toml"), "utf8");
+    const wallet = config.split(/^\[wallet\]\s*$/m)[1]?.split(/^\[/m)[0] ?? "";
+    const address = wallet.match(/^address\s*=\s*"(0x[0-9a-fA-F]{40})"\s*$/m)?.[1];
+    const directory = wallet.match(/^keystore_dir\s*=\s*"([^"]+)"\s*$/m)?.[1];
+    const kind = wallet.match(/^kind\s*=\s*"([^"]+)"\s*$/m)?.[1];
+    if (kind !== "evm-local" || !address || !directory) return "NOT_CONFIGURED";
+    const keystoreRoot = path.resolve(agentRoot, directory);
+    if (keystoreRoot !== path.join(workspaceRoot, ".studio", "wallets")) return "NOT_CONFIGURED";
+    return existsSync(path.join(keystoreRoot, `${address}.json`)) ? "CONFIGURED" : "NOT_CONFIGURED";
+  } catch {
+    return "NOT_CONFIGURED";
+  }
 }
 
 function resolveBagBin() {
@@ -86,9 +107,10 @@ console.log(`QWEN\t${qwen()}`);
 console.log(`FMP\t${fmp()}`);
 console.log("BINANCE SKILLS\tNOT_CONFIGURED");
 console.log("AGENTIC WALLET\tBLOCKED");
+console.log("TRADING WALLET\tNOT_CONNECTED");
 console.log("LIVE EXECUTION\tBLOCKED");
 console.log("AGENT IDENTITY\tNOT_REGISTERED");
-console.log("OPERATING WALLET\tNOT_CONFIGURED");
+console.log(`OPERATING WALLET\t${operatingWallet()}`);
 console.log("STUDIO PROJECT\tCONFIGURED");
 console.log("DEPLOYMENT\tNOT_DEPLOYED");
 console.log(`STUDIO CLI\t${studio.compatibility}`);

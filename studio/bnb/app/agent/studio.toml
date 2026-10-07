@@ -17,6 +17,7 @@ default = "bsc-testnet"
 kind = "evm-local"
 signer = "local"
 keystore_dir = "../../.studio/wallets"
+address = "0xe7a6b15AE66ddCe94C28BC47c66e60222824494E"
 
 [llm]
 provider = "none"
