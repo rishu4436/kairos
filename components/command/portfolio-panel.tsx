@@ -7,13 +7,13 @@ export function PortfolioPanel({ portfolio }: { portfolio: CommandCenterModel["p
     <section className="panel h-full" aria-labelledby="portfolio-title">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="eyebrow">Sample ledger</p>
+          <p className="eyebrow">Paper ledger</p>
           <h2 id="portfolio-title" className="mt-1 text-base font-medium tracking-tight">
             Portfolio
           </h2>
-          <p className="mt-1 text-xs text-muted">Fixture book. The paper cycle uses a separate simulated account.</p>
+          <p className="mt-1 text-xs text-muted">Current simulated account. Values are empty until a paper book exists.</p>
         </div>
-        <Sparkline values={portfolio.sparkline} label="Simulated equity path ending at the current paper equity" />
+        {portfolio.sparkline.length > 1 && <Sparkline values={portfolio.sparkline} label="Stored paper equity history" />}
       </div>
       <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3 xl:grid-cols-5">
         <Metric label="Total equity" value={portfolio.equity} />

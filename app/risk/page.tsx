@@ -13,10 +13,10 @@ export default function RiskPage() {
       <PageHeader
         kicker="User enforced"
         title="Risk"
-        description="Hard limits for the demo user. The validator lives outside any future model proposer."
+        description="Hard limits for the local user. The validator lives outside any future model proposer."
       />
       <p className="phase-banner" role="status">
-        Policy editing is not available. The values below are the demo user&apos;s sample policy. The paper cycle sends intents through the same risk engine. This screen does not approve a trade.
+        Policy editing is not available. The values below are the local user&apos;s configured paper policy. The paper cycle sends intents through the same risk engine. This screen does not approve a trade.
       </p>
       <section className="panel panel-risk max-w-3xl">
         <p className="text-sm text-muted">Owner · {model.owner}</p>

@@ -1,4 +1,4 @@
-import { createDemoSession } from "@/data/sample-session";
+import { localPaperSession } from "@/paper/session";
 import { resolveServerPaperCapability } from "@/domain/execution-authority";
 import type { ObservationBoard } from "@/domain/observation";
 import { DEMO_USER_ID, DEMO_WATCH_TICKERS } from "@/domain/watchlist";
@@ -27,7 +27,7 @@ export async function GET(request: Request): Promise<Response> {
       if (requested !== DEMO_USER_ID) {
         return json(buildPaperObservation(requested).board);
       }
-      const session = createDemoSession();
+      const session = localPaperSession()!;
       const authority = resolveServerPaperCapability({
         serverDataMode: "paper",
         requestedUserId: requested,
@@ -56,7 +56,6 @@ export async function GET(request: Request): Promise<Response> {
     }
     console.error("[kairos.binance]", {
       category: "UNKNOWN_ERROR",
-      message: error instanceof Error ? error.message : "Unknown failure",
     });
     return json(
       failureBoard(

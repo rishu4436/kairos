@@ -16,7 +16,7 @@ export function KairosLive({ account }: { account: AgenticWalletAccount }) {
         <Item label="Simulation" value="NOT RUN" />
         <Item label="Execution" value="NOT READY" />
       </dl>
-      <p className="mt-3 text-xs text-muted">No live order has been submitted. The sample portfolio is not this wallet.</p>
+      <p className="mt-3 text-xs text-muted">Paper portfolio values are separate from this live wallet.</p>
       <p className="mt-2 text-sm">NO TRANSACTION HAS BEEN BROADCAST</p>
       <button className="mt-3 rounded-md border border-line px-3 py-2 text-sm text-muted" type="button" disabled>
         Authorize live trade

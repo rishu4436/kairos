@@ -8,7 +8,7 @@ import type { ResearchLifecycle } from "@/lifecycle/types";
 import { reviewPromotion, resetPromotionAudits, listPromotionAudits } from "@/lifecycle/promote";
 import { exportUserPerformance, strategyMemory, resetStrategyMemory } from "@/lifecycle/store";
 import { getStrategyVersion, resetStrategyVersions } from "@/lifecycle/version";
-import { resetMarketStores } from "@/observation/stores";
+import { resetTestMarketStores as resetMarketStores } from "@/test/paper-market";
 import { runManualPaperCycle } from "@/observation/autonomous-board";
 import { applyPaperFillOnce } from "@/paper/idempotency";
 import { readPaperBook } from "@/paper/store";

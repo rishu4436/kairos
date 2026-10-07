@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { scaleDecimal } from "@/domain/candle";
 import { InMemoryMarketHistory } from "@/domain/history";
-import { candlesFromCloses } from "@/domain/test-candles";
+import { candlesFromCloses } from "@/test/candles";
 
 describe("market history", () => {
   it("appends, queries, and caps", () => {

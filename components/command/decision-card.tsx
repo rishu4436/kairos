@@ -14,7 +14,7 @@ export function DecisionCard({ decision }: { decision: CommandCenterModel["decis
             {decision.symbol}
           </h2>
           <p className="mt-1 text-sm text-signal">{decision.posture}</p>
-          <p className="mt-1 text-xs text-muted">{decision.name} · sample assessment</p>
+          <p className="mt-1 text-xs text-muted">{decision.name}</p>
         </div>
         <p className="decision-action">{decision.action}</p>
       </div>

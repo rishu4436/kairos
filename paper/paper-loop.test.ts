@@ -9,7 +9,7 @@ import type { ObservationBoard, ObservationRow } from "@/domain/observation";
 import { asAgentId, asUserId } from "@/domain/ids";
 import { parseDecimal } from "@/domain/money";
 import { markPositions, summarizePortfolio } from "@/domain/portfolio";
-import { resetMarketStores } from "@/observation/stores";
+import { resetTestMarketStores as resetMarketStores } from "@/test/paper-market";
 import { paperObservationBoard } from "@/observation/paper";
 import { runPreparedAgentCycle } from "@/paper/cycle";
 import { executePaper } from "@/paper/execute";
@@ -543,7 +543,7 @@ describe("paper autonomous loop", () => {
     expect(source).not.toMatch(/sendTransaction/);
   });
 
-  it("isolates users and leaves the sample command center unchanged", () => {
+  it("isolates users and keeps the local command center empty", () => {
     const userB = asUserId("user_b");
     const agentB = asAgentId("agent_b");
     run(select("BUY"));
@@ -570,7 +570,7 @@ describe("paper autonomous loop", () => {
     expect(readStoredRiskPolicy(DEMO_USER_ID)?.userId).toBe(DEMO_USER_ID);
     expect(runAgentCycle("user_b").ran).toBe(false);
     expect(readPaperBook(ids.userId, ids.agentId)?.account.cash).toBe(cashA);
-    expect(getCommandCenterModel().portfolio.equity).toBe("47,217.90 USDT");
+    expect(getCommandCenterModel().portfolio.equity).toBe("—");
     expect(getCommandCenterModel().agent.lastDecision).toBe("None");
   });
 
@@ -628,7 +628,7 @@ describe("paper autonomous loop", () => {
     expect(second.paperCycle?.loopState).toBe("MONITORING_POSITION");
     expect(second.paperCycle?.executionMode).toBe("PAPER");
     expect(readPaperBook(asUserId(DEMO_USER_ID), asAgentId("agent_demo"))?.account.positions).toHaveLength(1);
-    expect(getCommandCenterModel().portfolio.equity).toBe("47,217.90 USDT");
+    expect(getCommandCenterModel().portfolio.equity).toBe(formatUsdt(summarizePortfolio(filled!.account).equity));
   });
 
   it("refuses an untrusted or live authority and does not open a book", () => {

@@ -31,7 +31,6 @@ export async function loadDemoObservationBoard(): Promise<ObservationBoard> {
     }
     console.error("[kairos.binance]", {
       category: "UNKNOWN_ERROR",
-      message: error instanceof Error ? error.message : "Unknown failure",
     });
     return failureBoard(
       new KairosApiError({

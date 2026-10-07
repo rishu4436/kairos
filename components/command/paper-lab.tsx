@@ -25,7 +25,7 @@ export function PaperLabPreview({ lab, research }: { lab: CommandCenterModel["la
         <LabStat label="Running" value={String(research.running)} />
       </dl>
       <p className="mt-4 text-xs text-muted">
-        Paper experiment. Not real money. The sample ledger still reports {lab.activeExperiments} fixture experiments and {lab.underEvaluation} records under evaluation. Best recent fixture result {lab.bestRecent}.
+        Paper experiments. Not real money. {lab.activeExperiments} experiments running; {lab.underEvaluation} stored records. Best recent result {lab.bestRecent}.
       </p>
     </section>
   );

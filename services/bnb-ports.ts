@@ -37,7 +37,7 @@ function disconnected(name: string): DisconnectedPort {
   return {
     name,
     connected: false,
-    documentationNote: `${name} is not connected. This phase does not quote, sign, simulate, or broadcast.`,
+    documentationNote: `${name} is not connected. Calls through this disconnected port are refused.`,
   };
 }
 
@@ -73,13 +73,13 @@ export const bnbWalletPort: ConnectedPort = {
 };
 export const bnbBroadcastPort = disconnected("BNB transaction broadcast");
 export const bnbAgentStudioPort = disconnected(
-  "BNB Agent Studio runtime. bag 0.0.5 is installed. No studio.toml project, identity, or deployment was found.",
+  "BNB Agent Studio runtime. The workspace is configured; deployment and identity registration remain inactive.",
 );
 export const agenticWalletPort: DisconnectedPort = {
   name: "Agentic Wallet provider",
   connected: false,
   documentationNote:
-    "The baw adapter exists. wallet status returned UNCONNECTED. market-order swap is not called unless KAIROS_AGENTIC_WALLET_EXECUTE=1. No private key is stored.",
+    "The baw adapter exists. Connection requires a current wallet status read. market-order swap is not called unless KAIROS_AGENTIC_WALLET_EXECUTE=1. No private key is stored.",
 };
 
 export const BNB_PORTS = [

@@ -1,10 +1,10 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { arbitrateAsset } from "@/arbitration/arbitrate";
 import type { ArbitrationContext, StrategyEvaluation } from "@/domain/arbitration";
 import { asAgentId, asUserId } from "@/domain/ids";
 import { parseDecimal } from "@/domain/money";
 import { activateLiveCandidate, registerStrategyCandidate, resetStrategyCandidates, transitionCandidate } from "@/lifecycle/candidates";
-import { resetMarketStores } from "@/observation/stores";
+import { resetTestMarketStores as resetMarketStores } from "@/test/paper-market";
 import { applyPaperFillOnce } from "@/paper/idempotency";
 import { exportPaperBook, importPaperBook } from "@/paper/snapshot";
 import { readPaperBook } from "@/paper/store";
@@ -18,6 +18,8 @@ import { deterministicPositionManager } from "@/context/position-manager";
 import type { KAIROSContext } from "@/context/types";
 
 const NOW = Date.parse("2026-10-04T15:00:00.000Z");
+
+beforeEach(() => resetMarketStores());
 
 afterEach(() => {
   resetMarketStores();

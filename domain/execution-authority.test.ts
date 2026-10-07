@@ -13,7 +13,7 @@ import {
 import { NEUTRAL_EXTERNAL_POLICY } from "@/domain/arbitration";
 import { asAgentId, asUserId } from "@/domain/ids";
 import { parseDecimal } from "@/domain/money";
-import { resetMarketStores } from "@/observation/stores";
+import { resetTestMarketStores as resetMarketStores } from "@/test/paper-market";
 import { executePaper } from "@/paper/execute";
 import { openLiveGateway, openPaperGateway } from "@/paper/gateway";
 import { createTradeIntent } from "@/paper/intent";

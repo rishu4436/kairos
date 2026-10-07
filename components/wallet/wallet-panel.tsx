@@ -25,7 +25,7 @@ export function WalletPanel({ account, balances }: { account: AgenticWalletAccou
         <Item label="Tradable token scope" value={policy === null ? "—" : policy.tradeAllTokens === true ? "All tokens" : "Allow list, not verified"} />
         <Item label="High-risk handling" value={policy?.highRiskHandling ?? "—"} />
       </dl>
-      <p className="mt-4 text-sm text-muted">This book is separate from the sample portfolio. Signing material is not stored in KAIROS.</p>
+      <p className="mt-4 text-sm text-muted">This wallet is separate from the simulated paper account. Signing material is not stored in KAIROS.</p>
       {balances.length > 0 ? (
         <ul className="mt-3 space-y-1 text-sm">
           {balances.map((item) => (

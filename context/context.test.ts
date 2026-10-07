@@ -1,3 +1,4 @@
+import { seedPaperMarketFixture } from "@/test/paper-market";
 import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it } from "vitest";
 import { arbitrateAsset } from "@/arbitration/arbitrate";
@@ -743,6 +744,7 @@ describe("context fusion", () => {
     expect(context.eventContext.value?.events[0]?.origin).toBe("MOCK");
     expect(context.timeline.some((entry) => entry.origin === "MOCK")).toBe(true);
 
+    seedPaperMarketFixture();
     const board = buildPaperObservation("user_demo", new Date(NOW));
     const tsla = board.board.rows.find((row) => row.ticker === "TSLA");
     expect(tsla?.kairos?.assetId).toBe("paper:TSLA");

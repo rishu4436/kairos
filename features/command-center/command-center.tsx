@@ -1,5 +1,4 @@
 import { AutonomousRuntimePanel } from "@/components/command/autonomous-runtime";
-import { RecordedIntelligenceEvidence } from "@/components/command/recorded-intelligence";
 import { AgentRuntimePanel } from "@/components/command/agent-runtime";
 import { ExternalIntelligencePanel } from "@/components/command/binance-intelligence";
 import { AgentStatus } from "@/components/command/agent-status";
@@ -89,9 +88,6 @@ export async function CommandCenter() {
         </div>
         <div className="xl:col-span-12">
           <AutonomousRuntimePanel snapshot={runtime} />
-        </div>
-        <div className="xl:col-span-12">
-          <RecordedIntelligenceEvidence />
         </div>
         <div className="xl:col-span-12">
           <MarketObserver dataMode={model.dataMode} initialBoard={board} />

@@ -2,7 +2,7 @@
 
 KAIROS can ask Binance for a quote, an unsigned swap transaction, and an off-chain simulation. It cannot sign or broadcast. A live failure does not become a paper fill. This is simulated execution and does not broadcast blockchain transactions.
 
-The pages used for the field names are the Binance Web3 docs dated 2026-10-01:
+Binance Web3 API references:
 
 - Trading API catalog and introduction
 - Transaction API catalog and introduction
@@ -27,7 +27,7 @@ KAIROS does not send fee or referrer fields.
 
 The response `data` is a list of routes. KAIROS keeps the first route and reads `quoteId`, `vendorName`, `fromTokenAmount`, `toTokenAmount`, `tradeFee`, `priceImpactPercent`, and `executionMode`. A missing value stays null. The schema does not return an execution price, so that field is null. The documented quote TTL is 30 seconds. The payload does not include `expiresAt`, so KAIROS derives it from the receive time plus that documented TTL. An expired quote is not simulated.
 
-`SWAP` means a later phase would sign `tx` and broadcast. `RFQ` means a later phase would sign `rfq.typedDataToSign` and submit an order. This phase does neither.
+SWAP preparation returns an unsigned transaction; RFQ preparation returns typed data. This preparation boundary signs neither.
 
 ## Unsigned build
 
@@ -53,7 +53,7 @@ Query: `address` and `excludeRiskToken=true`. Each row maps `binanceChainId`, `t
 
 ## KAIROS gate
 
-The preparation function accepts a live capability and a risk pass. It does not quote when risk failed. Quoted `priceImpactPercent` above the user's maximum is `SLIPPAGE_LIMIT_EXCEEDED`. A missing impact is `PRICE_IMPACT_UNAVAILABLE` and is not treated as zero. The final successful state is `TRANSACTION_SIMULATED`. `SIGNED`, `BROADCAST`, and `CONFIRMED` are not states in this phase.
+The preparation function accepts a live capability and a risk pass. It does not quote when risk failed. Quoted `priceImpactPercent` above the user's maximum is `SLIPPAGE_LIMIT_EXCEEDED`. A missing impact is `PRICE_IMPACT_UNAVAILABLE` and is not treated as zero. The final successful state is `TRANSACTION_SIMULATED`. `SIGNED`, `BROADCAST`, and `CONFIRMED` are not states in the preparation boundary.
 
 The public wallet address is `KAIROS_WALLET_ADDRESS`. It is not a private key. Token decimals must already be on the listing. KAIROS does not guess them. The BSC USDT contract used as the quote counter-asset is the address in the Trading API examples: `0x55d398326f99059fF775485246999027B3197955`.
 

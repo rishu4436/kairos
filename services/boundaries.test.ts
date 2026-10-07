@@ -38,11 +38,11 @@ describe("integration boundaries", () => {
     expect(model.agent.strategy).toBe("No live strategy selected yet");
     expect(model.decision.action).toBe("WAIT");
     expect(model.risk.liveTrading).toBe("Disabled");
-    expect(model.portfolio.equity).toBe("47,217.90 USDT");
-    expect(model.events.at(-1)?.message).toBe("No execution — confidence threshold not met");
+    expect(model.portfolio.equity).toBe("—");
+    expect(model.events).toHaveLength(0);
     expect(model.strategies.find((strategy) => strategy.id === "arbitrage")?.status).toBe("coming_soon");
-    expect(model.lab.activeExperiments).toBe(2);
-    expect(model.lab.underEvaluation).toBe(3);
+    expect(model.lab.activeExperiments).toBe(0);
+    expect(model.lab.underEvaluation).toBe(0);
     expect(model.lab.bestRecent).toBe("—");
   });
 });

@@ -1,8 +1,8 @@
 # Binance Web3 integration
 
-KAIROS reads tokenized-equity market data from the official Binance Web3 API. This phase does not quote, sign, or broadcast.
+KAIROS reads tokenized-equity market data from the official Binance Web3 API. Market observation does not quote, sign, or broadcast.
 
-Documentation inspected on 2026-10-03:
+API references:
 
 - https://web3.binance.com/en/dev-docs/introduction
 - https://web3.binance.com/en/dev-docs/authentication
@@ -11,7 +11,7 @@ Documentation inspected on 2026-10-03:
 - https://web3.binance.com/en/dev-docs/products/market-api/introduction
 - https://web3.binance.com/en/dev-docs/catalog/web3-wallet/api/rest-api/rwa-data
 
-The RWA field names below match that catalog and the OpenAPI models generated into the official `binance/binance-web3-connector-js` repository. Two timestamp names were missing from the rendered HTML and were taken from those generated models. See `docs/DEVEX_NOTES.md`.
+The RWA field names below match that catalog and the OpenAPI models generated into the official `binance/binance-web3-connector-js` repository. Two timestamp names were missing from the rendered HTML and were taken from those generated models. Source timestamps are mapped from dataUpdateTime and timestamp; receive time is kept separately.
 
 ## Endpoints in use
 
@@ -28,7 +28,7 @@ Every call is a signed `GET`. The signed path includes the `/build` prefix.
 
 `tokenContractAddresses` is comma-separated, at most 100 addresses per call.
 
-Not called in this phase:
+Separate execution adapters:
 
 - `GET /api/v1/dex/market/rwa/underlying-profile`
 - `GET /api/v1/dex/market/rwa/underlying-market`
@@ -127,7 +127,7 @@ Missing `BINANCE_WEB3_API_KEY` or `BINANCE_WEB3_SECRET_KEY` throws before any re
 3. Set `KAIROS_DATA_MODE=live`, `BINANCE_WEB3_API_KEY`, and `BINANCE_WEB3_SECRET_KEY`.
 4. `npm run dev` and open the command center.
 
-The demo watchlist is NVDA, TSLA, AAPL, MSFT, AMD, and SPY for `user_demo`. Symbols and contracts come from search results.
+The local watchlist is NVDA, TSLA, AAPL, MSFT, AMD, and SPY for `user_demo`. Symbols and contracts come from search results.
 
 `npm test` does not call Binance. `services/binance/integration.test.ts` runs only when `BINANCE_WEB3_API_KEY` is set in the environment.
 

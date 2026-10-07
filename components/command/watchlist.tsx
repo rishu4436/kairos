@@ -28,7 +28,7 @@ export function Watchlist({ rows }: { rows: CommandCenterModel["watchlist"] }) {
       </h2>
       {rows.length === 0 ? (
         <div className="mt-4">
-          <EmptyState title="No names on the watchlist" body="The sample watchlist is empty." />
+          <EmptyState title="No names on the watchlist" body="No current observations are available." />
         </div>
       ) : (
         <div className="mt-4 overflow-x-auto">

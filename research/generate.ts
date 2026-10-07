@@ -1,4 +1,4 @@
-import { createDemoSession } from "@/data/sample-session";
+import { localPaperSession } from "@/paper/session";
 import { parseDecimal } from "@/domain/money";
 import { readDataMode } from "@/lib/mode";
 import { liveObservationBoard } from "@/observation/live";
@@ -6,13 +6,12 @@ import { buildPaperObservation } from "@/observation/paper";
 import { marketHistory } from "@/observation/stores";
 import { KairosApiError } from "@/services/binance/errors";
 import { buildResearchContext } from "@/research/context";
-import { demoBars } from "@/research/demo";
 import { readLlmConfig } from "@/research/llm-config";
 import { MockReasoningProvider } from "@/research/mock-provider";
 import { selectReasoningProvider } from "@/research/select-provider";
 import { runResearchDraft } from "@/research/pipeline";
 import { researchStore } from "@/research/store";
-import { unavailableResearchBoundaries, type MarketDataSource, type ResearchSourceType } from "@/research/types";
+import { type MarketDataSource, type ResearchSourceType } from "@/research/types";
 import { DEMO_USER_ID, demoWatchlist } from "@/domain/watchlist";
 
 export interface GenerateResearchResult {
@@ -36,7 +35,7 @@ export async function generateResearchThesis(input: {
   if (input.userId !== DEMO_USER_ID) {
     return failed("BUILDING CONTEXT", "USER_MISMATCH", "No watchlist is stored for this user.");
   }
-  const session = createDemoSession();
+  const session = localPaperSession()!;
   const watchlist = demoWatchlist(input.userId);
   const ticker = normalizeAsset(input.assetId);
   if (!watchlist.tickers.includes(ticker)) {
@@ -44,32 +43,18 @@ export async function generateResearchThesis(input: {
   }
   const nowMs = input.nowMs ?? Date.now();
   const config = readLlmConfig();
-  if (input.mode === "mock" || config.provider === "mock") {
-    return runWithProvider({
-      provider: new MockReasoningProvider(),
-      userId: session.user.id,
-      agentId: session.agent.id,
-      ticker,
-      bars: demoBars(),
-      dataSource: "MOCK_FIXTURE",
-      contextTimestamp: new Date(nowMs).toISOString(),
-      contextDataVersion: "mock:NVDA:40",
-      watchlist: watchlist.tickers,
-      nowMs,
-      row: null,
-    });
-  }
-  if (!config.configured) {
+  const mockRequested = input.mode === "mock" || config.provider === "mock";
+  if (!mockRequested && !config.configured) {
     const message = config.provider === "qwen" && config.apiKey.length > 0
       ? "Qwen workspace base URL is not configured. The mock lab was not used."
       : "LLM is not configured. The mock lab is separate and was not used.";
     return failed("ANALYZING", "NOT_CONFIGURED", message);
   }
-  const loaded = await loadCanonical(input.userId, ticker, nowMs);
+  const loaded = await loadCanonical(input.userId, ticker, nowMs, mockRequested);
   if (!loaded.ok) {
     return failed("BUILDING CONTEXT", loaded.code, loaded.message);
   }
-  const provider = selectReasoningProvider(config);
+  const provider = mockRequested ? new MockReasoningProvider() : selectReasoningProvider(config);
   const result = await runResearchDraft({
     provider,
     context: loaded.built.context,
@@ -98,9 +83,10 @@ async function loadCanonical(
   userId: string,
   ticker: string,
   nowMs: number,
+  paperOnly = false,
 ): Promise<{ ok: true; built: ReturnType<typeof buildResearchContext> } | { ok: false; code: string; message: string }> {
-  const session = createDemoSession();
-  if (readDataMode() === "live") {
+  const session = localPaperSession()!;
+  if (!paperOnly && readDataMode() === "live") {
     try {
       const board = await liveObservationBoard(userId);
       const row = board.rows.find((item) => item.ticker === ticker);
@@ -130,7 +116,7 @@ async function loadCanonical(
   const builtPaper = buildPaperObservation(userId, new Date(nowMs));
   const row = builtPaper.board.rows.find((item) => item.ticker === ticker);
   if (!builtPaper.board.ok || !row) {
-    return { ok: false, code: "ASSET_NOT_ON_WATCHLIST", message: "That asset is not on this user's watchlist." };
+    return { ok: false, code: "PAPER_MARKET_DATA_UNAVAILABLE", message: "No paper market input is configured." };
   }
   return {
     ok: true,
@@ -144,50 +130,6 @@ async function loadCanonical(
       nowMs,
     }),
   };
-}
-
-async function runWithProvider(input: {
-  provider: MockReasoningProvider;
-  userId: ReturnType<typeof createDemoSession>["user"]["id"];
-  agentId: ReturnType<typeof createDemoSession>["agent"]["id"];
-  ticker: string;
-  bars: ReturnType<typeof demoBars>;
-  dataSource: MarketDataSource;
-  contextTimestamp: string;
-  contextDataVersion: string;
-  watchlist: readonly string[];
-  nowMs: number;
-  row: null;
-}): Promise<GenerateResearchResult> {
-  const result = await runResearchDraft({
-    provider: input.provider,
-    context: {
-      userId: input.userId,
-      agentId: input.agentId,
-      assetId: `paper:${input.ticker}`,
-      ticker: input.ticker,
-      watchlist: input.watchlist,
-      observation: { price: "100.00", session: "CLOSED", regime: "UNKNOWN", freshness: "SAMPLE" },
-      features: [{ id: "return_1h", value: null, bps: null }],
-      signals: [],
-      arbitration: null,
-      paperPerformance: null,
-      priorExperiments: [],
-      contextId: null,
-      ...unavailableResearchBoundaries(),
-    },
-    store: researchStore(),
-    bars: input.bars,
-    dataset: "deterministic_research_sample",
-    dataSource: input.dataSource,
-    contextTimestamp: input.contextTimestamp,
-    contextDataVersion: input.contextDataVersion,
-    initialCapital: parseDecimal("10000"),
-    nowMs: input.nowMs,
-    userId: input.userId,
-    agentId: input.agentId,
-  });
-  return toResult(result.thesis.status, result.thesis.thesisId, "MOCK", "MOCK_FIXTURE", result.thesis.rejectionReasons, null);
 }
 
 function toResult(

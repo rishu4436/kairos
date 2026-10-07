@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { assessDataQuality } from "@/domain/quality";
 import { hasDirectionalAction, parseSignal, serializeSignal } from "@/domain/signal";
-import { candlesFromCloses } from "@/domain/test-candles";
+import { candlesFromCloses } from "@/test/candles";
 import { buildStrategyContext, type StrategyContext } from "@/strategies/context";
 import { meanReversionStrategy } from "@/strategies/mean-reversion";
 import { momentumStrategy } from "@/strategies/momentum";

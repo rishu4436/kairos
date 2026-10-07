@@ -12,7 +12,7 @@ An open position may span many cycles. Each review keeps `cycleId`, `correlation
 
 If another directional strategy has higher confidence than the origin, the review records `ALTERNATE_STRATEGY_SIGNAL` and `alternateStrategyId`. Ownership stays with the origin. There is no automatic handoff.
 
-The whole position, including later adds, reduces, and the exit, stays attributed to that origin version in the paper ledger and in Phase 11 performance memory.
+The whole position, including later adds, reduces, and the exit, stays attributed to that origin version in the paper ledger and in strategy performance memory.
 
 ## Entry snapshot
 

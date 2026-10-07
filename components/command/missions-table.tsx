@@ -10,7 +10,7 @@ export function MissionsTable({ missions }: { missions: CommandCenterModel["miss
       </h2>
       {missions.length === 0 ? (
         <div className="mt-4">
-          <EmptyState title="No paper missions" body="The sample ledger has no fills." />
+          <EmptyState title="No paper missions" body="The current paper ledger has no fills." />
         </div>
       ) : (
         <div className="mt-4 overflow-x-auto">

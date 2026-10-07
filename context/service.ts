@@ -10,7 +10,7 @@ import { formatDecimal, mul, parseDecimal } from "@/domain/money";
 import type { ObservationRow, SignalView } from "@/domain/observation";
 import { realizedLossToday, summarizePortfolio, valuePosition } from "@/domain/portfolio";
 import { DEMO_USER_ID } from "@/domain/watchlist";
-import { createDemoSession } from "@/data/sample-session";
+import { localPaperSession } from "@/paper/session";
 import { DEFAULT_PAPER_POLICY } from "@/paper/policy";
 import { positionPolicyFor } from "@/position/policy";
 import type { DataQuality } from "@/domain/quality";
@@ -386,7 +386,7 @@ function riskSnapshot(
   account: NonNullable<ReturnType<typeof readPaperBook>>["account"],
   nowMs: number,
 ): PositionSliceValue["risk"] {
-  const policy = userId === DEMO_USER_ID ? createDemoSession().policy : null;
+  const policy = userId === DEMO_USER_ID ? localPaperSession(userId)?.policy ?? null : null;
   const summary = summarizePortfolio(account);
   const day = new Date(nowMs).toISOString().slice(0, 10);
   return {

@@ -2,10 +2,6 @@
 
 KAIROS decides. Binance Agentic Wallet authorizes. KAIROS does not store a private key, seed phrase, or signing session.
 
-The local skill file is `binance-agentic-wallet` version `1.11.0`. Its required CLI version is `1.9.0`. On this machine `baw cli-check --required-version 1.9.0 --json` returned `currentCliVersion` `1.9.0` and `needUpdateCli` false. `baw skill-check` returned `needUpdateSkill` true and `latestSkillVersion` `1.12.0`. The skill says to ask before installing that update, so it was not installed. The CLI was not upgraded.
-
-`baw wallet status --json` returned `UNCONNECTED` before sign-in. `baw auth signin --json` then succeeded. The returned `urlForWeb` was shown to the operator and was not stored. `auth verify` was not started. No address or balance was read.
-
 ## Documented commands KAIROS may run
 
 The argument list is fixed. KAIROS does not build a shell string.
@@ -32,4 +28,8 @@ Execution also requires a live capability, a BUY or SELL, a valid unexpired quot
 
 The stock contract comes from the existing KAIROS RWA record. The wallet skill is not a second token catalog. A halted token is `TOKEN_NOT_TRADABLE` and no swap is sent.
 
-The sample portfolio of 47,217.90 USDT is not the live wallet.
+## Multi-user boundary
+
+The supported local CLI session has no profile or user argument. KAIROS scopes this boundary to the stable local user ID user_demo; another user receives UNCONNECTED without a CLI call. AgenticWalletGateway retains a userId parameter, but production multi-user session orchestration is unfinished. KAIROS does not invent a second credential store or a global wallet.
+
+Paper portfolio values are simulated state and do not establish a live wallet balance.

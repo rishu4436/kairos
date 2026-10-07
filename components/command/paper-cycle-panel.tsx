@@ -88,7 +88,7 @@ function CurrentMission({ mission }: { mission: PaperMissionView | null }) {
     return (
       <div className="rounded-xl border border-line px-3 py-3">
         <h3 className="text-sm font-medium">Current mission</h3>
-        <p className="mt-2 text-sm text-muted">No paper mission yet. The sample ledger on this page is a separate fixture.</p>
+        <p className="mt-2 text-sm text-muted">No paper mission has been executed.</p>
       </div>
     );
   }

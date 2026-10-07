@@ -23,7 +23,7 @@ Nothing in that chain creates an order.
 
 The store is behind the interface so a later Redis or Postgres implementation can replace it. Strategies receive a `Candle[]` from the caller. They do not read the map.
 
-Paper mode appends a deterministic sample series and labels the board paper. A failed live candle request does not copy that series.
+Paper mode consumes explicitly supplied paper inputs and labels the board paper. Tests supply deterministic series; application startup does not generate them. A failed live candle request does not copy that series.
 
 ## Features
 

@@ -17,7 +17,7 @@ export function ActivityFeed({ events }: { events: CommandCenterModel["events"] 
           </li>
         ))}
       </ol>
-      <p className="mt-3 text-xs text-muted">Recorded sample. The feed is not updating.</p>
+      <p className="mt-3 text-xs text-muted">Stored paper activity. No activity appears until a cycle runs.</p>
     </section>
   );
 }

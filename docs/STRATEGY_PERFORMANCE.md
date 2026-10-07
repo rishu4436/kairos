@@ -12,7 +12,7 @@ Records are created only for contexts that occur:
 - asset + session
 - regime + session
 
-User A's records are not readable as User B's. This phase does not roll user paper results into a cross-user aggregate.
+User A's records are not readable as User B's. The runtime does not roll user paper results into a cross-user aggregate.
 
 ## Expectancy
 

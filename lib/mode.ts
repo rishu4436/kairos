@@ -9,8 +9,8 @@ export interface DataModeEnv {
 }
 
 /**
- * Explicit data mode. `paper` and `mock` are the sample snapshot.
- * `live` requests Binance Web3 market data and does not fall back to that snapshot.
+ * Explicit data mode. `paper` and its legacy `mock` alias consume supplied paper inputs.
+ * `live` requests Binance Web3 market data and never substitutes synthetic inputs.
  * Any other value fails closed.
  *
  * `KAIROS_DATA_MODE` wins when both variables are set.

@@ -1,6 +1,6 @@
 # KAIROS architecture
 
-## Phase 17G public intelligence boundary
+## Public intelligence boundary
 
 `observation/live.ts` projects public provider rows into `studio/intelligence.ts`
 before user-specific enrichment. The projection recomputes the standard public
@@ -24,14 +24,14 @@ deterministic risk → Binance quote/build/simulation → Agentic Wallet.
 The rail is configured, on-chain publication NOT PERFORMED, deployment NOT DEPLOYED,
 ERC-8004 NOT_REGISTERED, and trading wallet NOT CONNECTED.
 
-This build is the skeleton. Names below match the code. Anything described as later is not implemented.
+The following boundaries describe implemented code and its remaining activation limits.
 
 ## System boundaries
 
 ```text
 app / components / features     render read models
         │
-        ├── services/command-center.ts     paper ledger and sample decision
+        ├── services/command-center.ts     stored paper ledger and empty decision state
         └── GET /api/observations          polled by the browser
                 │
                 ▼
@@ -49,14 +49,14 @@ agent                           state machine + decision pipeline
         ├── execution           plan + mock simulation
         └── wallet              paper authorization, no signature
 
-execution ports and external access stay disconnected
+live submission is separately gated; general external MCP transport is unimplemented
 ```
 
-UI components do not validate orders. Portfolio and decision strings come from `services/command-center.ts`. Market rows come from `GET /api/observations`. The decision pipeline does not read the live observation yet.
+UI components do not validate orders. Portfolio and decision strings come from `services/command-center.ts`. Market rows come from `GET /api/observations`. The canonical context feeds arbitration and the cycle; UI rendering grants no execution authority.
 
 Domain types do not import React. A later API or MCP adapter can call the same functions without rendering a page.
 
-There is no global wallet. `User`, `Agent`, `WalletAccount`, `RiskPolicy`, and `PaperAccountState` all carry user and agent ids. The demo session is one example of that graph, not a singleton the domain requires.
+There is no global wallet. `User`, `Agent`, `WalletAccount`, `RiskPolicy`, and `PaperAccountState` all carry user and agent ids. The local session provides identity and paper policy only; test fixtures provide synthetic portfolio/market inputs explicitly.
 
 ## Agent loop
 
@@ -74,7 +74,7 @@ The paper cycle is `runAgentCycle` / `runPreparedAgentCycle`. It does not take a
 
 `ArbitrationDecision` describes the decision boundary. Its `loopPhase` stays `WAITING_FOR_RISK`. The paper execution lifecycle is a separate state machine and ends at `MONITORING_POSITION` when a position is open. Those two records are not merged.
 
-`PAPER_EXECUTING` records a simulated fill. It is not chain `EXECUTING`. `MONITORING_POSITION` means an open paper position exists. The mark reader does not write the book. The next paper cycle can hold, add, reduce, or exit that position from the current KAIROS context, and only after risk. A closed book returns to `OBSERVING`. A risk rejection or an expired intent stays at `WAITING_FOR_RISK`. This is simulated execution and does not broadcast blockchain transactions. The sample 47,217.90 USDT ledger is not the cycle book. See [EXECUTION_CONTEXT.md](EXECUTION_CONTEXT.md) and [POSITION_MANAGER.md](POSITION_MANAGER.md).
+`PAPER_EXECUTING` records a simulated fill. It is not chain `EXECUTING`. `MONITORING_POSITION` means an open paper position exists. The mark reader does not write the book. The next paper cycle can hold, add, reduce, or exit that position from the current KAIROS context, and only after risk. A closed book returns to `OBSERVING`. A risk rejection or an expired intent stays at `WAITING_FOR_RISK`. This is simulated execution and does not broadcast blockchain transactions. The command center reads the stored cycle book or an empty state. See [EXECUTION_CONTEXT.md](EXECUTION_CONTEXT.md) and [POSITION_MANAGER.md](POSITION_MANAGER.md).
 
 ```text
 Observation → Strategy → Arbitration → Trade intent → Risk → Simulation → Paper execution → Position
@@ -102,7 +102,7 @@ Live preparation can quote, build an unsigned swap, and simulate it. It stops at
 
 Strategy versions, paper outcomes, and experiment outcomes feed a performance memory. Health is computed from that memory. It does not replace the current signal, and a research strategy cannot activate itself for live trading. See [STRATEGY_LIFECYCLE.md](STRATEGY_LIFECYCLE.md).
 
-Agent Studio, when a project exists, is a runtime around the same KAIROS cycle. The operating wallet and the Agentic Wallet stay separate. This workspace has `bag` 0.0.5 and no `studio.toml`, so the runtime port stays disconnected. See [AGENT_STUDIO.md](AGENT_STUDIO.md).
+Agent Studio runtime adapters wrap the same cycle. The checked-in Studio project supplies a read-only intelligence work hook; seller bootstrap and deployment remain inactive. Operating and trading wallets stay separate. See [AGENT_STUDIO.md](AGENT_STUDIO.md).
 
 Binance skills are inputs. KAIROS normalizes them and decides. Trading-signal CLI commands and wallet tracking are blocked on baw 1.9.0 because those skills require 1.9.1. Smart Money live read is unavailable because the skill script is not installed and the current CLI reference does not publish a URL. Token audit and Ondo tokenized-security info are direct public APIs. They are not called from the browser, and a missing result stays missing. Token security is a gate after KAIROS risk. It does not add to strategy confidence. See [BINANCE_SKILLS.md](BINANCE_SKILLS.md).
 
@@ -112,7 +112,7 @@ MARKET → BINANCE INTELLIGENCE → STRATEGIES → KAIROS CONTEXT → ARBITRATOR
 
 One `KAIROSContext` is built per user, representation, and cycle in `context/`. Consumers read it. They do not fetch the wallet, the skills, or a second copy of the market. A stale or missing price blocks that context before arbitration, so a market-data failure cannot open a paper or live trade. Optional gaps degrade the context. See [CONTEXT_FUSION.md](CONTEXT_FUSION.md) and [EVENT_INTELLIGENCE.md](EVENT_INTELLIGENCE.md).
 
-The research brain is a separate path. `ReasoningProvider` has two adapters: Qwen Chat Completions and the xAI Responses API. The pipeline sees only the normalized thesis and proposal. A model failure is not replaced by another provider or by the mock. The provider cannot create a trade intent, open a gateway, or register a strategy. The research brain cannot directly execute trades. See [RESEARCH_BRAIN.md](RESEARCH_BRAIN.md) and [QWEN_INTEGRATION.md](QWEN_INTEGRATION.md).
+The research brain is a separate path. `ReasoningProvider` has Qwen Chat Completions, Gemini Interactions, and xAI Responses adapters. The pipeline sees only the normalized thesis and proposal. A model failure is not replaced by another provider or by the mock. The provider cannot create a trade intent, open a gateway, or register a strategy. The research brain cannot directly execute trades. See [RESEARCH_BRAIN.md](RESEARCH_BRAIN.md) and [QWEN_INTEGRATION.md](QWEN_INTEGRATION.md).
 
 ## REAL MODEL EXECUTION
 
@@ -167,7 +167,7 @@ A buy is rejected when any of these hold:
 - The resulting invested share of equity would exceed the maximum allocation.
 - Realized losses already booked that calendar day have reached the daily loss limit.
 
-A sell is still allowed after the daily loss limit so a later phase can reduce risk. Sells still have to pass ownership, venue, allowlist, and slippage checks. The paper simulator separately rejects a sell larger than the position.
+A sell is still allowed after the daily loss limit to reduce risk. Sells still have to pass ownership, venue, allowlist, and slippage checks. The paper simulator separately rejects a sell larger than the position.
 
 `validateRiskPolicy` takes `INCREASE_RISK`, `REDUCE_RISK`, or `CLOSE_RISK`. Omitted, a buy is `INCREASE_RISK` and a sell is `REDUCE_RISK`. `CLOSE_RISK` is a full exit. Both reducing effects skip the entry position, allocation, and daily-loss caps and still run every other check. A buy on either reducing effect fails with `exposure_increase`. HOLD and BLOCKED use `NONE` and never reach this function. See [POSITION_RISK.md](POSITION_RISK.md).
 
@@ -187,7 +187,7 @@ A grant is permission for a future paper fill. It is not a signature.
 
 `external_agentic_wallet` and every live plan are denied with an explicit "signing is not connected" reason.
 
-The demo account stores `address: null`.
+The local paper account has no chain address. The separate Agentic Wallet boundary obtains live status and requires explicit execution gates.
 
 ## Paper ledger
 
@@ -202,13 +202,11 @@ The demo account stores `address: null`.
 
 `applyPaperFill` returns a new state and rejects another user's fill, a cash shortfall, and an oversized sell. The decision pipeline does not call it.
 
-## Future paper strategy lab
+## Strategy Lab
 
-`StrategyExperiment` records a named hypothesis, a strategy id, a status (`draft`, `paper`, or `archived`), and paper capital. The command center counts the demo experiments. It does not generate, run, rank, or evolve them. The best recent experiment is empty on purpose.
+The Research Brain validates thesis/proposal output and runs declarative paper experiments over supplied history. Shadow/paper candidates, measured strategy performance, and guarded promotion analysis remain implemented. The command center counts stored experiments; it does not seed presentation drafts. See [RESEARCH_BRAIN.md](RESEARCH_BRAIN.md) and [STRATEGY_LIFECYCLE.md](STRATEGY_LIFECYCLE.md).
 
-The lab is meant to sit on the paper ledger above, after a hypothesis exists, and to stay away from the wallet signer.
-
-## Future multi-user model
+## Multi-user boundary
 
 ```text
 User
@@ -218,7 +216,7 @@ User
     → Positions and paper trades
 ```
 
-Isolation is already required by the risk check and the paper fill. What is missing is authentication, storage, and a request scoped to the signed-in user. The read models currently load the single demo session. `KAIROS_DATA_MODE` selects live or paper market data. An unknown mode fails. Live market data does not change the paper ledger.
+Isolation is already required by the risk check and the paper fill. Authentication and signed-in request scoping remain unfinished. Runtime state supports memory and Redis, while the read models use the stable local user/agent IDs. `KAIROS_DATA_MODE` selects live or paper market data. An unknown mode fails. Live market data does not change the paper ledger.
 
 ## Future MCP model
 
@@ -242,7 +240,7 @@ User
       → Tokenized representations returned by search
 ```
 
-`createUserWatchlist(userId, tickers)` builds one list for that user. It does not read a process-global list. This phase stores a list only for `user_demo`, with NVDA, TSLA, AAPL, MSFT, AMD, and SPY. Another user id gets "No watchlist is stored for this user."
+`createUserWatchlist(userId, tickers)` builds one list for that user. It does not read a process-global list. The local configuration stores a list only for `user_demo`, with NVDA, TSLA, AAPL, MSFT, AMD, and SPY. Another user id gets "No watchlist is stored for this user."
 
 The live pipeline is `observation/engine.ts`:
 
@@ -258,14 +256,14 @@ An underlying and a representation are different types. One ticker can have seve
 
 After the RWA snapshot, `observation/analyze.ts` loads 15-minute candles for each representation already on that watchlist, appends them to `InMemoryMarketHistory`, computes features, classifies a regime, and evaluates the implemented strategies. The loop stops at signals. It does not build a trade intent.
 
-Candle history is watchlist-scoped. The hot-token ranking is not called. Paper mode builds a labeled sample series and does not call the candle endpoint. A failed candle request leaves that representation's history empty or unchanged and does not copy the paper series in.
+Candle history is watchlist-scoped. The hot-token ranking is not called. Paper mode consumes supplied market/candle inputs; no automatic series is generated. A failed candle request leaves that representation's history empty or unchanged and does not copy the paper series in.
 
-`GET /api/observations` serves the board, including regime, features, candles, and signals. Paper mode returns the sample and labels it. Live mode calls Binance or returns a KAIROS error. The client polls on a timer, aborts on unmount, and backs off after a transient failure.
+`GET /api/observations` serves the board, including regime, features, candles, and signals. Paper mode returns supplied inputs or an unavailable board. Live mode calls Binance or returns a KAIROS error. The client polls on a timer, aborts on unmount, and backs off after a transient failure.
 
-The older `MarketObservation` type remains the fixture shape for the paper decision pipeline. Intelligence strategies do not read it. See `docs/MARKET_INTELLIGENCE.md` and `docs/STRATEGY_ENGINE.md`.
+The older `MarketObservation` type remains the input shape for the lower-level paper decision pipeline. Intelligence strategies do not read it. See `docs/MARKET_INTELLIGENCE.md` and `docs/STRATEGY_ENGINE.md`.
 
 ## BNB ports
 
 `services/bnb-ports.ts` lists market data, tokenized-equity reference data, quotes, transaction simulation, wallet integration, Agent Studio, and an Agentic Wallet provider.
 
-Market data and tokenized-equity reference data are connected to the adapters in `services/binance/`. RWA reads are in `docs/BINANCE_INTEGRATION.md`. Candles are in `docs/BINANCE_MARKET_DATA.md`. Quote, simulation, wallet, Agent Studio, and Agentic Wallet stay `connected: false`. `assertPortReady` throws on those before any network call.
+Market data and tokenized-equity reference data are connected to the adapters in `services/binance/`. RWA reads are in `docs/BINANCE_INTEGRATION.md`. Candles are in `docs/BINANCE_MARKET_DATA.md`. Quote, unsigned build, simulation, and balance-read ports are implemented. Generic broadcast and deployed Studio ports stay disconnected. Agentic Wallet has its own explicitly gated adapter; declared ports do not prove an active wallet session. `assertPortReady` rejects disconnected ports before a request.

@@ -23,7 +23,7 @@ export default async function MarketAssetPage({ params }: { params: Promise<{ ti
         description={
           mode === "live"
             ? "Live observation, candle history, features, and strategy signals. No order is sent."
-            : "Paper observation and a deterministic sample candle path. No order is sent."
+            : "Current paper observation and supplied candle history."
         }
       />
       <AssetTerminal ticker={symbol} initialBoard={board} />

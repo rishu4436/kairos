@@ -6,7 +6,7 @@ import { CANDLE_INTERVAL_MS, type Candle } from "@/domain/candle";
 import { asUserId } from "@/domain/ids";
 import { parseDecimal, SCALE } from "@/domain/money";
 import type { ObservationRow } from "@/domain/observation";
-import { resetMarketStores } from "@/observation/stores";
+import { resetTestMarketStores as resetMarketStores } from "@/test/paper-market";
 import { DEMO_USER_ID } from "@/domain/watchlist";
 import { buildResearchContext } from "@/research/context";
 import { generateResearchThesis } from "@/research/generate";

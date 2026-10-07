@@ -1,4 +1,4 @@
-import { createDemoSession } from "@/data/sample-session";
+import { localPaperSession } from "@/paper/session";
 import {
   issuePaperExecutionContext,
   resolveServerPaperCapability,
@@ -14,7 +14,7 @@ import { buildPaperObservation } from "@/observation/paper";
 import { runPreparedAgentCycle, type AgentCycleResult } from "@/paper/cycle";
 
 /**
- * Paper entry for the stored demo policy.
+ * Paper entry for the configured local policy.
  * The context is issued here from that policy. The caller does not pass a mode.
  */
 export function runAgentCycle(userId: string, now = new Date(), options?: { safetyMode?: "NORMAL" | "RISK_REDUCTION_ONLY" }): AgentCycleResult {
@@ -43,12 +43,12 @@ export function runAgentCycle(userId: string, now = new Date(), options?: { safe
   });
 }
 
-/** Server pages mint paper authority for the demo session. Client fields are not accepted. */
+/** Server pages mint paper authority for the local session. Client fields are not accepted. */
 export function sessionPaperCapability(nowMs = Date.now()): PaperExecutionCapability | null {
   if (readDataMode() !== "paper") {
     return null;
   }
-  const session = createDemoSession();
+  const session = localPaperSession()!;
   const resolved = resolveServerPaperCapability({
     serverDataMode: "paper",
     requestedUserId: session.user.id,
@@ -65,7 +65,7 @@ export function readStoredRiskPolicy(userId: string): RiskPolicy | null {
   if (userId !== DEMO_USER_ID) {
     return null;
   }
-  return createDemoSession().policy;
+  return localPaperSession(userId)?.policy ?? null;
 }
 
 function stopped(

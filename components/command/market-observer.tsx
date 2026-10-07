@@ -89,7 +89,7 @@ export function MarketObserver({
           <p className="mt-3 text-xs text-muted">
             {live
               ? "Reference deviation compares the token price with the API reference price. That reference is a per-share conversion of the on-chain token price, not an official stock quote. 24h change is not returned by these endpoints."
-              : "These rows are the paper sample. A failed live request is never replaced with this sample."}
+              : "These rows use explicitly supplied paper inputs. Failed live requests stay unavailable."}
           </p>
         </section>
       </div>

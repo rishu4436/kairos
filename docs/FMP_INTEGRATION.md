@@ -4,7 +4,7 @@ Financial Modeling Prep is the underlying-equity event provider. It is not a tra
 
 Official stable base: `https://financialmodelingprep.com/stable/`
 
-This workspace checked the current FMP docs pages for the Earnings Report API and the Search Stock News API on 2026-10-06. The static pages name these endpoints:
+The FMP Earnings Report and Search Stock News APIs use these endpoints:
 
 ```text
 GET /stable/earnings?symbol={ticker}
@@ -13,7 +13,7 @@ GET /stable/news/stock?symbols={ticker}
 
 Authentication in the current FMP examples is the `apikey` query parameter. KAIROS reads that value from server env `FMP_API_KEY`. The key is not prefixed with `NEXT_PUBLIC_`. It is not written into context snapshots, research records, logs, or rendered HTML.
 
-No real FMP request was sent while this phase was built. Response fields below are the ones the mapper accepts. A field that is absent stays null.
+Response fields below are the ones the mapper accepts. A field that is absent stays null.
 
 ## Earnings fields
 

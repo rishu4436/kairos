@@ -1,43 +1,4 @@
-# Qwen integration
-
-## User-authorized retry — 2026-10-07
-
-At `2026-10-07T09:06:17.388Z` (14:36:17 IST), one additional request used the
-current private configuration, the same Redis context, model `qwen3.8-max`, and
-prompt 1.1. It returned no HTTP response within the 60-second client limit
-(60,022 ms). No output, thesis, proposal, experiment, or promotion was produced.
-Authentication success cannot be inferred from a request that did not respond.
-
-The first HTTP 401 record is preserved as
-[attempt 1](evidence/phase-17i-qwen-attempt-1.json); the
-[latest record](evidence/phase-17i-qwen.json) retains the provider's actual
-UPSTREAM_ERROR result. That category arose when the existing internal retry was
-blocked by the one-request wrapper. The adapter now supports an explicit
-single-attempt mode, used by this evidence harness, so future timeouts keep
-their TIMEOUT category without initiating another fetch. Normal callers retain
-the original two-attempt policy. A local regression test verifies this change;
-no third real request was made. The UI shows NO RESPONSE, not HTTP null.
-
-## Phase 17I actual provider attempt
-
-Configured locally with private credentials; this alone does not mean connected.
-At `2026-10-07T07:54:13.483Z`, the existing QwenReasoningProvider sent exactly one
-strict JSON Schema thesis request on the bounded research projection reloaded
-from the real Binance TSLA context in Redis. Requested model: `qwen3.8-max`;
-prompt version: 1.1; latency: 840 ms; HTTP 401 / AUTHENTICATION_ERROR.
-No response model, thesis, or proposal was returned. Real Qwen intelligence is
-NOT VERIFIED. FMP news/earnings remained UNAVAILABLE in the supplied context.
-
-The single-request guard prevents an accidental retry or second proposal call.
-KAIROS's existing pipeline ordinarily calls generateThesis and then
-generateStrategyProposal separately. The thesis schema has no proposal field.
-This phase therefore did not run a proposal/experiment or promote a strategy.
-Another network request requires explicit user authorization. The endpoint/model
-was not silently changed. No tools, search, wallet, or execution was provided.
-
-Record: [actual Qwen result](evidence/phase-17i-qwen.json).
-Gate: `QWEN_LIVE_TEST=1` with the dedicated context-evidence integration test.
-The pre-existing KAIROS_LLM_LIVE_TEST gates are separate and were not run.
+# Qwen research integration
 
 Qwen is one `ReasoningProvider`. It does not replace xAI, and the research pipeline does not read Qwen response objects. The research brain cannot directly execute trades.
 
@@ -109,7 +70,7 @@ Prompt versions are `QWEN_THESIS_PROMPT_VERSION` `1.1` and `QWEN_STRATEGY_PROMPT
 
 | Variable | Role |
 | --- | --- |
-| `KAIROS_LLM_PROVIDER` | `qwen`, `xai`, or `mock`. Anything else is `MODEL_PROVIDER_UNSUPPORTED`. A key with no provider still selects `xai`. |
+| `KAIROS_LLM_PROVIDER` | `qwen`, `gemini`, `xai`, or `mock`. Anything else is `MODEL_PROVIDER_UNSUPPORTED`. A key with no provider still selects `xai`. |
 | `KAIROS_LLM_MODEL` | Optional. Qwen defaults to `qwen3.8-max`. xAI defaults to `grok-4.7`. |
 | `KAIROS_LLM_API_KEY` | Server-side bearer token. |
 | `KAIROS_LLM_TIMEOUT_MS` | Bound from 1000 to 120000. Default 15000. |
@@ -136,24 +97,8 @@ The retry bound is two attempts. A Qwen failure does not call xAI or the mock pr
 
 Each attempt records request id, provider, model, start, completion, latency, status, and error category. The raw response and the API key are not stored.
 
-## Tests
+## Optional live test
 
-The default suite mocks HTTP. It does not need a Qwen key.
+KAIROS_LLM_LIVE_TEST=1 enables research/qwen-live.integration.test.ts only when Qwen, its key, and its HTTPS base URL are configured. The test sends one request against a bounded synthetic test context and disables the adapter's optional second attempt. It validates schema and semantics, writes no files, and does not fetch market data or call Redis. Default CI skips it.
 
-The optional live test is `research/qwen-live.integration.test.ts`. It runs only when all of these are set:
-
-```text
-KAIROS_LLM_LIVE_TEST=1
-KAIROS_LLM_PROVIDER=qwen
-KAIROS_LLM_API_KEY
-KAIROS_QWEN_BASE_URL
-```
-
-It makes one thesis request. It does not write a fixture. No live Qwen call was made while this document was written, so no latency or rate-limit measurement is recorded here. The model card describes dynamic rate limits in Beijing and Singapore and published RPM/TPM in other regions. Those figures were not observed from this workspace.
-
-## Limits
-
-The adapter does not enable thinking controls, because the structured-output example for `qwen3.8-max` does not send them. If a live call rejects a schema keyword such as `anyOf`, that is a provider limitation and the local validators remain authoritative. Qwen cannot create a trade intent, change risk, reach a wallet, sign, broadcast, or promote a strategy.
-## Explicit provider selection
-
-Qwen, xAI, and Gemini are supported; mock is test-only. Selecting `KAIROS_LLM_PROVIDER=qwen` retains Qwen errors and never calls Gemini. Selecting Gemini uses the generic key/model settings for Gemini, as described in [GEMINI_INTEGRATION.md](GEMINI_INTEGRATION.md). The recorded Qwen HTTP 401 and subsequent no-response attempt remain unchanged and do not become Gemini evidence.
+Selecting Qwen retains Qwen errors; it never calls Gemini or xAI. See [Gemini integration](GEMINI_INTEGRATION.md).

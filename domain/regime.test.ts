@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { classifyRegime } from "@/domain/regime";
-import { candlesFromCloses } from "@/domain/test-candles";
+import { candlesFromCloses } from "@/test/candles";
 
 describe("market regime", () => {
   it("stays unknown without enough candles", () => {

@@ -1,4 +1,4 @@
-import { createMockObservation } from "@/data/observations";
+import { createMockObservation } from "@/test/fixtures/observations";
 import { asAccountId, asAgentId, asAssetId, asPolicyId, asUserId } from "@/domain/ids";
 import type {
   Agent,

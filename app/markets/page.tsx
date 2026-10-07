@@ -13,7 +13,7 @@ export default function MarketsPage() {
         title="Markets"
         description="The command center polls the observation board. This page does not start a second request."
       />
-      <PhaseBanner detail="Each ticker opens the asset terminal. History is collected only for the demo watchlist. This index does not scan the market." />
+      <PhaseBanner detail="Each ticker opens the asset terminal. History is collected only for the local watchlist. This index does not scan the market." />
       <ul className="grid gap-2 sm:grid-cols-3">
         {DEMO_WATCH_TICKERS.map((ticker) => (
           <li key={ticker}>

@@ -2,37 +2,13 @@
 
 Binance skills provide capabilities and signals. KAIROS normalizes those inputs and decides. A skill does not replace the strategy engine, the arbitrator, or KAIROS risk. A skill cannot create a trade intent, sign, or broadcast.
 
-This phase is intelligence and safety only. No live order was submitted.
+The intelligence registry is read-only. Wallet execution is a separate guarded boundary.
 
-## Inspected skills
+## Capability availability
 
-Inspected on 2026-10-04. Hub files are the current `SKILL.md` documents on `binance/binance-skills-hub`. The local skills directory contained `binance-agentic-wallet` only. The other four skills were not installed. `npx skills add` was not run. `baw` was not upgraded.
+The registry carries compatibility metadata and capability requirements; those declarations do not prove a current CLI session or a successful read. Trading-signal and wallet-tracker capabilities require CLI 1.9.1 and remain blocked by the compatibility gate when unmet. Smart Money requires the supported skill script; missing installation leaves it unavailable, without a guessed endpoint.
 
-`baw --version` printed `1.9.0`. `node --version` printed `v24.18.0`.
-
-| Skill | Version | Required CLI | Installed CLI | Installed here | Compatibility | Transport |
-| --- | --- | --- | --- | --- | --- | --- |
-| binance-agentic-wallet | 1.11.0 | 1.9.0 | 1.9.0 | Yes, local skill | COMPATIBLE | LOCAL CLI |
-| binance-trading-signal | 3.5 | 1.9.1 | 1.9.0 | No | SKILL_BLOCKED_BY_VERSION | SKILL |
-| query-token-audit | 1.4 | none | 1.9.0 | No | COMPATIBLE | DIRECT API |
-| binance-tokenized-securities-info | 1.1 | none | 1.9.0 | No | COMPATIBLE, ONDO_ONLY | DIRECT API |
-| binance-wallet-tracker | 1.3 | 1.9.1 | 1.9.0 | No | SKILL_BLOCKED_BY_VERSION | LOCAL CLI |
-
-`skill-check` from the earlier wallet pass reported agentic-wallet 1.12.0 available. That update was not installed.
-
-## Classification
-
-| Capability | Class | What happened in this phase |
-| --- | --- | --- |
-| Agentic wallet status | LOCAL CLI | The command center still calls the existing `wallet status` path for `user_demo`. This phase did not start sign-in, verify, or a swap. |
-| Trading-signal `baw signal` commands | LOCAL CLI | Blocked. Installed CLI 1.9.0 is older than required 1.9.1. Not invoked. |
-| Smart Money | SKILL, then UNAVAILABLE | The skill says Smart Money does not require `baw` and is `node <skill-dir>/scripts/cli.mjs smart-money`. The skill directory is not installed. `references/cli.md` documents fields and does not publish a URL. KAIROS does not guess an endpoint. |
-| Token audit | DIRECT API | Request builder only. No POST was sent. |
-| Tokenized securities info | DIRECT API | Normalizer only. Ondo `type=1`. No GET was sent. The existing RWA resolver stays authoritative for representation discovery. |
-| Wallet tracker | LOCAL CLI | Blocked. Interface and discovery only. `baw tracker` was not called. |
-| Paper and research fixtures | MOCK | Unchanged sample books. External signals are not turned into candles. |
-
-There is no MOCK Binance skill. Missing live reads stay unavailable. They are not replaced with a fabricated signal.
+Token audit and Ondo-only tokenized-security information use direct public API adapters. The canonical RWA resolver remains authoritative for representation discovery. No mock Binance signal substitutes for a missing live read.
 
 ## Permissions
 
@@ -71,7 +47,7 @@ Asset attachment requires `chainId` and `contractAddress` against one canonical 
 
 ## Token security
 
-Direct API, not called in this phase:
+Direct API:
 
 `POST https://web3.binance.com/bapi/defi/v1/public/wallet-direct/security/token/audit`
 
@@ -83,13 +59,13 @@ The result is authoritative only when `hasResult` and `isSupported` are both tru
 
 `LOW` stays `LOW`. The skill says it means proceed with caution and is not a guarantee. Risk level 4 or `HIGH` blocks. Risk level 5 blocks. The block clears the selected action. The strategy score is not increased. Confidence is withheld rather than averaged with a security score.
 
-No latency or rate limit was measured. No audit response was received.
+A successful read supplies status and latency; absent results stay unavailable.
 
 ## Tokenized securities
 
-The installed skill text is Ondo-only (`type=1`). KAIROS records `CAPABILITY_LIMITATION: ONDO_ONLY`. The existing RWA resolver still discovers representations, including the types it already supports. This adapter does not replace it.
+The tokenized-security adapter is Ondo-only (`type=1`). KAIROS records `CAPABILITY_LIMITATION: ONDO_ONLY`. The existing RWA resolver still discovers representations, including the types it already supports. This adapter does not replace it.
 
-Documented GETs, not called here:
+Supported GET endpoints:
 
 - `GET https://www.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/market/token/rwa/stock/detail/list/ai`
 - `GET https://www.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/market/token/rwa/market/status/ai`
@@ -123,11 +99,11 @@ Health labels in the command center:
 | Wallet tracker | NOT ENABLED | CLI blocked. |
 | Agentic wallet | CONNECTED or NOT CONFIGURED | Taken from the existing wallet status. Unconnected stays NOT CONFIGURED. |
 
-`READY` is not shown. `lastLatencyMs` stays null because no skill call was timed.
+Readiness and latency reflect observed results; configuration alone is not a successful read.
 
 ## Decision path
 
-Future pre-trade order, defined and not executed:
+Pre-trade boundary:
 
 ```text
 STRATEGY → ARBITRATION → KAIROS RISK → TOKEN SECURITY → QUOTE → SIMULATION → WALLET

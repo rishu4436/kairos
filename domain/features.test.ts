@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { scaleDecimal } from "@/domain/candle";
 import { computeFeatures, ema, featureById, simpleReturnBps, sma } from "@/domain/features";
-import { candlesFromCloses } from "@/domain/test-candles";
+import { candlesFromCloses } from "@/test/candles";
 
 describe("feature engine", () => {
   it("computes a one-bar return and a simple average", () => {

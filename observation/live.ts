@@ -62,7 +62,6 @@ export async function liveObservationBoard(userId: string, signal?: AbortSignal)
         } else {
           console.error("[kairos.binance]", {
             category: "UNKNOWN_ERROR",
-            message: error instanceof Error ? error.message : "Candle request failed.",
           });
         }
       }
@@ -147,9 +146,6 @@ export function logBinanceFailure(error: KairosApiError): void {
   console.error("[kairos.binance]", {
     category: error.category,
     httpStatus: error.httpStatus,
-    upstreamCode: error.upstreamCode,
-    endpoint: error.endpoint,
-    message: error.technicalMessage,
   });
 }
 

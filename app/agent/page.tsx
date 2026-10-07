@@ -1,6 +1,5 @@
 import { AGENT_STATE_DETAIL, AGENT_STATE_LABEL, AGENT_STATES, nextStates } from "@/agent/states";
 import { AutonomousRuntimePanel } from "@/components/command/autonomous-runtime";
-import { RecordedIntelligenceEvidence } from "@/components/command/recorded-intelligence";
 import { AgentIdentitySections } from "@/components/command/agent-runtime";
 import { PageHeader } from "@/components/ui/page-header";
 import { PhaseBanner } from "@/components/ui/phase-banner";
@@ -39,9 +38,6 @@ export default async function AgentPage() {
         <AutonomousRuntimePanel snapshot={runtime} />
       </div>
       <div className="mb-4">
-        <RecordedIntelligenceEvidence />
-      </div>
-      <div className="mb-4">
         <AgentIdentitySections
           view={buildRuntimeDashboard({
             tradingConnected: trading.connectionStatus === "CONNECTED",
@@ -53,7 +49,7 @@ export default async function AgentPage() {
       <p className="eyebrow mb-3">Trading lifecycle</p>
       <section className="panel mb-4 max-w-3xl">
         <dl className="grid gap-4 sm:grid-cols-2">
-          <Item label="Sample runtime" value={model.runtimeLabel} />
+          <Item label="Runtime" value={model.runtimeLabel} />
           <Item label="Mode" value={model.mode} />
           <Item label="User" value={model.user} />
           <Item label="Account" value={model.account} />
@@ -68,7 +64,7 @@ export default async function AgentPage() {
             <li key={state} className={current ? "state-card state-current" : "state-card"}>
               <div className="flex items-center justify-between gap-3">
                 <h2 className="text-sm font-medium">{AGENT_STATE_LABEL[state]}</h2>
-                {current ? <span className="pill pill-signal">Sample</span> : null}
+                {current ? <span className="pill pill-signal">Current</span> : null}
               </div>
               <p className="mt-2 text-sm text-muted">{AGENT_STATE_DETAIL[state]}</p>
             </li>

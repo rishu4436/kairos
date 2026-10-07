@@ -1,8 +1,8 @@
 # Binance market data
 
-KAIROS already reads RWA identity and prices. This phase adds historical candles for representations that search already resolved. It does not quote, sign, or broadcast.
+KAIROS already reads RWA identity and prices. The candle adapter supplies historical candles for representations that search already resolved. It does not quote, sign, or broadcast.
 
-Documentation inspected on 2026-10-03:
+API references:
 
 - https://web3.binance.com/en/dev-docs/products/market-api/introduction
 - https://web3.binance.com/en/dev-docs/catalog/web3-wallet/api/rest-api/general-data

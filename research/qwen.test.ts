@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { CANDLE_INTERVAL_MS, type Candle } from "@/domain/candle";
 import { asUserId } from "@/domain/ids";
 import { parseDecimal, SCALE } from "@/domain/money";
-import { resetMarketStores } from "@/observation/stores";
+import { resetTestMarketStores as resetMarketStores } from "@/test/paper-market";
 import { DEMO_USER_ID } from "@/domain/watchlist";
 import { generateResearchThesis } from "@/research/generate";
 import { normalizeQwenBase, publicLlmStatus, readLlmConfig } from "@/research/llm-config";

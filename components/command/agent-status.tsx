@@ -14,7 +14,7 @@ export function AgentStatus({ agent }: { agent: CommandCenterModel["agent"] }) {
         <div className="text-right">
           <p className="flex items-center justify-end gap-2 text-sm tracking-[0.16em]">
             <span className="h-2 w-2 rounded-full bg-signal" aria-hidden="true" />
-            SAMPLE
+            {agent.runtimeLabel}
           </p>
           <p className="mt-1 text-xs text-muted">No orders</p>
         </div>
@@ -27,7 +27,7 @@ export function AgentStatus({ agent }: { agent: CommandCenterModel["agent"] }) {
         <StatusRow label="Next evaluation" value={agent.nextEvaluation} />
       </dl>
       <p className="mt-auto pt-5 text-xs text-muted">
-        Sample runtime. Market data is separate. This card does not place orders.
+        Current paper runtime state. Market data is shown separately.
       </p>
     </section>
   );

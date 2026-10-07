@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { asUserId } from "@/domain/ids";
-import { resetMarketStores } from "@/observation/stores";
+import { resetTestMarketStores as resetMarketStores } from "@/test/paper-market";
 import { generateResearchThesis } from "@/research/generate";
 import { researchStore } from "@/research/store";
 
@@ -8,9 +8,7 @@ const { liveBoard, paperBoard } = vi.hoisted(() => ({
   liveBoard: vi.fn(async () => {
     throw new Error("live unavailable");
   }),
-  paperBoard: vi.fn(() => {
-    throw new Error("paper fallback");
-  }),
+  paperBoard: vi.fn(),
 }));
 
 vi.mock("@/lib/mode", () => ({
@@ -21,9 +19,10 @@ vi.mock("@/observation/live", () => ({
   liveObservationBoard: () => liveBoard(),
 }));
 
-vi.mock("@/observation/paper", () => ({
-  buildPaperObservation: () => paperBoard(),
-}));
+vi.mock("@/observation/paper", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@/observation/paper")>();
+  return { ...original, buildPaperObservation: (...args: Parameters<typeof original.buildPaperObservation>) => { paperBoard(); return original.buildPaperObservation(...args); } };
+});
 
 const NOW = Date.parse("2026-01-01T14:30:00.000Z");
 const savedLlmKey = process.env.KAIROS_LLM_API_KEY;
@@ -77,6 +76,6 @@ describe("live research context without credentials", () => {
     expect(result.sourceType).toBe("MOCK");
     expect(result.dataSource).toBe("MOCK_FIXTURE");
     expect(liveBoard).not.toHaveBeenCalled();
-    expect(paperBoard).not.toHaveBeenCalled();
+    expect(paperBoard).toHaveBeenCalledOnce();
   });
 });

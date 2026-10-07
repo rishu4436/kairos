@@ -1,27 +1,5 @@
 # Autonomous runtime
 
-## Phase 17H durability status (2026-10-07)
-
-Local KAIROS selects the existing Redis backend through private `.env.local`.
-Real Upstash RESP/TLS tests verify leases, CAS, record serialization, restart
-recovery, idempotency, interrupted cycles, and bounded decision-context retention.
-This is remote backend evidence rather than merely code support.
-
-The main and agent runtime panel uses a read-only connectivity probe for its
-REDIS / DURABLE label. Memory remains MEMORY / EPHEMERAL; a configured but
-unreachable Redis endpoint reports unavailable, with no fallback or URL exposure.
-No background loop, Studio deployment, live trade, signing, or broadcasting was started.
-
-One entry point runs the agent:
-
-```text
-runKairosAutonomousCycle
-```
-
-Local page loads, the observation route, and the Agent Studio runtime adapter call it. `runAgentCycle` and `runPreparedAgentCycle` remain the paper execution core. They are not a second scheduler.
-
-The development server does not start a background loop. A cycle runs when a paper page or the observation route asks for one. `KAIROS_CYCLE_INTERVAL_MS` is the suggested gap, default 60 seconds.
-
 ## Modes
 
 | Input | Values |

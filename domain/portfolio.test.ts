@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createDemoSession } from "@/data/sample-session";
+import { createDemoSession } from "@/test/fixtures/sample-session";
 import { asUserId } from "@/domain/ids";
 import { parseDecimal } from "@/domain/money";
 import {

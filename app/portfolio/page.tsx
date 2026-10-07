@@ -22,7 +22,7 @@ export default function PortfolioPage() {
       <PageHeader
         kicker="Simulated paper ledger"
         title="Portfolio"
-        description="The first table is the sample fixture. The paper cycle book below is a separate simulated account. This is simulated execution and does not broadcast blockchain transactions."
+        description="Current paper positions and simulated execution history. Values are empty until a paper account is initialized."
       />
       <PhaseBanner detail="Funding, transfers, and wallet connection are not available." />
       <dl className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-3">
@@ -34,7 +34,7 @@ export default function PortfolioPage() {
         <Summary label="Total PnL" value={model.totalPnl} />
       </dl>
       {model.positions.length === 0 ? (
-        <EmptyState title="No open paper positions" body="The sample account has no positions." />
+        <EmptyState title="No open paper positions" body="The current paper account has no positions." />
       ) : (
         <div className="overflow-x-auto">
           <table className="data-table min-w-[680px]">

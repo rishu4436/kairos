@@ -4,7 +4,7 @@ import { InMemoryMarketHistory } from "@/domain/history";
 import type { SignalView } from "@/domain/observation";
 import { resetPaperIdempotency } from "@/paper/idempotency";
 import { resetPaperBooks } from "@/paper/store";
-import { resetDemoResearch } from "@/research/demo";
+import { resetPaperObservationInputs } from "@/observation/paper";
 import { resetLlmAttempt } from "@/research/llm-status";
 import { resetResearchStore } from "@/research/store";
 
@@ -61,6 +61,6 @@ export function resetMarketStores(): void {
   resetPaperIdempotency();
   resetExecutionAuthority();
   resetResearchStore();
-  resetDemoResearch();
+  resetPaperObservationInputs();
   resetLlmAttempt();
 }

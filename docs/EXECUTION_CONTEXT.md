@@ -6,7 +6,7 @@ This is simulated execution and does not broadcast blockchain transactions.
 
 ## Why a mode argument is not enough
 
-Phase 5.1 checked `executionMode === "PAPER"` on the arguments of the cycle and the gateways. That check is real, and it is also forgeable: the caller chooses the string. A browser request that can pass `mode=LIVE`, or a server function that forwards that string, would be the security boundary. The mode string is now only a field inside a context the server issued.
+A caller-controlled check of `executionMode === "PAPER"` is forgeable: the caller chooses the string. A browser request that can pass `mode=LIVE`, or a server function that forwards that string, would be the security boundary. The mode string is now only a field inside a context the server issued.
 
 ## Trusted context
 
@@ -56,7 +56,7 @@ The record does not store the seal, a key, or a signature.
 
 ## Future wallet boundary
 
-Live execution is not implemented. The intended order, still disconnected, is:
+Live preparation and the separately gated Agentic Wallet boundary require this order:
 
 ```text
 Risk PASS

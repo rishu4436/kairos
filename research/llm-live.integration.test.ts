@@ -3,7 +3,7 @@ import { readLlmConfig } from "@/research/llm-config";
 import { HttpReasoningProvider } from "@/research/llm-http";
 import { unavailableResearchBoundaries } from "@/research/types";
 
-const enabled = process.env.KAIROS_LLM_LIVE_TEST === "1" && Boolean(process.env.KAIROS_LLM_API_KEY);
+const enabled = process.env.KAIROS_LLM_LIVE_TEST === "1" && process.env.KAIROS_LLM_PROVIDER === "xai" && Boolean(process.env.KAIROS_LLM_API_KEY);
 
 describe("credentialed xAI research call", () => {
   it.skipIf(!enabled)("receives a structured thesis from the Responses API", async () => {
